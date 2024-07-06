@@ -56,7 +56,7 @@ impl SphericalCoordinates {
         }
     }
 
-    pub(crate) fn eq_within(&self, other: &Self, accuracy: Angle<f64>) -> bool {
+    pub fn eq_within(&self, other: &Self, accuracy: Angle<f64>) -> bool {
         let northpole_latitude = QUARTER_CIRC;
         let southpole_latitude = -QUARTER_CIRC;
         let mut copy = *self;
