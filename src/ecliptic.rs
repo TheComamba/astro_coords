@@ -69,6 +69,10 @@ impl EclipticCoordinates {
         self.spherical.to_direction()
     }
 
+    pub fn to_earth_equatorial(&self) -> crate::earth_equatorial::EarthEquatorialCoordinates {
+        self.to_direction().to_earth_equatorial()
+    }
+
     pub fn angle_to(&self, other: &Self) -> Angle<f64> {
         //TODO: There must be a more performant and stable way.
         self.to_direction().angle_to(&other.to_direction())

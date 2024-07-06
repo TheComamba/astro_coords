@@ -2,7 +2,9 @@ use serde::{Deserialize, Serialize};
 use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
 
-use crate::{angle_helper::*, cartesian::CartesianCoordinates};
+use crate::{
+    angle_helper::*, cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
+};
 
 use super::{
     declination::{Declination, Sgn},
@@ -106,6 +108,10 @@ impl SphericalCoordinates {
         let y = self.get_longitude().rad.sin() * self.get_latitude().rad.cos();
         let z = self.get_latitude().rad.sin();
         Direction { x, y, z }
+    }
+
+    pub fn to_earth_equatorial(&self) -> EarthEquatorialCoordinates {
+        self.to_direction().to_earth_equatorial()
     }
 
     pub fn to_ecliptic(&self) -> EclipticCoordinates {

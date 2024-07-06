@@ -2,7 +2,10 @@ use std::fmt::Display;
 
 use simple_si_units::{base::Distance, geometry::Angle};
 
-use crate::{angle_helper::EARTH_AXIS_TILT, cartesian::CartesianCoordinates};
+use crate::{
+    angle_helper::EARTH_AXIS_TILT, cartesian::CartesianCoordinates,
+    equatorial::EquatorialCoordinates,
+};
 
 use super::{direction::Direction, ecliptic::EclipticCoordinates, spherical::SphericalCoordinates};
 
@@ -38,16 +41,15 @@ impl EarthEquatorialCoordinates {
         vec.to_ecliptic()
     }
 
+    pub fn to_equatorial(&self, axis: Direction) -> EquatorialCoordinates {
+        self.to_direction().to_equatorial(axis)
+    }
+
     pub fn to_spherical(&self) -> SphericalCoordinates {
         SphericalCoordinates::new(self.right_ascension, self.declination)
     }
 
-    #[cfg(test)]
-    pub(crate) fn eq_within(
-        &self,
-        other: &EarthEquatorialCoordinates,
-        accuracy: Angle<f64>,
-    ) -> bool {
+    pub fn eq_within(&self, other: &EarthEquatorialCoordinates, accuracy: Angle<f64>) -> bool {
         let mut self_spherical = SphericalCoordinates::new(self.right_ascension, self.declination);
         self_spherical.normalize();
         let mut other_spherical =

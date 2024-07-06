@@ -1,7 +1,7 @@
 use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
 
-use crate::cartesian::CartesianCoordinates;
+use crate::{cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates};
 
 use super::{direction::Direction, spherical::SphericalCoordinates};
 
@@ -50,6 +50,10 @@ impl EquatorialCoordinates {
         self.spherical
             .to_direction()
             .active_rotation_to_new_z_axis(&self.rotation_axis)
+    }
+
+    pub fn to_earth_equatorial(&self) -> EarthEquatorialCoordinates {
+        self.to_direction().to_earth_equatorial()
     }
 }
 

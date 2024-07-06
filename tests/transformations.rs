@@ -12,6 +12,7 @@ use simple_si_units::{base::Distance, geometry::Angle};
 
 const ACC: f64 = 1e-5;
 const DISTANCE_ACC: Distance<f64> = Distance { m: ACC };
+const ANGLE_ACC: Angle<f64> = Angle { rad: ACC };
 
 fn distance_examples() -> Vec<Distance<f64>> {
     vec![
@@ -226,5 +227,53 @@ fn direction_to_spherical_roundtrip() {
         let spherical = direction.to_spherical();
         let new_direction = spherical.to_direction();
         assert!(direction.eq_within(&new_direction, ACC));
+    }
+}
+
+#[test]
+fn earth_equatorial_to_cartesian_roundtrip() {
+    for earth_equatorial in earth_equatorial_examples() {
+        let length = Distance::from_m(10.);
+        let cartesian = earth_equatorial.to_cartesian(length);
+        let new_earth_equatorial = cartesian.to_earth_equatorial().unwrap();
+        assert!(earth_equatorial.eq_within(&new_earth_equatorial, ANGLE_ACC));
+    }
+}
+
+#[test]
+fn earth_equatorial_to_direction_roundtrip() {
+    for earth_equatorial in earth_equatorial_examples() {
+        let direction = earth_equatorial.to_direction();
+        let new_earth_equatorial = direction.to_earth_equatorial();
+        assert!(earth_equatorial.eq_within(&new_earth_equatorial, ANGLE_ACC));
+    }
+}
+
+#[test]
+fn earth_equatorial_to_ecliptic_roundtrip() {
+    for earth_equatorial in earth_equatorial_examples() {
+        let ecliptic = earth_equatorial.to_ecliptic();
+        let new_earth_equatorial = ecliptic.to_earth_equatorial();
+        assert!(earth_equatorial.eq_within(&new_earth_equatorial, ANGLE_ACC));
+    }
+}
+
+#[test]
+fn earth_equatorial_to_equatorial_roundtrip() {
+    for earth_equatorial in earth_equatorial_examples() {
+        for axis in direction_examples() {
+            let equatorial = earth_equatorial.to_equatorial(axis);
+            let new_earth_equatorial = equatorial.to_earth_equatorial();
+            assert!(earth_equatorial.eq_within(&new_earth_equatorial, ANGLE_ACC));
+        }
+    }
+}
+
+#[test]
+fn earth_equatorial_to_spherical_roundtrip() {
+    for earth_equatorial in earth_equatorial_examples() {
+        let spherical = earth_equatorial.to_spherical();
+        let new_earth_equatorial = spherical.to_earth_equatorial();
+        assert!(earth_equatorial.eq_within(&new_earth_equatorial, ANGLE_ACC));
     }
 }
