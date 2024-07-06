@@ -1,0 +1,18 @@
+[package]
+authors = ["The Comamba <thecomamba@jojoheinze.de>"]
+categories = ["mathematics", "science"]
+description = "A Rust crate containing typed coordinate systems found in the context of astronomy."
+edition = "2021"
+keywords = ["coordinates", "astronomy"]
+license = "MIT"
+name = "astro_coordinates"
+readme = "README.md"
+repository = "https://github.com/TheComamba/AstroCoordinates"
+version = "0.1.0"
+
+[dependencies]
+serde = { version = "1.0", default-features = false, features = ["derive"] } # (De)Serialization
+simple-si-units = { version = "1.1", default-features = false, features = ["serde"] }
+
+[dev-dependencies]
+serde_json = "1.0"
