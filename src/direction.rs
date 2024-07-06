@@ -209,7 +209,7 @@ impl Direction {
     }
 
     pub fn to_equatorial(&self, axis: Direction) -> EquatorialCoordinates {
-        let dir_in_equatorial = self.active_rotation_to_new_z_axis(&axis);
+        let dir_in_equatorial = self.passive_rotation_to_new_z_axis(&axis);
         let spherical = dir_in_equatorial.to_spherical();
         EquatorialCoordinates::new(spherical, axis)
     }
