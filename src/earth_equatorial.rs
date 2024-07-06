@@ -46,7 +46,7 @@ impl EarthEquatorialCoordinates {
     }
 
     pub fn to_spherical(&self) -> SphericalCoordinates {
-        SphericalCoordinates::new(self.right_ascension, self.declination)
+        self.to_direction().to_spherical()
     }
 
     pub fn eq_within(&self, other: &EarthEquatorialCoordinates, accuracy: Angle<f64>) -> bool {
