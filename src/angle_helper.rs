@@ -6,7 +6,7 @@ pub(crate) const FULL_CIRC: Angle<f64> = Angle { rad: 2. * PI };
 pub(crate) const QUARTER_CIRC: Angle<f64> = Angle { rad: 2. * PI / 4. };
 pub(crate) const HALF_CIRC: Angle<f64> = Angle { rad: 2. * PI / 2. };
 #[cfg(test)]
-mod test {
+pub(crate) mod test {
     use super::*;
 
     pub(crate) const THREE_QUARTER_CIRC: Angle<f64> = Angle {

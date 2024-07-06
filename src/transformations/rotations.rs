@@ -1,6 +1,7 @@
-use crate::coordinates::direction::Direction;
 use simple_si_units::geometry::Angle;
 use std::ops::{Add, Mul};
+
+use crate::direction::Direction;
 
 pub(crate) fn rotated_tuple<T>(tup: (T, T, T), angle: Angle<f64>, axis: &Direction) -> (T, T, T)
 where
@@ -47,8 +48,11 @@ pub fn get_rotation_parameters(start: &Direction, end: &Direction) -> (Angle<f64
 
 #[cfg(test)]
 mod tests {
+    use crate::angle_helper::{test::*, *};
+
     use super::*;
-    use crate::{tests::TEST_ACCURACY, units::angle::*};
+
+    const TEST_ACCURACY: f64 = 1e-5;
 
     const X_VECTOR: (f64, f64, f64) = (1., 0., 0.);
     const MINUS_X_VECTOR: (f64, f64, f64) = (-1., 0., 0.);
