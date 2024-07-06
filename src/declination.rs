@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use simple_si_units::geometry::Angle;
 
 pub struct Declination {
@@ -40,6 +38,8 @@ impl Declination {
 
 #[cfg(test)]
 mod tests {
+    use crate::angle_helper::{angle_from_arcsecs, angle_to_arcsecs};
+
     use super::*;
 
     #[test]

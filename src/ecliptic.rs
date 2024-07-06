@@ -113,8 +113,8 @@ mod tests {
                         let ecliptic2 = dir2.to_ecliptic();
                         let actual_angle = ecliptic1.angle_to(&ecliptic2);
 
-                        println!("Expected: {}", angle.astro_display());
-                        println!("Actual: {}", actual_angle.astro_display());
+                        println!("Expected: {}", angle);
+                        println!("Actual: {}", actual_angle);
                         assert!(angle_eq_within(actual_angle, angle, Angle { rad: 1e-5 }));
                     }
                 }

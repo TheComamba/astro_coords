@@ -48,9 +48,7 @@ impl EquatorialCoordinates {
 
 #[cfg(test)]
 mod tests {
-    use crate::earth_equatorial::{
-        test::EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES, EarthEquatorialCoordinates,
-    };
+    use crate::earth_equatorial::EarthEquatorialCoordinates;
 
     use super::*;
 

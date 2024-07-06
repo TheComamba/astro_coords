@@ -27,6 +27,9 @@ pub(crate) const ARCSEC: Angle<f64> = Angle {
 pub(crate) const SECOND_ANGLE: Angle<f64> = Angle {
     rad: 2. * PI / (24. * 60. * 60.),
 };
+pub(crate) const EARTH_AXIS_TILT: Angle<f64> = Angle {
+    rad: 23.439_281 * DEGREE.rad,
+};
 
 pub(crate) fn angle_from_arcsecs(arcsec: f64) -> Angle<f64> {
     arcsec * ARCSEC

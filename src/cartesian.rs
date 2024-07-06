@@ -21,9 +21,9 @@ pub struct CartesianCoordinates {
 
 impl CartesianCoordinates {
     pub const ORIGIN: CartesianCoordinates = CartesianCoordinates {
-        x: Distance { m: 0 },
-        y: Distance { m: 0 },
-        z: Distance { m: 0 },
+        x: Distance { m: 0. },
+        y: Distance { m: 0. },
+        z: Distance { m: 0. },
     };
 
     pub const fn new(x: Distance<f64>, y: Distance<f64>, z: Distance<f64>) -> CartesianCoordinates {
@@ -32,11 +32,9 @@ impl CartesianCoordinates {
 
     #[cfg(test)]
     pub(crate) fn eq_within(&self, other: &CartesianCoordinates, accuracy: Distance<f64>) -> bool {
-        use crate::tests::eq_within;
-
-        eq_within(self.x.m, other.x.m, accuracy.m)
-            && eq_within(self.y.m, other.y.m, accuracy.m)
-            && eq_within(self.z.m, other.z.m, accuracy.m)
+        (self.x.m - other.x.m).abs() < accuracy.m
+            && (self.y.m - other.y.m).abs() < accuracy.m
+            && (self.z.m - other.z.m).abs() < accuracy.m
     }
 
     pub fn length(&self) -> Distance<f64> {

@@ -1,5 +1,6 @@
 use simple_si_units::{base::Distance, geometry::Angle};
-use std::fmt::Display;
+
+use crate::angle_helper::EARTH_AXIS_TILT;
 
 use super::{direction::Direction, ecliptic::EclipticCoordinates, spherical::SphericalCoordinates};
 
@@ -22,7 +23,7 @@ impl EarthEquatorialCoordinates {
     pub(crate) fn to_direction(&self) -> Direction {
         let direction_in_equatorial =
             SphericalCoordinates::new(self.right_ascension, self.declination).to_direction();
-        direction_in_equatorial.rotated(-EARTH.axis_tilt, &Direction::X)
+        direction_in_equatorial.rotated(-EARTH_AXIS_TILT, &Direction::X)
     }
 
     pub fn to_ecliptic(&self) -> EclipticCoordinates {
@@ -60,12 +61,14 @@ pub(super) mod tests {
     use super::EarthEquatorialCoordinates;
 
     const TILT_ACCURACY: Angle<f64> = Angle { rad: 2e-3 };
+    const TEST_ACCURACY: f64 = 1e-5;
+    const ANGLE_TEST_ACCURACY: Angle<f64> = Angle { rad: TEST_ACCURACY };
 
     pub(super) const EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES: EclipticCoordinates =
         EclipticCoordinates::new(SphericalCoordinates::new(
             QUARTER_CIRC,
             Angle {
-                rad: QUARTER_CIRC.rad - EARTH.axis_tilt.rad,
+                rad: QUARTER_CIRC.rad - EARTH_AXIS_TILT.rad,
             },
         ));
 

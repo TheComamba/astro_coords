@@ -2,7 +2,7 @@ use serde::ser::SerializeTuple;
 use serde::Serializer;
 use serde::{Deserialize, Serialize};
 use simple_si_units::{base::Distance, geometry::Angle};
-use std::{fmt::Display, ops::Neg};
+use std::ops::Neg;
 
 use crate::angle_helper::*;
 use crate::error::AstroCoordsError;
@@ -197,7 +197,7 @@ impl Direction {
     }
 
     pub fn to_earth_equatorial(&self) -> EarthEquatorialCoordinates {
-        let dir_in_equatorial = self.rotated(EARTH.axis_tilt, &Direction::X);
+        let dir_in_equatorial = self.rotated(EARTH_AXIS_TILT, &Direction::X);
         let spherical = dir_in_equatorial.to_spherical();
         EarthEquatorialCoordinates::new(spherical.get_longitude(), spherical.get_latitude())
     }

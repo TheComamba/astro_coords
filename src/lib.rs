@@ -1,5 +1,5 @@
 #![warn(clippy::unwrap_used)]
-#![warn(missing_docs)]
+//#![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
 
 mod angle_helper;
