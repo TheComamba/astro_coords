@@ -26,8 +26,9 @@ impl RightAscension {
 
 #[cfg(test)]
 mod tests {
+    use crate::angle_helper::{angle_eq_within, angle_from_second_angle, angle_to_arcsecs};
+
     use super::*;
-    use crate::units::angle::{angle_eq, angle_from_second_angle, angle_to_arcsecs};
 
     #[test]
     fn one_second() {
@@ -35,6 +36,10 @@ mod tests {
         let expected = angle_from_second_angle(1.);
         println!("{}", angle_to_arcsecs(&dec.to_angle()));
         println!("{}", angle_to_arcsecs(&expected));
-        assert!(angle_eq(dec.to_angle(), expected));
+        assert!(angle_eq_within(
+            dec.to_angle(),
+            expected,
+            Angle { rad: 1e-5 }
+        ));
     }
 }

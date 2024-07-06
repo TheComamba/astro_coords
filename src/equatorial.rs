@@ -49,7 +49,7 @@ impl EquatorialCoordinates {
 #[cfg(test)]
 mod tests {
     use crate::earth_equatorial::{
-        EarthEquatorialCoordinates, EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES,
+        test::EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES, EarthEquatorialCoordinates,
     };
 
     use super::*;

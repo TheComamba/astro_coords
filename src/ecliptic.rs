@@ -1,9 +1,8 @@
-use crate::astro_display::AstroDisplay;
-
-use super::{direction::Direction, spherical::SphericalCoordinates};
 use serde::{Deserialize, Serialize};
 use simple_si_units::geometry::Angle;
-use std::{fmt::Display, ops::Neg};
+use std::ops::Neg;
+
+use super::{direction::Direction, spherical::SphericalCoordinates};
 
 /*  The "absolute" reference we use for polar coordiantes is heliocentric ecliptic coordinates:
  * Longitude denotes the angle between the vernal equinox and the body, measured in the ecliptic plane.
@@ -88,25 +87,11 @@ impl Neg for EclipticCoordinates {
     }
 }
 
-impl AstroDisplay for EclipticCoordinates {
-    fn astro_display(&self) -> String {
-        format!("{} to ecliptic plane", self.spherical)
-    }
-}
-
-impl Display for EclipticCoordinates {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.astro_display())
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use simple_si_units::geometry::Angle;
 
-    use crate::{
-        astro_display::AstroDisplay, coordinates::direction::Direction, units::angle::angle_eq,
-    };
+    use crate::{angle_helper::angle_eq_within, direction::Direction};
 
     #[test]
     fn test_angle_function() {
@@ -130,7 +115,7 @@ mod tests {
 
                         println!("Expected: {}", angle.astro_display());
                         println!("Actual: {}", actual_angle.astro_display());
-                        assert!(angle_eq(actual_angle, angle));
+                        assert!(angle_eq_within(actual_angle, angle, Angle { rad: 1e-5 }));
                     }
                 }
             }

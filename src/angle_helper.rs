@@ -18,6 +18,32 @@ pub(crate) mod test {
     };
 }
 
+pub(crate) const DEGREE: Angle<f64> = Angle {
+    rad: 2. * PI / 360.,
+};
+pub(crate) const ARCSEC: Angle<f64> = Angle {
+    rad: 2. * PI / (360. * 60. * 60.),
+};
+pub(crate) const SECOND_ANGLE: Angle<f64> = Angle {
+    rad: 2. * PI / (24. * 60. * 60.),
+};
+
+pub(crate) fn angle_from_arcsecs(arcsec: f64) -> Angle<f64> {
+    arcsec * ARCSEC
+}
+
+pub(crate) fn angle_to_arcsecs(angle: &Angle<f64>) -> f64 {
+    angle / &ARCSEC
+}
+
+pub(crate) fn angle_from_second_angle(second_angle: f64) -> Angle<f64> {
+    second_angle * SECOND_ANGLE
+}
+
+pub(crate) fn angle_to_second_angle(angle: &Angle<f64>) -> f64 {
+    angle / &SECOND_ANGLE
+}
+
 pub(crate) fn angle_eq_within(
     actual: Angle<f64>,
     expected: Angle<f64>,

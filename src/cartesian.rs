@@ -3,10 +3,9 @@ use simple_si_units::{
     base::Distance,
     geometry::{Angle, Area},
 };
-use std::{
-    fmt::Display,
-    ops::{Add, Div, Mul, Neg, Sub},
-};
+use std::ops::{Add, Div, Mul, Neg, Sub};
+
+use crate::error::AstroCoordsError;
 
 use super::{
     direction::Direction, ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
@@ -80,11 +79,11 @@ impl CartesianCoordinates {
         CartesianCoordinates { x, y, z }
     }
 
-    pub fn angle_to(&self, other: &CartesianCoordinates) -> Result<Angle<f64>, AstroUtilError> {
+    pub fn angle_to(&self, other: &CartesianCoordinates) -> Result<Angle<f64>, AstroCoordsError> {
         Ok(self.to_direction()?.angle_to(&other.to_direction()?))
     }
 
-    pub fn to_direction(&self) -> Result<Direction, AstroUtilError> {
+    pub fn to_direction(&self) -> Result<Direction, AstroCoordsError> {
         Direction::new(self.x.m, self.y.m, self.z.m)
     }
 
@@ -219,28 +218,11 @@ impl Neg for &CartesianCoordinates {
     }
 }
 
-impl AstroDisplay for CartesianCoordinates {
-    fn astro_display(&self) -> String {
-        format!(
-            "({}, {}, {})",
-            self.x.astro_display(),
-            self.y.astro_display(),
-            self.z.astro_display()
-        )
-    }
-}
-
-impl Display for CartesianCoordinates {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.astro_display())
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::tests::{eq, TEST_ACCURACY};
-
     use super::*;
+
+    const TEST_ACCURACY: f64 = 1e-5;
 
     #[test]
     fn test_length() {

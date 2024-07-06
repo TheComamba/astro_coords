@@ -1,8 +1,7 @@
+use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
 
 use super::{direction::Direction, ecliptic::EclipticCoordinates, spherical::SphericalCoordinates};
-use crate::{astro_display::AstroDisplay, real_data::planets::EARTH};
-use simple_si_units::{base::Distance, geometry::Angle};
 
 pub struct EarthEquatorialCoordinates {
     right_ascension: Angle<f64>,
@@ -51,44 +50,24 @@ impl EarthEquatorialCoordinates {
     }
 }
 
-impl AstroDisplay for EarthEquatorialCoordinates {
-    fn astro_display(&self) -> String {
-        format!("(ra: {}, dec: {})", self.right_ascension, self.declination)
-    }
-}
-
-impl Display for EarthEquatorialCoordinates {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.astro_display())
-    }
-}
-
 #[cfg(test)]
-pub(super) const EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES: EclipticCoordinates =
-    EclipticCoordinates::new(SphericalCoordinates::new(
-        crate::units::angle::QUARTER_CIRC,
-        Angle {
-            rad: crate::units::angle::QUARTER_CIRC.rad - EARTH.axis_tilt.rad,
-        },
-    ));
-
 #[cfg(test)]
-mod tests {
-    use super::EarthEquatorialCoordinates;
-    use crate::{
-        coordinates::{
-            earth_equatorial::EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES,
-            ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
-        },
-        real_data::planets::*,
-        units::{
-            angle::{angle_eq_within, ANGLE_ZERO},
-            tests::ANGLE_TEST_ACCURACY,
-        },
-    };
+pub(super) mod tests {
     use simple_si_units::geometry::Angle;
 
+    use crate::{angle_helper::*, ecliptic::EclipticCoordinates, spherical::SphericalCoordinates};
+
+    use super::EarthEquatorialCoordinates;
+
     const TILT_ACCURACY: Angle<f64> = Angle { rad: 2e-3 };
+
+    pub(super) const EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES: EclipticCoordinates =
+        EclipticCoordinates::new(SphericalCoordinates::new(
+            QUARTER_CIRC,
+            Angle {
+                rad: QUARTER_CIRC.rad - EARTH.axis_tilt.rad,
+            },
+        ));
 
     /*
      * https://ned.ipac.caltech.edu/coordinate_calculator?in_csys=Equatorial&in_equinox=J2000.0&obs_epoch=2000.0&ra=0&dec=90&pa=0.0&out_csys=Ecliptic&out_equinox=J2000.0
