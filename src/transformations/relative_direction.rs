@@ -1,4 +1,4 @@
-use crate::coordinates::direction::Direction;
+use crate::direction::Direction;
 
 /*
  * Rotates object_direction as it would seem to an observer looking in the direction of observer_normal.
@@ -26,12 +26,13 @@ pub fn direction_relative_to_normal(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::{
-        tests::TEST_ACCURACY,
-        units::angle::{ANGLE_ZERO, HALF_CIRC},
-    };
     use simple_si_units::geometry::Angle;
+
+    use crate::angle_helper::*;
+
+    use super::*;
+
+    const TEST_ACCURACY: f64 = 1e-5;
 
     #[test]
     fn direction_relative_to_itself_is_z_axis() {

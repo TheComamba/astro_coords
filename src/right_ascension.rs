@@ -1,8 +1,5 @@
-use std::fmt::Display;
-
 use simple_si_units::geometry::Angle;
-
-use crate::astro_display::AstroDisplay;
+use std::fmt::Display;
 
 pub struct RightAscension {
     pub(super) hours: i8,
@@ -25,18 +22,6 @@ impl RightAscension {
         let seconds = self.seconds as f64;
 
         Angle::from_degrees((hours + minutes / 60. + seconds / 3600.) * 15.)
-    }
-}
-
-impl AstroDisplay for RightAscension {
-    fn astro_display(&self) -> String {
-        format!("{:02}h{:02}m{:02}s", self.hours, self.minutes, self.seconds)
-    }
-}
-
-impl Display for RightAscension {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.astro_display())
     }
 }
 
