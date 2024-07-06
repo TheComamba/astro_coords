@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
-use simple_si_units::geometry::Angle;
+use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
+
+use crate::cartesian::CartesianCoordinates;
 
 use super::{direction::Direction, spherical::SphericalCoordinates};
 
@@ -57,6 +59,10 @@ impl EclipticCoordinates {
 
     pub fn set_latitude(&mut self, latitude: Angle<f64>) {
         self.spherical.set_latitude(latitude);
+    }
+
+    pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
+        self.to_direction().to_cartesian(length)
     }
 
     pub fn to_direction(&self) -> Direction {

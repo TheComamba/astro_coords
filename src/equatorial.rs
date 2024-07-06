@@ -1,5 +1,7 @@
-use simple_si_units::geometry::Angle;
+use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
+
+use crate::cartesian::CartesianCoordinates;
 
 use super::{direction::Direction, spherical::SphericalCoordinates};
 
@@ -38,6 +40,10 @@ impl EquatorialCoordinates {
 
     pub fn get_rotation_axis(&self) -> &Direction {
         &self.rotation_axis
+    }
+
+    pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
+        self.to_direction().to_cartesian(length)
     }
 
     pub fn to_direction(&self) -> Direction {
