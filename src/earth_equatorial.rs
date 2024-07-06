@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use simple_si_units::{base::Distance, geometry::Angle};
 
 use crate::angle_helper::EARTH_AXIS_TILT;
@@ -51,7 +53,12 @@ impl EarthEquatorialCoordinates {
     }
 }
 
-#[cfg(test)]
+impl Display for EarthEquatorialCoordinates {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "RA: {}, Dec: {}", self.right_ascension, self.declination)
+    }
+}
+
 #[cfg(test)]
 pub(super) mod tests {
     use simple_si_units::geometry::Angle;

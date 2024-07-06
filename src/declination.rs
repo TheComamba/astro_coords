@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use simple_si_units::geometry::Angle;
 
 pub struct Declination {
@@ -33,6 +35,20 @@ impl Declination {
         let seconds = self.seconds as f64;
 
         sign * Angle::from_degrees(degrees + minutes / 60. + seconds / 3600.)
+    }
+}
+
+impl Display for Declination {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let sign = match self.sign {
+            Sgn::Pos => "+",
+            Sgn::Neg => "-",
+        };
+        write!(
+            f,
+            "{}{:02}°{:02}'{:02}\"",
+            sign, self.degrees, self.minutes, self.seconds
+        )
     }
 }
 

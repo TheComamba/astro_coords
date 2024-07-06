@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use simple_si_units::geometry::Angle;
-use std::ops::Neg;
+use std::{fmt::Display, ops::Neg};
 
 use super::{direction::Direction, spherical::SphericalCoordinates};
 
@@ -84,6 +84,12 @@ impl Neg for EclipticCoordinates {
 
     fn neg(self) -> EclipticCoordinates {
         -&self
+    }
+}
+
+impl Display for EclipticCoordinates {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.spherical)
     }
 }
 

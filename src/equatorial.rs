@@ -1,4 +1,5 @@
 use simple_si_units::geometry::Angle;
+use std::fmt::Display;
 
 use super::{direction::Direction, spherical::SphericalCoordinates};
 
@@ -43,6 +44,16 @@ impl EquatorialCoordinates {
         self.spherical
             .to_direction()
             .active_rotation_to_new_z_axis(&self.rotation_axis)
+    }
+}
+
+impl Display for EquatorialCoordinates {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{} relative to equatorial plane with north pole at {}",
+            self.spherical, self.rotation_axis
+        )
     }
 }
 

@@ -3,7 +3,10 @@ use simple_si_units::{
     base::Distance,
     geometry::{Angle, Area},
 };
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::{
+    fmt::Display,
+    ops::{Add, Div, Mul, Neg, Sub},
+};
 
 use crate::error::AstroCoordsError;
 
@@ -212,6 +215,37 @@ impl Neg for &CartesianCoordinates {
             x: -self.x,
             y: -self.y,
             z: -self.z,
+        }
+    }
+}
+
+impl Display for CartesianCoordinates {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let length = self.length();
+        if length.to_parsec() > 0.1 {
+            write!(
+                f,
+                "({:.2} pc, {:.2} pc, {:.2} pc)",
+                self.x.to_parsec(),
+                self.y.to_parsec(),
+                self.z.to_parsec()
+            )
+        } else if length.to_au() > 0.1 {
+            write!(
+                f,
+                "({:.2} AU, {:.2} AU, {:.2} AU)",
+                self.x.to_au(),
+                self.y.to_au(),
+                self.z.to_au()
+            )
+        } else {
+            write!(
+                f,
+                "({:.2} km, {:.2} km, {:.2} km)",
+                self.x.to_km(),
+                self.y.to_km(),
+                self.z.to_km()
+            )
         }
     }
 }

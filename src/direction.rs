@@ -2,6 +2,7 @@ use serde::ser::SerializeTuple;
 use serde::Serializer;
 use serde::{Deserialize, Serialize};
 use simple_si_units::{base::Distance, geometry::Angle};
+use std::fmt::Display;
 use std::ops::Neg;
 
 use crate::angle_helper::*;
@@ -216,6 +217,12 @@ impl Neg for &Direction {
             y: -self.y,
             z: -self.z,
         }
+    }
+}
+
+impl Display for Direction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({:.2}, {:.2}, {:.2})", self.x, self.y, self.z)
     }
 }
 
