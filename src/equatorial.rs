@@ -62,6 +62,14 @@ impl EquatorialCoordinates {
     pub fn to_ecliptic(&self) -> EclipticCoordinates {
         self.to_direction().to_ecliptic()
     }
+
+    pub fn to_spherical(&self) -> SphericalCoordinates {
+        self.to_ecliptic().to_spherical()
+    }
+
+    pub fn eq_within(&self, other: &EquatorialCoordinates, accuracy: Angle<f64>) -> bool {
+        self.to_ecliptic().eq_within(&other.to_ecliptic(), accuracy)
+    }
 }
 
 impl Display for EquatorialCoordinates {

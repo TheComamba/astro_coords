@@ -4,6 +4,7 @@ use std::{fmt::Display, ops::Neg};
 
 use crate::{
     angle_helper::*, cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
+    equatorial::EquatorialCoordinates,
 };
 
 use super::{
@@ -116,6 +117,10 @@ impl SphericalCoordinates {
 
     pub fn to_ecliptic(&self) -> EclipticCoordinates {
         EclipticCoordinates { spherical: *self }
+    }
+
+    pub fn to_equatorial(&self, axis: Direction) -> EquatorialCoordinates {
+        self.to_direction().to_equatorial(axis)
     }
 
     pub fn to_ra_and_dec(&self) -> (RightAscension, Declination) {
