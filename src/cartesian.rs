@@ -1,8 +1,3 @@
-use super::{
-    direction::Direction, ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
-    transformations::rotations::rotated_tuple,
-};
-use crate::{astro_display::AstroDisplay, error::AstroUtilError, units::distance::DISTANCE_ZERO};
 use serde::{Deserialize, Serialize};
 use simple_si_units::{
     base::Distance,
@@ -11,6 +6,11 @@ use simple_si_units::{
 use std::{
     fmt::Display,
     ops::{Add, Div, Mul, Neg, Sub},
+};
+
+use super::{
+    direction::Direction, ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
+    transformations::rotations::rotated_tuple,
 };
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -22,9 +22,9 @@ pub struct CartesianCoordinates {
 
 impl CartesianCoordinates {
     pub const ORIGIN: CartesianCoordinates = CartesianCoordinates {
-        x: DISTANCE_ZERO,
-        y: DISTANCE_ZERO,
-        z: DISTANCE_ZERO,
+        x: Distance { m: 0 },
+        y: Distance { m: 0 },
+        z: Distance { m: 0 },
     };
 
     pub const fn new(x: Distance<f64>, y: Distance<f64>, z: Distance<f64>) -> CartesianCoordinates {
@@ -32,7 +32,6 @@ impl CartesianCoordinates {
     }
 
     #[cfg(test)]
-    #[allow(dead_code)]
     pub(crate) fn eq_within(&self, other: &CartesianCoordinates, accuracy: Distance<f64>) -> bool {
         use crate::tests::eq_within;
 

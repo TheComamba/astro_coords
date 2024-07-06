@@ -9,6 +9,7 @@ pub mod direction;
 pub mod earth_equatorial;
 pub mod ecliptic;
 pub mod equatorial;
+pub mod error;
 pub mod right_ascension;
 pub mod spherical;
 pub mod transformations;

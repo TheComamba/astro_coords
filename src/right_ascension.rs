@@ -1,5 +1,4 @@
 use simple_si_units::geometry::Angle;
-use std::fmt::Display;
 
 pub struct RightAscension {
     pub(super) hours: i8,

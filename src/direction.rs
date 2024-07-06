@@ -1,19 +1,17 @@
-use super::{
-    cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
-    ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
-    transformations::rotations::rotated_tuple,
-};
-use crate::{
-    astro_display::AstroDisplay,
-    error::AstroUtilError,
-    real_data::planets::EARTH,
-    units::angle::{ANGLE_ZERO, HALF_CIRC},
-};
 use serde::ser::SerializeTuple;
 use serde::Serializer;
 use serde::{Deserialize, Serialize};
 use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
+
+use crate::angle_helper::*;
+use crate::error::AstroCoordsError;
+
+use super::{
+    cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
+    ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
+    transformations::rotations::rotated_tuple,
+};
 
 pub(super) const NORMALIZATION_THRESHOLD: f64 = 1e-5;
 
@@ -31,7 +29,7 @@ impl Direction {
         [self.x, self.y, self.z]
     }
 
-    pub fn from_array(array: [f64; 3]) -> Result<Self, AstroUtilError> {
+    pub fn from_array(array: [f64; 3]) -> Result<Self, AstroCoordsError> {
         Direction::new(array[0], array[1], array[2])
     }
 }
@@ -73,10 +71,10 @@ impl Direction {
         z: 1.,
     };
 
-    pub fn new(x: f64, y: f64, z: f64) -> Result<Self, AstroUtilError> {
+    pub fn new(x: f64, y: f64, z: f64) -> Result<Self, AstroCoordsError> {
         let length = (x * x + y * y + z * z).sqrt();
         if length < NORMALIZATION_THRESHOLD {
-            Err(AstroUtilError::NormalizingZeroVector)
+            Err(AstroCoordsError::NormalizingZeroVector)
         } else {
             Ok(Direction {
                 x: x / length,
@@ -142,7 +140,7 @@ impl Direction {
         ortho.unwrap_or(Self::Z)
     }
 
-    pub fn cross_product(&self, other: &Direction) -> Result<Direction, AstroUtilError> {
+    pub fn cross_product(&self, other: &Direction) -> Result<Direction, AstroCoordsError> {
         let (ax, ay, az) = (self.x, self.y, self.z);
         let (bx, by, bz) = (other.x(), other.y(), other.z());
 
@@ -221,26 +219,11 @@ impl Neg for &Direction {
     }
 }
 
-impl AstroDisplay for Direction {
-    fn astro_display(&self) -> String {
-        format!("({:.2}, {:.2}, {:.2})", self.x, self.y, self.z)
-    }
-}
-
-impl Display for Direction {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.astro_display())
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        tests::{eq, TEST_ACCURACY},
-        units::angle::{angle_eq_within, QUARTER_CIRC},
-    };
 
+    const TEST_ACCURACY: f64 = 1e-5;
     const ROTATION_ACCURACY: Angle<f64> = Angle { rad: 1e-3 }; //Accos is a bit unstable
 
     #[test]
