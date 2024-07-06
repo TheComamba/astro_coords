@@ -1,11 +1,9 @@
 use astro_coordinates::{
     cartesian::CartesianCoordinates,
-    declination::{Declination, Sgn},
     direction::Direction,
     earth_equatorial::EarthEquatorialCoordinates,
     ecliptic::EclipticCoordinates,
     equatorial::EquatorialCoordinates,
-    right_ascension::RightAscension,
     spherical::SphericalCoordinates,
 };
 use simple_si_units::{base::Distance, geometry::Angle};
@@ -42,39 +40,6 @@ fn spherical_examples() -> Vec<SphericalCoordinates> {
         }
     }
     examples
-}
-
-fn declination_examples() -> Vec<Declination> {
-    vec![
-        Declination::new(Sgn::Pos, 0, 0, 0),
-        Declination::new(Sgn::Neg, 0, 0, 0),
-        Declination::new(Sgn::Pos, 90, 0, 0),
-        Declination::new(Sgn::Neg, 90, 0, 0),
-        Declination::new(Sgn::Pos, 45, 0, 0),
-        Declination::new(Sgn::Neg, 45, 0, 0),
-        Declination::new(Sgn::Pos, 0, 30, 0),
-        Declination::new(Sgn::Neg, 0, 30, 0),
-        Declination::new(Sgn::Pos, 0, 0, 30),
-        Declination::new(Sgn::Neg, 0, 0, 30),
-        Declination::new(Sgn::Pos, 45, 30, 30),
-        Declination::new(Sgn::Neg, 45, 30, 30),
-        Declination::new(Sgn::Pos, 90, 30, 30),
-        Declination::new(Sgn::Neg, 90, 30, 30),
-    ]
-}
-
-fn ra_examples() -> Vec<RightAscension> {
-    vec![
-        RightAscension::new(0, 0, 0),
-        RightAscension::new(6, 0, 0),
-        RightAscension::new(12, 0, 0),
-        RightAscension::new(18, 0, 0),
-        RightAscension::new(23, 59, 59),
-        RightAscension::new(0, 59, 59),
-        RightAscension::new(6, 59, 59),
-        RightAscension::new(12, 59, 59),
-        RightAscension::new(18, 59, 59),
-    ]
 }
 
 fn cartesian_examples() -> Vec<CartesianCoordinates> {
