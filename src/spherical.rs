@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
-use simple_si_units::geometry::Angle;
+use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
 
-use crate::angle_helper::*;
+use crate::{angle_helper::*, cartesian::CartesianCoordinates};
 
 use super::{
     declination::{Declination, Sgn},
@@ -95,6 +95,10 @@ impl SphericalCoordinates {
             longitude,
             latitude,
         }
+    }
+
+    pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
+        self.to_direction().to_cartesian(length)
     }
 
     pub fn to_direction(&self) -> Direction {

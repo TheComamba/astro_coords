@@ -170,3 +170,61 @@ fn cartesian_to_equatorial_roundtrip() {
         }
     }
 }
+
+#[test]
+fn cartesian_to_spherical_roundtrip() {
+    for cartesian in cartesian_examples() {
+        let length = cartesian.length();
+        let spherical = cartesian.to_spherical();
+        let new_cartesian = spherical.to_cartesian(length);
+        assert!(cartesian.eq_within(&new_cartesian, DISTANCE_ACC));
+    }
+}
+
+#[test]
+fn direction_to_cartesian_roundtrip() {
+    for direction in direction_examples() {
+        let length = Distance::from_m(10.);
+        let cartesian = direction.to_cartesian(length);
+        let new_direction = cartesian.to_direction().unwrap();
+        assert!(direction.eq_within(&new_direction, ACC));
+    }
+}
+
+#[test]
+fn direction_to_earth_equatorial_roundtrip() {
+    for direction in direction_examples() {
+        let earth_equatorial = direction.to_earth_equatorial();
+        let new_direction = earth_equatorial.to_direction();
+        assert!(direction.eq_within(&new_direction, ACC));
+    }
+}
+
+#[test]
+fn direction_to_ecliptic_roundtrip() {
+    for direction in direction_examples() {
+        let ecliptic = direction.to_ecliptic();
+        let new_direction = ecliptic.to_direction();
+        assert!(direction.eq_within(&new_direction, ACC));
+    }
+}
+
+#[test]
+fn direction_to_equatorial_roundtrip() {
+    for direction in direction_examples() {
+        for axis in direction_examples() {
+            let equatorial = direction.to_equatorial(axis);
+            let new_direction = equatorial.to_direction();
+            assert!(direction.eq_within(&new_direction, ACC));
+        }
+    }
+}
+
+#[test]
+fn direction_to_spherical_roundtrip() {
+    for direction in direction_examples() {
+        let spherical = direction.to_spherical();
+        let new_direction = spherical.to_direction();
+        assert!(direction.eq_within(&new_direction, ACC));
+    }
+}
