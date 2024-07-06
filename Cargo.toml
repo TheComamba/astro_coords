@@ -11,3 +11,5 @@ repository = "https://github.com/TheComamba/AstroCoordinates"
 version = "0.1.0"
 
 [dependencies]
+serde = { version = "1.0", default-features = false, features = ["derive"] } # (De)Serialization
+simple-si-units = { version = "1.1", default-features = false, features = ["serde"] }

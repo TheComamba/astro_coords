@@ -1,16 +1,15 @@
+use serde::{Deserialize, Serialize};
+use simple_si_units::geometry::Angle;
+use std::ops::Neg;
+
+use crate::angle_helper::*;
+
 use super::{
     declination::{Declination, Sgn},
     direction::Direction,
     ecliptic::EclipticCoordinates,
     right_ascension::RightAscension,
 };
-use crate::{
-    astro_display::AstroDisplay,
-    units::angle::{angle_eq_within, normalized_angle, ANGLE_ZERO, HALF_CIRC, QUARTER_CIRC},
-};
-use serde::{Deserialize, Serialize};
-use simple_si_units::geometry::Angle;
-use std::{fmt::Display, ops::Neg};
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SphericalCoordinates {
@@ -158,30 +157,17 @@ impl Neg for SphericalCoordinates {
     }
 }
 
-impl AstroDisplay for SphericalCoordinates {
-    fn astro_display(&self) -> String {
-        format!("({} long, {} lat)", self.longitude, self.latitude)
-    }
-}
-
-impl Display for SphericalCoordinates {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.astro_display())
-    }
-}
-
 #[cfg(test)]
 mod tests {
+    use simple_si_units::base::Distance;
     use std::f64::consts::PI;
 
+    use crate::cartesian::CartesianCoordinates;
+
     use super::*;
-    use crate::{
-        astro_display::AstroDisplay,
-        coordinates::cartesian::CartesianCoordinates,
-        tests::TEST_ACCURACY,
-        units::{angle::FULL_CIRC, tests::ANGLE_TEST_ACCURACY},
-    };
-    use simple_si_units::base::Distance;
+
+    const TEST_ACCURACY: f64 = 1e-5;
+    const ANGLE_TEST_ACCURACY: Angle<f64> = Angle { rad: TEST_ACCURACY };
 
     #[test]
     fn test_from_cartesian() {
