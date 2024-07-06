@@ -1,8 +1,11 @@
 use serde::{Deserialize, Serialize};
-use simple_si_units::geometry::Angle;
+use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
 
-use crate::angle_helper::*;
+use crate::{
+    angle_helper::*, cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
+    equatorial::EquatorialCoordinates,
+};
 
 use super::{
     declination::{Declination, Sgn},
@@ -53,7 +56,7 @@ impl SphericalCoordinates {
         }
     }
 
-    pub(crate) fn eq_within(&self, other: &Self, accuracy: Angle<f64>) -> bool {
+    pub fn eq_within(&self, other: &Self, accuracy: Angle<f64>) -> bool {
         let northpole_latitude = QUARTER_CIRC;
         let southpole_latitude = -QUARTER_CIRC;
         let mut copy = *self;
@@ -97,6 +100,10 @@ impl SphericalCoordinates {
         }
     }
 
+    pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
+        self.to_direction().to_cartesian(length)
+    }
+
     pub fn to_direction(&self) -> Direction {
         let x = self.get_longitude().rad.cos() * self.get_latitude().rad.cos();
         let y = self.get_longitude().rad.sin() * self.get_latitude().rad.cos();
@@ -104,8 +111,16 @@ impl SphericalCoordinates {
         Direction { x, y, z }
     }
 
+    pub fn to_earth_equatorial(&self) -> EarthEquatorialCoordinates {
+        self.to_direction().to_earth_equatorial()
+    }
+
     pub fn to_ecliptic(&self) -> EclipticCoordinates {
         EclipticCoordinates { spherical: *self }
+    }
+
+    pub fn to_equatorial(&self, axis: Direction) -> EquatorialCoordinates {
+        self.to_direction().to_equatorial(axis)
     }
 
     pub fn to_ra_and_dec(&self) -> (RightAscension, Declination) {

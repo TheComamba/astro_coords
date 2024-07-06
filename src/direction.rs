@@ -6,6 +6,7 @@ use std::fmt::Display;
 use std::ops::Neg;
 
 use crate::angle_helper::*;
+use crate::equatorial::EquatorialCoordinates;
 use crate::error::AstroCoordsError;
 
 use super::{
@@ -205,6 +206,12 @@ impl Direction {
 
     pub fn to_ecliptic(&self) -> EclipticCoordinates {
         EclipticCoordinates::new(self.to_spherical())
+    }
+
+    pub fn to_equatorial(&self, axis: Direction) -> EquatorialCoordinates {
+        let dir_in_equatorial = self.passive_rotation_to_new_z_axis(&axis);
+        let spherical = dir_in_equatorial.to_spherical();
+        EquatorialCoordinates::new(spherical, axis)
     }
 }
 

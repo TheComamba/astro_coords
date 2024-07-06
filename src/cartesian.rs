@@ -8,7 +8,10 @@ use std::{
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
-use crate::error::AstroCoordsError;
+use crate::{
+    earth_equatorial::EarthEquatorialCoordinates, equatorial::EquatorialCoordinates,
+    error::AstroCoordsError,
+};
 
 use super::{
     direction::Direction, ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
@@ -33,8 +36,7 @@ impl CartesianCoordinates {
         CartesianCoordinates { x, y, z }
     }
 
-    #[cfg(test)]
-    pub(crate) fn eq_within(&self, other: &CartesianCoordinates, accuracy: Distance<f64>) -> bool {
+    pub fn eq_within(&self, other: &CartesianCoordinates, accuracy: Distance<f64>) -> bool {
         (self.x.m - other.x.m).abs() < accuracy.m
             && (self.y.m - other.y.m).abs() < accuracy.m
             && (self.z.m - other.z.m).abs() < accuracy.m
@@ -88,10 +90,25 @@ impl CartesianCoordinates {
         Direction::new(self.x.m, self.y.m, self.z.m)
     }
 
+    pub fn to_earth_equatorial(&self) -> Result<EarthEquatorialCoordinates, AstroCoordsError> {
+        Ok(self.to_direction()?.to_earth_equatorial())
+    }
+
     pub fn to_ecliptic(&self) -> EclipticCoordinates {
         EclipticCoordinates {
             spherical: self.to_spherical(),
         }
+    }
+
+    pub fn to_equatorial(
+        &self,
+        rotation_axis: Direction,
+    ) -> Result<EquatorialCoordinates, AstroCoordsError> {
+        let spherical = self
+            .to_direction()?
+            .passive_rotation_to_new_z_axis(&rotation_axis)
+            .to_spherical();
+        Ok(EquatorialCoordinates::new(spherical, rotation_axis))
     }
 
     pub fn to_spherical(&self) -> SphericalCoordinates {

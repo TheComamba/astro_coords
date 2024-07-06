@@ -1,5 +1,10 @@
-use simple_si_units::geometry::Angle;
+use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
+
+use crate::{
+    cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
+    ecliptic::EclipticCoordinates,
+};
 
 use super::{direction::Direction, spherical::SphericalCoordinates};
 
@@ -40,10 +45,30 @@ impl EquatorialCoordinates {
         &self.rotation_axis
     }
 
+    pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
+        self.to_direction().to_cartesian(length)
+    }
+
     pub fn to_direction(&self) -> Direction {
         self.spherical
             .to_direction()
             .active_rotation_to_new_z_axis(&self.rotation_axis)
+    }
+
+    pub fn to_earth_equatorial(&self) -> EarthEquatorialCoordinates {
+        self.to_direction().to_earth_equatorial()
+    }
+
+    pub fn to_ecliptic(&self) -> EclipticCoordinates {
+        self.to_direction().to_ecliptic()
+    }
+
+    pub fn to_spherical(&self) -> SphericalCoordinates {
+        self.to_ecliptic().to_spherical()
+    }
+
+    pub fn eq_within(&self, other: &EquatorialCoordinates, accuracy: Angle<f64>) -> bool {
+        self.to_ecliptic().eq_within(&other.to_ecliptic(), accuracy)
     }
 }
 

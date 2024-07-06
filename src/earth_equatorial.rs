@@ -2,7 +2,10 @@ use std::fmt::Display;
 
 use simple_si_units::{base::Distance, geometry::Angle};
 
-use crate::angle_helper::EARTH_AXIS_TILT;
+use crate::{
+    angle_helper::EARTH_AXIS_TILT, cartesian::CartesianCoordinates,
+    equatorial::EquatorialCoordinates,
+};
 
 use super::{direction::Direction, ecliptic::EclipticCoordinates, spherical::SphericalCoordinates};
 
@@ -22,7 +25,11 @@ impl EarthEquatorialCoordinates {
         }
     }
 
-    pub(crate) fn to_direction(&self) -> Direction {
+    pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
+        self.to_direction().to_cartesian(length)
+    }
+
+    pub fn to_direction(&self) -> Direction {
         let direction_in_equatorial =
             SphericalCoordinates::new(self.right_ascension, self.declination).to_direction();
         direction_in_equatorial.rotated(-EARTH_AXIS_TILT, &Direction::X)
@@ -34,16 +41,15 @@ impl EarthEquatorialCoordinates {
         vec.to_ecliptic()
     }
 
-    pub fn to_spherical(&self) -> SphericalCoordinates {
-        SphericalCoordinates::new(self.right_ascension, self.declination)
+    pub fn to_equatorial(&self, axis: Direction) -> EquatorialCoordinates {
+        self.to_direction().to_equatorial(axis)
     }
 
-    #[cfg(test)]
-    pub(crate) fn eq_within(
-        &self,
-        other: &EarthEquatorialCoordinates,
-        accuracy: Angle<f64>,
-    ) -> bool {
+    pub fn to_spherical(&self) -> SphericalCoordinates {
+        self.to_direction().to_spherical()
+    }
+
+    pub fn eq_within(&self, other: &EarthEquatorialCoordinates, accuracy: Angle<f64>) -> bool {
         let mut self_spherical = SphericalCoordinates::new(self.right_ascension, self.declination);
         self_spherical.normalize();
         let mut other_spherical =
@@ -207,128 +213,4 @@ pub(super) mod tests {
             }
         }
     }
-
-    //TODO: I do not want to loose these tests, but they do not really fit in here.
-
-    // const TILT_ACCURACY: Angle<f64> = Angle { rad: 2e-3 };
-
-    // #[test]
-    // fn axis_tilt_of_mercury() {
-    //     let orbit_normal = MERCURY.orbit.normal();
-    //     let north = MERCURY.rotation_axis.to_direction();
-    //     println!("orbit_normal: {}", orbit_normal);
-    //     println!("north: {}", north);
-    //     let expected = MERCURY.axis_tilt;
-    //     let actual = orbit_normal.angle_to(&north);
-    //     println!("expected: {}, actual: {}", expected, actual);
-    //     assert!(angle_eq_within(actual, expected, TILT_ACCURACY));
-    // }
-
-    // #[test]
-    // fn axis_tilt_of_venus() {
-    //     let orbit_normal = VENUS.orbit.normal();
-    //     let north = VENUS.rotation_axis.to_direction();
-    //     println!("orbit_normal: {}", orbit_normal);
-    //     println!("north: {}", north);
-    //     let expected = VENUS.axis_tilt;
-    //     let actual = orbit_normal.angle_to(&north);
-    //     println!("expected: {}, actual: {}", expected, actual);
-    //     assert!(angle_eq_within(actual, expected, TILT_ACCURACY));
-    // }
-
-    // #[test]
-    // fn axis_tilt_of_earth() {
-    //     let orbit_normal = EARTH.orbit.normal();
-    //     let north = EARTH.rotation_axis.to_direction();
-    //     println!("orbit_normal: {}", orbit_normal);
-    //     println!("north: {}", north);
-    //     let expected = EARTH.axis_tilt;
-    //     let actual = orbit_normal.angle_to(&north);
-    //     println!("expected: {}, actual: {}", expected, actual);
-    //     assert!(angle_eq_within(actual, expected, TILT_ACCURACY));
-    // }
-
-    // #[test]
-    // fn axis_tilt_of_mars() {
-    //     let orbit_normal = MARS.orbit.normal();
-    //     let north = MARS.rotation_axis.to_direction();
-    //     println!("orbit_normal: {}", orbit_normal);
-    //     println!("north: {}", north);
-    //     let expected = MARS.axis_tilt;
-    //     let actual = orbit_normal.angle_to(&north);
-    //     println!("expected: {}, actual: {}", expected, actual);
-    //     assert!(angle_eq_within(actual, expected, TILT_ACCURACY));
-    // }
-
-    // #[test]
-    // fn axis_tilt_of_ceres() {
-    //     let orbit_normal = CERES.orbit.normal();
-    //     let north = CERES.rotation_axis.to_direction();
-    //     println!("orbit_normal: {}", orbit_normal);
-    //     println!("north: {}", north);
-    //     let expected = CERES.axis_tilt;
-    //     let actual = orbit_normal.angle_to(&north);
-    //     println!("expected: {}, actual: {}", expected, actual);
-    //     assert!(angle_eq_within(actual, expected, TILT_ACCURACY));
-    // }
-
-    // #[test]
-    // fn axis_tilt_of_jupiter() {
-    //     let orbit_normal = JUPITER.orbit.normal();
-    //     let north = JUPITER.rotation_axis.to_direction();
-    //     println!("orbit_normal: {}", orbit_normal);
-    //     println!("north: {}", north);
-    //     let expected = JUPITER.axis_tilt;
-    //     let actual = orbit_normal.angle_to(&north);
-    //     println!("expected: {}, actual: {}", expected, actual);
-    //     assert!(angle_eq_within(actual, expected, TILT_ACCURACY));
-    // }
-
-    // #[test]
-    // fn axis_tilt_of_saturn() {
-    //     let orbit_normal = SATURN.orbit.normal();
-    //     let north = SATURN.rotation_axis.to_direction();
-    //     println!("orbit_normal: {}", orbit_normal);
-    //     println!("north: {}", north);
-    //     let expected = SATURN.axis_tilt;
-    //     let actual = orbit_normal.angle_to(&north);
-    //     println!("expected: {}, actual: {}", expected, actual);
-    //     assert!(angle_eq_within(actual, expected, TILT_ACCURACY));
-    // }
-
-    // #[test]
-    // fn axis_tilt_of_uranus() {
-    //     let orbit_normal = URANUS.orbit.normal();
-    //     let north = URANUS.rotation_axis.to_direction();
-    //     println!("orbit_normal: {}", orbit_normal);
-    //     println!("north: {}", north);
-    //     let expected = URANUS.axis_tilt;
-    //     let actual = orbit_normal.angle_to(&north);
-    //     println!("expected: {}, actual: {}", expected, actual);
-    //     assert!(angle_eq_within(actual, expected, TILT_ACCURACY));
-    // }
-
-    // #[test]
-    // fn axis_tilt_of_neptune() {
-    //     let orbit_normal = NEPTUNE.orbit.normal();
-    //     let north = NEPTUNE.rotation_axis.to_direction();
-    //     println!("orbit_normal: {}", orbit_normal);
-    //     println!("north: {}", north);
-    //     let expected = NEPTUNE.axis_tilt;
-    //     let actual = orbit_normal.angle_to(&north);
-    //     println!("expected: {}, actual: {}", expected, actual);
-    //     assert!(angle_eq_within(actual, expected, TILT_ACCURACY));
-    // }
-
-    // #[test]
-    // fn axis_tilt_of_pluto() {
-    //     let orbit_normal = PLUTO.orbit.normal();
-    //     let north = PLUTO.rotation_axis.to_direction();
-    //     println!("orbit_normal: {}", orbit_normal);
-    //     println!("north: {}", north);
-    //     let expected = PLUTO.axis_tilt;
-    //     let actual = orbit_normal.angle_to(&north);
-    //     println!("expected: {}, actual: {}", expected, actual);
-    //     assert!(angle_eq_within(actual, expected, TILT_ACCURACY));
-    // }
 }
