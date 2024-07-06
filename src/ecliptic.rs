@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
 
-use crate::cartesian::CartesianCoordinates;
+use crate::{cartesian::CartesianCoordinates, equatorial::EquatorialCoordinates};
 
 use super::{direction::Direction, spherical::SphericalCoordinates};
 
@@ -71,6 +71,14 @@ impl EclipticCoordinates {
 
     pub fn to_earth_equatorial(&self) -> crate::earth_equatorial::EarthEquatorialCoordinates {
         self.to_direction().to_earth_equatorial()
+    }
+
+    pub fn to_equatorial(&self, axis: Direction) -> EquatorialCoordinates {
+        self.to_direction().to_equatorial(axis)
+    }
+
+    pub fn to_spherical(&self) -> SphericalCoordinates {
+        self.spherical
     }
 
     pub fn angle_to(&self, other: &Self) -> Angle<f64> {

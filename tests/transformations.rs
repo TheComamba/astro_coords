@@ -277,3 +277,51 @@ fn earth_equatorial_to_spherical_roundtrip() {
         assert!(earth_equatorial.eq_within(&new_earth_equatorial, ANGLE_ACC));
     }
 }
+
+#[test]
+fn ecliptic_to_cartesian_roundtrip() {
+    for ecliptic in ecliptic_examples() {
+        let length = Distance::from_m(10.);
+        let cartesian = ecliptic.to_cartesian(length);
+        let new_ecliptic = cartesian.to_ecliptic();
+        assert!(ecliptic.eq_within(&new_ecliptic, ANGLE_ACC));
+    }
+}
+
+#[test]
+fn ecliptic_to_direction_roundtrip() {
+    for ecliptic in ecliptic_examples() {
+        let direction = ecliptic.to_direction();
+        let new_ecliptic = direction.to_ecliptic();
+        assert!(ecliptic.eq_within(&new_ecliptic, ANGLE_ACC));
+    }
+}
+
+#[test]
+fn ecliptic_to_earth_equatorial_roundtrip() {
+    for ecliptic in ecliptic_examples() {
+        let earth_equatorial = ecliptic.to_earth_equatorial();
+        let new_ecliptic = earth_equatorial.to_ecliptic();
+        assert!(ecliptic.eq_within(&new_ecliptic, ANGLE_ACC));
+    }
+}
+
+#[test]
+fn ecliptic_to_equatorial_roundtrip() {
+    for ecliptic in ecliptic_examples() {
+        for axis in direction_examples() {
+            let equatorial = ecliptic.to_equatorial(axis);
+            let new_ecliptic = equatorial.to_ecliptic();
+            assert!(ecliptic.eq_within(&new_ecliptic, ANGLE_ACC));
+        }
+    }
+}
+
+#[test]
+fn ecliptic_to_spherical_roundtrip() {
+    for ecliptic in ecliptic_examples() {
+        let spherical = ecliptic.to_spherical();
+        let new_ecliptic = spherical.to_ecliptic();
+        assert!(ecliptic.eq_within(&new_ecliptic, ANGLE_ACC));
+    }
+}
