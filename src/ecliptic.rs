@@ -94,6 +94,15 @@ impl Display for EclipticCoordinates {
 }
 
 #[cfg(test)]
+pub(super) const EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES: EclipticCoordinates =
+    EclipticCoordinates::new(SphericalCoordinates::new(
+        crate::angle_helper::QUARTER_CIRC,
+        Angle {
+            rad: crate::angle_helper::QUARTER_CIRC.rad - crate::angle_helper::EARTH_AXIS_TILT.rad,
+        },
+    ));
+
+#[cfg(test)]
 mod tests {
     use simple_si_units::geometry::Angle;
 

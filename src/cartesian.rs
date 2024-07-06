@@ -264,7 +264,7 @@ mod tests {
             z: Distance::from_meters(5.),
         };
 
-        assert!(eq(coordinates.length().to_m(), 7.0710678118654755));
+        assert!((coordinates.length().to_m() - 7.0710678118654755).abs() < TEST_ACCURACY);
     }
 
     #[test]

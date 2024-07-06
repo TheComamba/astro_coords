@@ -249,9 +249,9 @@ mod tests {
                     let expected_z = z / length;
                     let direction = cartesian.to_spherical().to_direction();
 
-                    assert!(eq(direction.x(), expected_x));
-                    assert!(eq(direction.y(), expected_y));
-                    assert!(eq(direction.z(), expected_z));
+                    assert!((direction.x() - expected_x).abs() < TEST_ACCURACY);
+                    assert!((direction.y() - expected_y).abs() < TEST_ACCURACY);
+                    assert!((direction.z() - expected_z).abs() < TEST_ACCURACY);
                 }
             }
         }

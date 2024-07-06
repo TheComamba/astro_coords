@@ -38,7 +38,10 @@ impl Display for RightAscension {
 
 #[cfg(test)]
 mod tests {
-    use crate::angle_helper::{angle_eq_within, angle_from_second_angle, angle_to_arcsecs};
+    use crate::angle_helper::{
+        angle_eq_within,
+        test::{angle_from_second_angle, angle_to_arcsecs},
+    };
 
     use super::*;
 

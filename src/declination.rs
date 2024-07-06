@@ -54,7 +54,7 @@ impl Display for Declination {
 
 #[cfg(test)]
 mod tests {
-    use crate::angle_helper::{angle_from_arcsecs, angle_to_arcsecs};
+    use crate::angle_helper::test::{angle_from_arcsecs, angle_to_arcsecs};
 
     use super::*;
 

@@ -40,7 +40,7 @@ impl EquatorialCoordinates {
         &self.rotation_axis
     }
 
-    pub(crate) fn to_direction(&self) -> Direction {
+    pub fn to_direction(&self) -> Direction {
         self.spherical
             .to_direction()
             .active_rotation_to_new_z_axis(&self.rotation_axis)
@@ -59,7 +59,10 @@ impl Display for EquatorialCoordinates {
 
 #[cfg(test)]
 mod tests {
-    use crate::earth_equatorial::EarthEquatorialCoordinates;
+    use crate::{
+        earth_equatorial::EarthEquatorialCoordinates,
+        ecliptic::EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES,
+    };
 
     use super::*;
 
