@@ -20,6 +20,9 @@ use super::{
     transformations::rotations::rotated_tuple,
 };
 
+/// Cartesian coordinates in 3D space.
+/// 
+/// The members x, y and z are typed as `Distance<f64>`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CartesianCoordinates {
     x: Distance<f64>,
@@ -28,16 +31,29 @@ pub struct CartesianCoordinates {
 }
 
 impl CartesianCoordinates {
+    /// The origin of the coordinate system, given by (x,y,z)=(0,0,0).
     pub const ORIGIN: CartesianCoordinates = CartesianCoordinates {
         x: Distance { m: 0. },
         y: Distance { m: 0. },
         z: Distance { m: 0. },
     };
 
+    /// Creates a new CartesianCoordinates object.
     pub const fn new(x: Distance<f64>, y: Distance<f64>, z: Distance<f64>) -> CartesianCoordinates {
         CartesianCoordinates { x, y, z }
     }
 
+    /// Tests if the coordinates are equal to another set of coordinates within a certain accuracy.
+    /// 
+    /// # Examples
+    /// ```
+    /// use simple_si_units::base::Distance;
+    /// use astro_coordinates::cartesian::CartesianCoordinates;
+    /// 
+    /// let c1 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
+    /// let c2 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
+    /// assert!(c1.eq_within(&c2, Distance::from_meters(0.1)));
+    /// ```
     pub fn eq_within(&self, other: &CartesianCoordinates, accuracy: Distance<f64>) -> bool {
         (self.x.m - other.x.m).abs() < accuracy.m
             && (self.y.m - other.y.m).abs() < accuracy.m

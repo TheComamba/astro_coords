@@ -42,12 +42,13 @@ where
 /// ```
 /// use simple_si_units::geometry::Angle;
 /// use astro_coordinates::direction::Direction;
+/// use astro_coordinates::transformations::rotations::get_rotation_parameters;
 ///
 /// let start = Direction::new(1., 0., 0.).unwrap();
 /// let end = Direction::new(0., 1., 0.).unwrap();
-/// let (angle, axis) = astro_coordinates::transformations::get_rotation_parameters(&start, &end);
-/// assert_eq!(angle, Angle::from_degrees(90.));
-/// assert_eq!(axis, Direction::Z);
+/// let (angle, axis) = get_rotation_parameters(&start, &end);
+/// assert!((angle.to_degrees() - 90.).abs() < 1e-5);
+/// assert!(axis.eq_within(&Direction::Z, 1e-5));
 /// ```
 pub fn get_rotation_parameters(start: &Direction, end: &Direction) -> (Angle<f64>, Direction) {
     let angle = start.angle_to(end);
