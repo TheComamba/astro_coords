@@ -290,6 +290,14 @@ impl Direction {
         dir
     }
 
+    /// Returns the Direction that results from passively rotating the Direction to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
+    ///
+    /// This method is for example used to convert from ecliptic coordinates to equatorial coordinates.
+    /// It operates in the following way:
+    /// 1. The vector is rotated around the old z-axis by the angle between the new z-axis and the old y-axis, projected onto the old x-y plane.
+    /// 2. The vector is rotated around the old x-axis by the angle between new and old z-axis.
+    ///
+    /// This is the inverse operation of `active_rotation_to_new_z_axis`.
     pub fn passive_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
         let axis_projected_onto_xy_plane = Direction::new(new_z.x(), new_z.y(), 0.);
         let mut polar_rotation_angle = ANGLE_ZERO;
