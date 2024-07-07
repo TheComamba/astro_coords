@@ -19,6 +19,7 @@ use super::{
 
 pub(super) const NORMALIZATION_THRESHOLD: f64 = 1e-5;
 
+/// The Direction struct represents a normalised vector in 3D space.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Direction {
     pub(super) x: f64,
@@ -27,54 +28,32 @@ pub struct Direction {
 }
 
 impl Direction {
-    const SERIALIZATION_ACCURACY: f64 = 1e-3;
-
-    pub fn to_array(&self) -> [f64; 3] {
-        [self.x, self.y, self.z]
-    }
-
-    pub fn from_array(array: [f64; 3]) -> Result<Self, AstroCoordsError> {
-        Direction::new(array[0], array[1], array[2])
-    }
-}
-
-impl Serialize for Direction {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        let array = self.to_array();
-        let mut tuple_serializer = serializer.serialize_tuple(3)?;
-        for value in &array {
-            let value =
-                (value / Self::SERIALIZATION_ACCURACY).round() * Self::SERIALIZATION_ACCURACY;
-            tuple_serializer.serialize_element(&value)?;
-        }
-        tuple_serializer.end()
-    }
-}
-
-impl<'de> Deserialize<'de> for Direction {
-    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let array = <[f64; 3]>::deserialize(deserializer)?;
-        Direction::from_array(array).map_err(serde::de::Error::custom)
-    }
-}
-
-impl Direction {
+    /// A normalised vector pointing in x-Direction.
     pub const X: Direction = Direction {
         x: 1.,
         y: 0.,
         z: 0.,
     };
+
+    /// A normalised vector pointing in y-Direction.
     pub const Y: Direction = Direction {
         x: 0.,
         y: 1.,
         z: 0.,
     };
+
+    /// A normalised vector pointing in z-Direction.
     pub const Z: Direction = Direction {
         x: 0.,
         y: 0.,
         z: 1.,
     };
 
+    const SERIALIZATION_ACCURACY: f64 = 1e-3;
+
+    /// Creates a new Direction from the given coordinates.
+    /// 
+    /// If the length of the vector is below the `NORMALIZATION_THRESHOLD`, an error is returned.
     pub fn new(x: f64, y: f64, z: f64) -> Result<Self, AstroCoordsError> {
         let length = (x * x + y * y + z * z).sqrt();
         if length < NORMALIZATION_THRESHOLD {
@@ -88,6 +67,30 @@ impl Direction {
         }
     }
 
+    /// Returns the Direction as an array.
+    pub fn to_array(&self) -> [f64; 3] {
+        [self.x, self.y, self.z]
+    }
+
+    /// Creates a Direction from an array.
+    pub fn from_array(array: [f64; 3]) -> Result<Self, AstroCoordsError> {
+        Direction::new(array[0], array[1], array[2])
+    }
+
+    /// Returns a CartesianCoordinates struct with the specified length, pointing in the direction.
+    /// 
+    /// # Example
+    /// ```
+    /// use simple_si_units::base::Distance;
+    /// use astro_coordinates::{direction::Direction, cartesian::CartesianCoordinates};
+    /// 
+    /// let direction = Direction::new(1., 1., 1.).unwrap();
+    /// let length = Distance::from_meters(10.);
+    /// let ordinate_length = length / 3f64.sqrt();
+    /// let cartesian = direction.to_cartesian(length);
+    /// let expected = CartesianCoordinates::new(ordinate_length, ordinate_length, ordinate_length);
+    /// assert!(cartesian.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// ```
     pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
         CartesianCoordinates::new(self.x * length, self.y * length, self.z * length)
     }
@@ -232,6 +235,26 @@ impl Neg for &Direction {
 impl Display for Direction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "({:.2}, {:.2}, {:.2})", self.x, self.y, self.z)
+    }
+}
+
+impl Serialize for Direction {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let array = self.to_array();
+        let mut tuple_serializer = serializer.serialize_tuple(3)?;
+        for value in &array {
+            let value =
+                (value / Self::SERIALIZATION_ACCURACY).round() * Self::SERIALIZATION_ACCURACY;
+            tuple_serializer.serialize_element(&value)?;
+        }
+        tuple_serializer.end()
+    }
+}
+
+impl<'de> Deserialize<'de> for Direction {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let array = <[f64; 3]>::deserialize(deserializer)?;
+        Direction::from_array(array).map_err(serde::de::Error::custom)
     }
 }
 
