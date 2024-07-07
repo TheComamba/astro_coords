@@ -52,7 +52,7 @@ impl Direction {
     const SERIALIZATION_ACCURACY: f64 = 1e-3;
 
     /// Creates a new Direction from the given coordinates.
-    /// 
+    ///
     /// If the length of the vector is below the `NORMALIZATION_THRESHOLD`, an error is returned.
     pub fn new(x: f64, y: f64, z: f64) -> Result<Self, AstroCoordsError> {
         let length = (x * x + y * y + z * z).sqrt();
@@ -78,12 +78,12 @@ impl Direction {
     }
 
     /// Returns a CartesianCoordinates struct with the specified length, pointing in the direction.
-    /// 
+    ///
     /// # Example
     /// ```
     /// use simple_si_units::base::Distance;
     /// use astro_coords::{direction::Direction, cartesian::CartesianCoordinates};
-    /// 
+    ///
     /// let direction = Direction::new(1., 1., 1.).unwrap();
     /// let length = Distance::from_meters(10.);
     /// let ordinate_length = length / 3f64.sqrt();
@@ -95,33 +95,91 @@ impl Direction {
         CartesianCoordinates::new(self.x * length, self.y * length, self.z * length)
     }
 
+    /// Returns the spherical coordinates of the Direction.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::direction::Direction;
+    ///
+    /// let direction = Direction::X;
+    /// let spherical = direction.to_spherical();
+    /// assert!((spherical.get_latitude().to_degrees() - 0.).abs() < 1e-5);
+    /// assert!((spherical.get_longitude().to_degrees() - 0.).abs() < 1e-5);
+    ///
+    /// let direction = Direction::Y;
+    /// let spherical = direction.to_spherical();
+    /// assert!((spherical.get_latitude().to_degrees() - 0.).abs() < 1e-5);
+    /// assert!((spherical.get_longitude().to_degrees() - 90.).abs() < 1e-5);
+    ///
+    /// let direction = Direction::Z;
+    /// let spherical = direction.to_spherical();
+    /// assert!((spherical.get_latitude().to_degrees() - 90.).abs() < 1e-5);
+    /// assert!((spherical.get_longitude().to_degrees() - 0.).abs() < 1e-5);
+    /// ```
     pub fn to_spherical(&self) -> SphericalCoordinates {
         SphericalCoordinates::cartesian_to_spherical((self.x, self.y, self.z))
     }
 
+    /// Returns the x-ordinate of the Direction.
     pub fn x(&self) -> f64 {
         self.x
     }
 
+    /// Returns the y-ordinate of the Direction.
     pub fn y(&self) -> f64 {
         self.y
     }
 
+    /// Returns the z-ordinate of the Direction.
     pub fn z(&self) -> f64 {
         self.z
     }
 
+    /// Returns a new Direction that is rotated by the specified angle around the specified axis.
+    ///
+    /// # Example
+    /// ```
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::direction::Direction;
+    ///
+    /// let direction = Direction::X;
+    /// let angle = Angle::from_degrees(90.);
+    /// let axis = Direction::Z;
+    /// let rotated = direction.rotated(angle, &axis);
+    /// assert!(rotated.eq_within(&Direction::Y, 1e-5));
+    /// ```
     pub fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Direction {
         let (x, y, z) = rotated_tuple((self.x, self.y, self.z), angle, axis);
         Direction { x, y, z }
     }
 
+    /// Returns true if the Direction is equal to the other Direction within the specified accuracy.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::direction::Direction;
+    ///
+    /// let direction = Direction::new(1., 1., 1.).unwrap();
+    /// let other = Direction::new(1., 1., 1.).unwrap();
+    /// assert!(direction.eq_within(&other, 1e-5));
+    /// ```
     pub fn eq_within(&self, other: &Direction, accuracy: f64) -> bool {
         (self.x - other.x).abs() < accuracy
             && (self.y - other.y).abs() < accuracy
             && (self.z - other.z).abs() < accuracy
     }
 
+    /// Returns the angle between the Direction and the other Direction.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::direction::Direction;
+    ///
+    /// let direction = Direction::X;
+    /// let other = Direction::Y;
+    /// let angle = direction.angle_to(&other);
+    /// assert!((angle.to_degrees() - 90.).abs() < 1e-5);
+    /// ```
     pub fn angle_to(&self, other: &Direction) -> Angle<f64> {
         let (ax, ay, az) = (self.x(), self.y(), self.z());
         let (bx, by, bz) = (other.x(), other.y(), other.z());
@@ -136,6 +194,16 @@ impl Direction {
         Angle::from_radians(cosine_argument.acos())
     }
 
+    /// Constructs a Direction that is guaranteed to be orthogonal to the Direction.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::direction::Direction;
+    ///
+    /// let direction = Direction::new(1., 2., 3.).unwrap();
+    /// let orthogonal = direction.some_orthogonal_vector();
+    /// assert!(orthogonal.angle_to(&direction).to_degrees() - 90. < 1e-5);
+    /// ```
     pub fn some_orthogonal_vector(&self) -> Direction {
         let ortho = if self.x().abs() > NORMALIZATION_THRESHOLD {
             self.cross_product(&Self::Y)
@@ -147,6 +215,17 @@ impl Direction {
         ortho.unwrap_or(Self::Z)
     }
 
+    /// Constructs the cross product of the Direction and the other Direction.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::direction::Direction;
+    ///
+    /// let direction = Direction::X;
+    /// let other = Direction::Y;
+    /// let cross = direction.cross_product(&other).unwrap();
+    /// assert!(cross.eq_within(&Direction::Z, 1e-5));
+    /// ```
     pub fn cross_product(&self, other: &Direction) -> Result<Direction, AstroCoordsError> {
         let (ax, ay, az) = (self.x, self.y, self.z);
         let (bx, by, bz) = (other.x(), other.y(), other.z());
@@ -158,17 +237,42 @@ impl Direction {
         Direction::new(cx, cy, cz)
     }
 
+    /// Calculates the dot product of the Direction and the other Direction.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::direction::Direction;
+    ///
+    /// let direction = Direction::X;
+    /// let other = Direction::Y;
+    /// let dot_product = direction.dot_product(&other);
+    /// assert!((dot_product - 0.).abs() < 1e-5);
+    /// ```
     pub fn dot_product(&self, other: &Direction) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    /*
-     * This method is for example used to convert from equatorial coordinates to ecliptic coordinates.
-     * It operates the following way:
-     * 1. The vector is rotated around the X axis by the angle between new and old Z axis.
-     * 2. The vector is rotated around old Z by the angle between new Z and old Y, projected on the old X-Y plane.
-     * The result is the coordinates. The new X-axis still lies in the old X-Y plane.
-     */
+    /// Returns the Direction that results from actively rotating the Direction to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
+    ///
+    /// This method is for example used to convert from equatorial coordinates to ecliptic coordinates.
+    /// It operates in the following way:
+    /// 1. The vector is rotated around the old x-axis by the angle between new and old z-axis.
+    /// 2. The vector is rotated around the old z-axis by the angle between the new z-axis and the old y-axis, projected onto the old x-y plane.
+    ///
+    /// This is the inverse operation of `passive_rotation_to_new_z_axis`.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::direction::Direction;
+    ///
+    /// let new_z = Direction::new(1., 1., 1.).unwrap();
+    ///
+    /// let rotated_z = Direction::Z.active_rotation_to_new_z_axis(&new_z);
+    /// assert!(rotated_z.eq_within(&new_z, 1e-5));
+    ///
+    /// let rotated_x = Direction::X.active_rotation_to_new_z_axis(&new_z);
+    /// assert!(rotated_x.dot_product(&Direction::Z).abs() < 1e-5);
+    /// ```
     pub fn active_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
         let angle_to_old_z = new_z.angle_to(&Self::Z);
 
