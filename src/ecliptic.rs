@@ -1,3 +1,5 @@
+//! This module contains the EclipticCoordinates struct and its implementation.
+
 use serde::{Deserialize, Serialize};
 use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
@@ -6,11 +8,12 @@ use crate::{cartesian::CartesianCoordinates, equatorial::EquatorialCoordinates};
 
 use super::{direction::Direction, spherical::SphericalCoordinates};
 
-/*  The "absolute" reference we use for polar coordiantes is heliocentric ecliptic coordinates:
- * Longitude denotes the angle between the vernal equinox and the body, measured in the ecliptic plane.
- * Latitude denotes the angle between the ecliptic plane and the body.
- * https://en.wikipedia.org/wiki/Ecliptic_coordinate_system
- */
+/// Ecliptic coordinates are a spherical coordinate system that is centered on the sun.
+///
+/// The "absolute" reference we use for polar coordiantes is heliocentric ecliptic coordinates:
+/// Longitude denotes the angle between the vernal equinox and the body, measured in the ecliptic plane.
+/// Latitude denotes the angle between the ecliptic plane and the body.
+/// Compare https://en.wikipedia.org/wiki/Ecliptic_coordinate_system
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct EclipticCoordinates {
     pub(super) spherical: SphericalCoordinates,

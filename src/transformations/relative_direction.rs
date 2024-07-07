@@ -1,10 +1,11 @@
+//! Functions for transforming directions relative to a normal vector.
+
 use crate::direction::Direction;
 
-/*
- * Rotates object_direction as it would seem to an observer looking in the direction of observer_normal.
- * The rotation_reference is used to determine the direction of the rotation.
- * Its projection onto the new XY plane points along the new X axis.
- */
+/// Rotates object_direction as it would seem to an observer looking in the direction of observer_normal.
+///
+/// The rotation_reference is used to determine the direction of the rotation.
+/// Its projection onto the new XY plane points along the new X axis.
 pub fn direction_relative_to_normal(
     object_direction: &Direction,
     observer_normal: &Direction,

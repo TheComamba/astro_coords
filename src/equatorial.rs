@@ -1,3 +1,5 @@
+//! This module contains the EquatorialCoordinates struct and its implementation.
+
 use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
 

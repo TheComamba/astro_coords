@@ -1,6 +1,13 @@
-use std::fmt::Display;
+//! Right Ascension and Declination types and conversions.
 
 use simple_si_units::geometry::Angle;
+use std::fmt::Display;
+
+pub struct RightAscension {
+    pub(super) hours: i8,
+    pub(super) minutes: i8,
+    pub(super) seconds: i8,
+}
 
 pub struct Declination {
     pub(super) sign: Sgn,
@@ -9,10 +16,43 @@ pub struct Declination {
     pub(super) seconds: u8,
 }
 
+/// Sign of a declination
+///
+/// This simple enum resolves the ambiguity that would arise from 0 == -0 in case degrees were stored in a signed integer.
 #[derive(Copy, Clone)]
 pub enum Sgn {
+    /// Positive sign, corresponding to the northern hemisphere.
     Pos,
+    /// Negative sign, corresponding to the southern hemisphere.
     Neg,
+}
+
+impl RightAscension {
+    pub const fn new(hours: i8, minutes: i8, seconds: i8) -> Self {
+        Self {
+            hours,
+            minutes,
+            seconds,
+        }
+    }
+
+    pub fn to_angle(&self) -> Angle<f64> {
+        let hours = self.hours as f64;
+        let minutes = self.minutes as f64;
+        let seconds = self.seconds as f64;
+
+        Angle::from_degrees((hours + minutes / 60. + seconds / 3600.) * 15.)
+    }
+}
+
+impl Display for RightAscension {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{:02}h{:02}m{:02}s",
+            self.hours, self.minutes, self.seconds
+        )
+    }
 }
 
 impl Declination {
@@ -54,18 +94,31 @@ impl Display for Declination {
 
 #[cfg(test)]
 mod tests {
-    use crate::angle_helper::test::{angle_from_arcsecs, angle_to_arcsecs};
+    use crate::angle_helper::{angle_eq_within, test::*};
 
     use super::*;
 
     #[test]
-    fn one_second() {
+    fn ra_one_second() {
+        let dec = RightAscension::new(0, 0, 1);
+        let expected = angle_from_second_angle(1.);
+        println!("{}", angle_to_arcsecs(&dec.to_angle()));
+        println!("{}", angle_to_arcsecs(&expected));
+        assert!(angle_eq_within(
+            dec.to_angle(),
+            expected,
+            Angle { rad: 1e-5 }
+        ));
+    }
+
+    #[test]
+    fn dec_one_second() {
         let dec = Declination::new(Sgn::Pos, 0, 0, 1);
         assert!((angle_to_arcsecs(&dec.to_angle()) - 1.) < 1e-5);
     }
 
     #[test]
-    fn small_angle_roundtrips() {
+    fn dec_small_angle_roundtrips() {
         const STEPS: u8 = 10;
         for sec in 0..STEPS {
             for min in 0..STEPS {
