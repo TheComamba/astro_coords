@@ -16,9 +16,14 @@ pub struct Declination {
     pub(super) seconds: u8,
 }
 
+/// Sign of a declination
+///
+/// This simple enum resolves the ambiguity that would arise from 0 == -0 in case degrees were stored in a signed integer.
 #[derive(Copy, Clone)]
 pub enum Sgn {
+    /// Positive sign, corresponding to the northern hemisphere.
     Pos,
+    /// Negative sign, corresponding to the southern hemisphere.
     Neg,
 }
 
