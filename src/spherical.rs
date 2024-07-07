@@ -1,3 +1,5 @@
+//! This module contains the SphericalCoordinates struct and its implementation.
+
 use serde::{Deserialize, Serialize};
 use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
@@ -8,10 +10,9 @@ use crate::{
 };
 
 use super::{
-    declination::{Declination, Sgn},
     direction::Direction,
     ecliptic::EclipticCoordinates,
-    right_ascension::RightAscension,
+    ra_and_dec::{Declination, RightAscension, Sgn},
 };
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]

@@ -1,3 +1,5 @@
+//! Cartesian coordinates in 3D space.
+
 use serde::{Deserialize, Serialize};
 use simple_si_units::{
     base::Distance,

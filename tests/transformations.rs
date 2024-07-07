@@ -1,10 +1,7 @@
 use astro_coordinates::{
-    cartesian::CartesianCoordinates,
-    direction::Direction,
-    earth_equatorial::EarthEquatorialCoordinates,
-    ecliptic::EclipticCoordinates,
-    equatorial::EquatorialCoordinates,
-    spherical::SphericalCoordinates,
+    cartesian::CartesianCoordinates, direction::Direction,
+    earth_equatorial::EarthEquatorialCoordinates, ecliptic::EclipticCoordinates,
+    equatorial::EquatorialCoordinates, spherical::SphericalCoordinates,
 };
 use simple_si_units::{base::Distance, geometry::Angle};
 

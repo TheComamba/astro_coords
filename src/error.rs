@@ -1,3 +1,5 @@
+//! Error types for the astro_coordinates crate
+
 use std::fmt::Display;
 
 #[derive(Debug, Clone, Copy)]

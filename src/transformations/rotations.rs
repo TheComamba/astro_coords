@@ -1,3 +1,5 @@
+//! Functions for rotating vectors.
+
 use simple_si_units::geometry::Angle;
 use std::ops::{Add, Mul};
 
@@ -34,6 +36,19 @@ where
     (x_out, y_out, z_out)
 }
 
+/// Calculates the angle and axis of rotation to rotate from one direction to another.
+///
+/// # Example
+/// ```
+/// use simple_si_units::geometry::Angle;
+/// use astro_coordinates::direction::Direction;
+///
+/// let start = Direction::new(1., 0., 0.).unwrap();
+/// let end = Direction::new(0., 1., 0.).unwrap();
+/// let (angle, axis) = astro_coordinates::transformations::get_rotation_parameters(&start, &end);
+/// assert_eq!(angle, Angle::from_degrees(90.));
+/// assert_eq!(axis, Direction::Z);
+/// ```
 pub fn get_rotation_parameters(start: &Direction, end: &Direction) -> (Angle<f64>, Direction) {
     let angle = start.angle_to(end);
     let axis = start.cross_product(end);

@@ -1,3 +1,5 @@
+//! This module contains the Direction struct, which represents a normalized vector in 3D space.
+
 use serde::ser::SerializeTuple;
 use serde::Serializer;
 use serde::{Deserialize, Serialize};
