@@ -82,7 +82,7 @@ impl Direction {
     /// # Example
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coordinates::{direction::Direction, cartesian::CartesianCoordinates};
+    /// use astro_coords::{direction::Direction, cartesian::CartesianCoordinates};
     /// 
     /// let direction = Direction::new(1., 1., 1.).unwrap();
     /// let length = Distance::from_meters(10.);

@@ -1,4 +1,4 @@
-use astro_coordinates::{
+use astro_coords::{
     cartesian::CartesianCoordinates, direction::Direction,
     earth_equatorial::EarthEquatorialCoordinates, ecliptic::EclipticCoordinates,
     equatorial::EquatorialCoordinates, spherical::SphericalCoordinates,

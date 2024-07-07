@@ -1,4 +1,4 @@
-//! Error types for the astro_coordinates crate
+//! Error types for the astro_coords crate
 
 use std::fmt::Display;
 

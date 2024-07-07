@@ -5,9 +5,9 @@ description = "A Rust crate containing typed coordinate systems found in the con
 edition = "2021"
 keywords = ["coordinates", "astronomy"]
 license = "MIT"
-name = "astro_coordinates"
+name = "astro_coords"
 readme = "README.md"
-repository = "https://github.com/TheComamba/AstroCoordinates"
+repository = "https://github.com/TheComamba/AstroCoords"
 version = "0.1.0"
 
 [dependencies]

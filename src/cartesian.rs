@@ -29,7 +29,7 @@ use super::{
 /// # Examples
 /// ```
 /// use simple_si_units::base::Distance;
-/// use astro_coordinates::cartesian::CartesianCoordinates;
+/// use astro_coords::cartesian::CartesianCoordinates;
 /// 
 /// let c1 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
 /// let c2 = CartesianCoordinates::new(Distance::from_meters(4.), Distance::from_meters(5.), Distance::from_meters(6.));
@@ -79,7 +79,7 @@ impl CartesianCoordinates {
     /// # Examples
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coordinates::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::CartesianCoordinates;
     /// 
     /// let c1 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
     /// let c2 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
@@ -99,7 +99,7 @@ impl CartesianCoordinates {
     /// # Examples
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coordinates::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::CartesianCoordinates;
     /// 
     /// let coordinates = CartesianCoordinates::new(Distance::from_meters(3.), Distance::from_meters(4.), Distance::from_meters(5.));
     /// assert!((coordinates.length().to_m() - 7.0710678118654755).abs() < 1e-5);
@@ -118,7 +118,7 @@ impl CartesianCoordinates {
     /// # Examples
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coordinates::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::CartesianCoordinates;
     /// 
     /// let coordinates = CartesianCoordinates::new(Distance::from_meters(3.), Distance::from_meters(4.), Distance::from_meters(5.));
     /// assert!((coordinates.length_squared().to_m2() - 50.).abs() < 1e-5);
@@ -137,7 +137,7 @@ impl CartesianCoordinates {
     /// # Examples
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coordinates::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::CartesianCoordinates;
     /// 
     /// let c1 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
     /// let c2 = CartesianCoordinates::new(Distance::from_meters(4.), Distance::from_meters(5.), Distance::from_meters(6.));
@@ -169,8 +169,8 @@ impl CartesianCoordinates {
     /// ```
     /// use simple_si_units::base::Distance;
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coordinates::cartesian::CartesianCoordinates;
-    /// use astro_coordinates::direction::Direction;
+    /// use astro_coords::cartesian::CartesianCoordinates;
+    /// use astro_coords::direction::Direction;
     /// 
     /// let coordinates = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
     /// let angle = Angle::from_degrees(90.);
@@ -190,7 +190,7 @@ impl CartesianCoordinates {
     /// ```
     /// use simple_si_units::base::Distance;
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coordinates::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::CartesianCoordinates;
     /// 
     /// let c1 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
     /// let c2 = CartesianCoordinates::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
@@ -208,7 +208,7 @@ impl CartesianCoordinates {
     /// # Examples
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coordinates::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::CartesianCoordinates;
     /// 
     /// let coordinates = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(1.), Distance::from_meters(0.));
     /// let direction = coordinates.to_direction().unwrap();

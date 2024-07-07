@@ -41,8 +41,8 @@ where
 /// # Example
 /// ```
 /// use simple_si_units::geometry::Angle;
-/// use astro_coordinates::direction::Direction;
-/// use astro_coordinates::transformations::rotations::get_rotation_parameters;
+/// use astro_coords::direction::Direction;
+/// use astro_coords::transformations::rotations::get_rotation_parameters;
 ///
 /// let start = Direction::new(1., 0., 0.).unwrap();
 /// let end = Direction::new(0., 1., 0.).unwrap();
