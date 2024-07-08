@@ -4,16 +4,16 @@ use simple_si_units::geometry::Angle;
 use std::fmt::Display;
 
 pub struct RightAscension {
-    pub(super) hours: i8,
-    pub(super) minutes: i8,
-    pub(super) seconds: i8,
+    pub hours: u8,
+    pub minutes: u8,
+    pub seconds: u8,
 }
 
 pub struct Declination {
-    pub(super) sign: Sgn,
-    pub(super) degrees: u8,
-    pub(super) minutes: u8,
-    pub(super) seconds: u8,
+    pub sign: Sgn,
+    pub degrees: u8,
+    pub minutes: u8,
+    pub seconds: u8,
 }
 
 /// Sign of a declination
@@ -28,7 +28,7 @@ pub enum Sgn {
 }
 
 impl RightAscension {
-    pub const fn new(hours: i8, minutes: i8, seconds: i8) -> Self {
+    pub const fn new(hours: u8, minutes: u8, seconds: u8) -> Self {
         Self {
             hours,
             minutes,

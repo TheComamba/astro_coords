@@ -165,12 +165,15 @@ impl SphericalCoordinates {
     }
 
     pub fn to_ra_and_dec(&self) -> (RightAscension, Declination) {
-        let mut ra_remainder = self.longitude.to_degrees();
-        let ra_hours = (ra_remainder / 15.).floor() as i8;
+        let mut ra_remainder = normalized_angle(self.longitude).to_degrees();
+        if ra_remainder < 0. {
+            ra_remainder += 360.;
+        }
+        let ra_hours = (ra_remainder / 15.).floor() as u8;
         ra_remainder -= ra_hours as f64 * 15.;
-        let ra_minutes = (ra_remainder / 15. * 60.).floor() as i8;
+        let ra_minutes = (ra_remainder / 15. * 60.).floor() as u8;
         ra_remainder -= ra_minutes as f64 / 60. * 15.;
-        let ra_seconds = (ra_remainder / 15. * 3600.).floor() as i8;
+        let ra_seconds = (ra_remainder / 15. * 3600.).floor() as u8;
         let ra = RightAscension::new(ra_hours, ra_minutes, ra_seconds);
 
         let mut dec_remainder = self.latitude.to_degrees();
