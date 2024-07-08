@@ -11,8 +11,8 @@ use crate::{
 use super::{direction::Direction, spherical::SphericalCoordinates};
 
 pub struct EquatorialCoordinates {
-    spherical: SphericalCoordinates,
-    rotation_axis: Direction,
+    pub spherical: SphericalCoordinates,
+    pub rotation_axis: Direction,
 }
 
 impl EquatorialCoordinates {
@@ -21,30 +21,6 @@ impl EquatorialCoordinates {
             spherical,
             rotation_axis,
         }
-    }
-
-    pub fn get_longitude(&self) -> Angle<f64> {
-        self.spherical.get_longitude()
-    }
-
-    pub fn get_latitude(&self) -> Angle<f64> {
-        self.spherical.get_latitude()
-    }
-
-    pub fn set_longitude(&mut self, longitude: Angle<f64>) {
-        self.spherical.set_longitude(longitude);
-    }
-
-    pub fn set_latitude(&mut self, latitude: Angle<f64>) {
-        self.spherical.set_latitude(latitude);
-    }
-
-    pub fn get_spherical(&self) -> &SphericalCoordinates {
-        &self.spherical
-    }
-
-    pub fn get_rotation_axis(&self) -> &Direction {
-        &self.rotation_axis
     }
 
     pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
@@ -189,7 +165,7 @@ mod tests {
     fn behaves_like_earth_equatorial() {
         let ordinates: Vec<f64> = vec![-1., 0., 1., 10.];
         let earth_north = EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES
-            .get_spherical()
+            .spherical
             .to_direction();
 
         for long in ordinates.clone() {

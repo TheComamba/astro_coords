@@ -103,18 +103,18 @@ impl Direction {
     ///
     /// let direction = Direction::X;
     /// let spherical = direction.to_spherical();
-    /// assert!((spherical.get_latitude().to_degrees() - 0.).abs() < 1e-5);
-    /// assert!((spherical.get_longitude().to_degrees() - 0.).abs() < 1e-5);
+    /// assert!((spherical.latitude.to_degrees() - 0.).abs() < 1e-5);
+    /// assert!((spherical.longitude.to_degrees() - 0.).abs() < 1e-5);
     ///
     /// let direction = Direction::Y;
     /// let spherical = direction.to_spherical();
-    /// assert!((spherical.get_latitude().to_degrees() - 0.).abs() < 1e-5);
-    /// assert!((spherical.get_longitude().to_degrees() - 90.).abs() < 1e-5);
+    /// assert!((spherical.latitude.to_degrees() - 0.).abs() < 1e-5);
+    /// assert!((spherical.longitude.to_degrees() - 90.).abs() < 1e-5);
     ///
     /// let direction = Direction::Z;
     /// let spherical = direction.to_spherical();
-    /// assert!((spherical.get_latitude().to_degrees() - 90.).abs() < 1e-5);
-    /// assert!((spherical.get_longitude().to_degrees() - 0.).abs() < 1e-5);
+    /// assert!((spherical.latitude.to_degrees() - 90.).abs() < 1e-5);
+    /// assert!((spherical.longitude.to_degrees() - 0.).abs() < 1e-5);
     /// ```
     pub fn to_spherical(&self) -> SphericalCoordinates {
         SphericalCoordinates::cartesian_to_spherical((self.x, self.y, self.z))
@@ -318,7 +318,7 @@ impl Direction {
     pub fn to_earth_equatorial(&self) -> EarthEquatorialCoordinates {
         let dir_in_equatorial = self.rotated(EARTH_AXIS_TILT, &Direction::X);
         let spherical = dir_in_equatorial.to_spherical();
-        EarthEquatorialCoordinates::new(spherical.get_longitude(), spherical.get_latitude())
+        EarthEquatorialCoordinates::new(spherical.longitude, spherical.latitude)
     }
 
     pub fn to_ecliptic(&self) -> EclipticCoordinates {
