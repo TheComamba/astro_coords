@@ -212,10 +212,10 @@ impl CartesianCoordinates {
         Ok(self.to_direction()?.to_earth_equatorial())
     }
 
-    pub fn to_ecliptic(&self) -> EclipticCoordinates {
-        EclipticCoordinates {
-            spherical: self.to_spherical(),
-        }
+    pub fn to_ecliptic(&self) -> Result<EclipticCoordinates, AstroCoordsError> {
+        Ok(EclipticCoordinates {
+            spherical: self.to_spherical()?,
+        })
     }
 
     pub fn to_equatorial(
@@ -229,7 +229,21 @@ impl CartesianCoordinates {
         Ok(EquatorialCoordinates::new(spherical, rotation_axis))
     }
 
-    pub fn to_spherical(&self) -> SphericalCoordinates {
+    /// Returns spherical coordinates representing the direction of the coordinates.
+    ///
+    /// For coordinates with a very small length, this function will return an error.
+    ///
+    /// # Examples
+    /// ```
+    /// use simple_si_units::base::Distance;
+    /// use astro_coords::cartesian::CartesianCoordinates;
+    ///
+    /// let coordinates = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// let spherical = coordinates.to_spherical().unwrap();
+    /// assert!((spherical.longitude.to_degrees() - 45.).abs() < 1e-5);
+    /// assert!((spherical.latitude.to_degrees() - 0.).abs() < 1e-5);
+    /// ```
+    pub fn to_spherical(&self) -> Result<SphericalCoordinates, AstroCoordsError> {
         SphericalCoordinates::cartesian_to_spherical((self.x.m, self.y.m, self.z.m))
     }
 }
