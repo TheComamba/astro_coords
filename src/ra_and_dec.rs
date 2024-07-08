@@ -3,17 +3,70 @@
 use simple_si_units::geometry::Angle;
 use std::fmt::Display;
 
+/// Right ascension is the angular distance of a point eastward along the celestial equator from the vernal equinox to the point in question.
+///
+/// It is measured in hours, minutes, and seconds, with 24 hours corresponding to a full circle.
+///
+/// # Examples
+/// ```
+/// use astro_coords::ra_and_dec::RightAscension;
+///
+/// let ra = RightAscension::new(1, 2, 3.456);
+/// assert_eq!(format!("{}", ra), "01h02m03.456s");
+///
+/// let ra = RightAscension::new(6, 0, 0.);
+/// assert!((ra.to_angle().to_degrees() - 90.).abs() < 1e-5);
+///
+/// let one_hour = RightAscension::new(1, 0, 0.);
+/// let sixty_minutes = RightAscension::new(0, 60, 0.);
+/// assert!((one_hour.to_angle() - sixty_minutes.to_angle()).to_degrees().abs() < 1e-5);
+///
+/// let one_minute = RightAscension::new(0, 1, 0.);
+/// let sixty_seconds = RightAscension::new(0, 0, 60.);
+/// assert!((one_minute.to_angle() - sixty_seconds.to_angle()).to_degrees().abs() < 1e-5);
+/// ```
 pub struct RightAscension {
+    /// Subdivision of the equatorial plane into 24 hours.
     pub hours: u8,
+    /// Subdivision of an hour into 60 minutes.
     pub minutes: u8,
+    /// Subdivision of a minute into 60 seconds.
     pub seconds: f64,
 }
 
+/// Declination is the angular distance of a point north or south of the celestial equator.
+///
+/// It is measured in degrees, arcminutes, and arcseconds.
+/// 90 degrees correspond to the north celestial pole and -90 degrees to the south celestial pole.
+/// One arcminute is 1/60 of a degree, and one arcsecond is 1/60 of an arcminute.
+///
+/// # Examples
+/// ```
+/// use astro_coords::ra_and_dec::{Declination, Sgn};
+///
+/// let dec = Declination::new(Sgn::Pos, 1, 2, 3.456);
+/// assert_eq!(format!("{}", dec), "+01°02'03.456\"");
+///
+/// let dec = Declination::new(Sgn::Neg, 45, 0, 0.);
+/// assert!((dec.to_angle().to_degrees() + 45.).abs() < 1e-5);
+///
+/// let one_degree = Declination::new(Sgn::Pos, 1, 0, 0.);
+/// let sixty_arcminutes = Declination::new(Sgn::Pos, 0, 60, 0.);
+/// assert!((one_degree.to_angle() - sixty_arcminutes.to_angle()).to_degrees().abs() < 1e-5);
+///
+/// let one_arcminute = Declination::new(Sgn::Pos, 0, 1, 0.);
+/// let sixty_arcseconds = Declination::new(Sgn::Pos, 0, 0, 60.);
+/// assert!((one_arcminute.to_angle() - sixty_arcseconds.to_angle()).to_degrees().abs() < 1e-5);
+/// ```
 pub struct Declination {
+    /// Sign of the declination, denoting northern or southern hemisphere.
     pub sign: Sgn,
+    /// The latitude of the point in degrees.
     pub degrees: u8,
-    pub minutes: u8,
-    pub seconds: f64,
+    /// Subdivision of a degree into 60 arcminutes.
+    pub arcminutes: u8,
+    /// Subdivision of an arcminute into 60 arcseconds.
+    pub arcseconds: f64,
 }
 
 /// Sign of a declination
@@ -28,6 +81,7 @@ pub enum Sgn {
 }
 
 impl RightAscension {
+    /// Create a new RightAscension instance.
     pub const fn new(hours: u8, minutes: u8, seconds: f64) -> Self {
         Self {
             hours,
@@ -36,6 +90,7 @@ impl RightAscension {
         }
     }
 
+    /// Convert the right ascension to an angle.
     pub fn to_angle(&self) -> Angle<f64> {
         let hours = self.hours as f64;
         let minutes = self.minutes as f64;
@@ -49,30 +104,32 @@ impl Display for RightAscension {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{:02}h{:02}m{:02}s",
+            "{:02}h{:02}m{:06.3}s",
             self.hours, self.minutes, self.seconds
         )
     }
 }
 
 impl Declination {
-    pub const fn new(sign: Sgn, degrees: u8, minutes: u8, seconds: f64) -> Self {
+    /// Create a new Declination instance.
+    pub const fn new(sign: Sgn, degrees: u8, arcminutes: u8, arcseconds: f64) -> Self {
         Self {
             sign,
             degrees,
-            minutes,
-            seconds,
+            arcminutes,
+            arcseconds,
         }
     }
 
+    /// Convert the declination to an angle.
     pub fn to_angle(&self) -> Angle<f64> {
         let sign = match self.sign {
             Sgn::Pos => 1.,
             Sgn::Neg => -1.,
         };
         let degrees = self.degrees as f64;
-        let minutes = self.minutes as f64;
-        let seconds = self.seconds as f64;
+        let minutes = self.arcminutes as f64;
+        let seconds = self.arcseconds as f64;
 
         sign * Angle::from_degrees(degrees + minutes / 60. + seconds / 3600.)
     }
@@ -86,8 +143,8 @@ impl Display for Declination {
         };
         write!(
             f,
-            "{}{:02}°{:02}'{:02}\"",
-            sign, self.degrees, self.minutes, self.seconds
+            "{}{:02}°{:02}'{:06.3}\"",
+            sign, self.degrees, self.arcminutes, self.arcseconds
         )
     }
 }
@@ -112,7 +169,7 @@ mod tests {
     }
 
     #[test]
-    fn dec_one_second() {
+    fn dec_one_arcsecond() {
         let dec = Declination::new(Sgn::Pos, 0, 0, 1.);
         assert!((angle_to_arcsecs(&dec.to_angle()) - 1.) < 1e-5);
     }
