@@ -173,7 +173,7 @@ impl SphericalCoordinates {
         ra_remainder -= ra_hours as f64 * 15.;
         let ra_minutes = (ra_remainder / 15. * 60.).floor() as u8;
         ra_remainder -= ra_minutes as f64 / 60. * 15.;
-        let ra_seconds = (ra_remainder / 15. * 3600.).floor() as u8;
+        let ra_seconds = (ra_remainder / 15. * 3600.).floor();
         let ra = RightAscension::new(ra_hours, ra_minutes, ra_seconds);
 
         let mut dec_remainder = self.latitude.to_degrees();
@@ -187,7 +187,7 @@ impl SphericalCoordinates {
         dec_remainder -= dec_degrees as f64;
         let dec_minutes = (dec_remainder * 60.).floor() as u8;
         dec_remainder -= dec_minutes as f64 / 60.;
-        let dec_seconds = (dec_remainder * 3600.).floor() as u8;
+        let dec_seconds = (dec_remainder * 3600.).floor();
         let dec = Declination::new(sign, dec_degrees, dec_minutes, dec_seconds);
 
         (ra, dec)

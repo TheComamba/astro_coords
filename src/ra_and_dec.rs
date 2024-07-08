@@ -6,14 +6,14 @@ use std::fmt::Display;
 pub struct RightAscension {
     pub hours: u8,
     pub minutes: u8,
-    pub seconds: u8,
+    pub seconds: f64,
 }
 
 pub struct Declination {
     pub sign: Sgn,
     pub degrees: u8,
     pub minutes: u8,
-    pub seconds: u8,
+    pub seconds: f64,
 }
 
 /// Sign of a declination
@@ -28,7 +28,7 @@ pub enum Sgn {
 }
 
 impl RightAscension {
-    pub const fn new(hours: u8, minutes: u8, seconds: u8) -> Self {
+    pub const fn new(hours: u8, minutes: u8, seconds: f64) -> Self {
         Self {
             hours,
             minutes,
@@ -56,7 +56,7 @@ impl Display for RightAscension {
 }
 
 impl Declination {
-    pub const fn new(sign: Sgn, degrees: u8, minutes: u8, seconds: u8) -> Self {
+    pub const fn new(sign: Sgn, degrees: u8, minutes: u8, seconds: f64) -> Self {
         Self {
             sign,
             degrees,
@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn ra_one_second() {
-        let dec = RightAscension::new(0, 0, 1);
+        let dec = RightAscension::new(0, 0, 1.);
         let expected = angle_from_second_angle(1.);
         println!("{}", angle_to_arcsecs(&dec.to_angle()));
         println!("{}", angle_to_arcsecs(&expected));
@@ -113,7 +113,7 @@ mod tests {
 
     #[test]
     fn dec_one_second() {
-        let dec = Declination::new(Sgn::Pos, 0, 0, 1);
+        let dec = Declination::new(Sgn::Pos, 0, 0, 1.);
         assert!((angle_to_arcsecs(&dec.to_angle()) - 1.) < 1e-5);
     }
 
@@ -123,7 +123,7 @@ mod tests {
         for sec in 0..STEPS {
             for min in 0..STEPS {
                 for sign in [Sgn::Pos, Sgn::Neg] {
-                    let dec = Declination::new(sign, 0, min, sec);
+                    let dec = Declination::new(sign, 0, min, sec as f64);
                     let angle_abs = ((min as u32) * 60 + sec as u32) as f64;
                     let sign = match sign {
                         Sgn::Pos => 1.,

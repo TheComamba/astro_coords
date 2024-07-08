@@ -65,7 +65,6 @@ impl EclipticCoordinates {
     }
 
     pub fn angle_to(&self, other: &Self) -> Angle<f64> {
-        //TODO: There must be a more performant and stable way.
         self.to_direction().angle_to(&other.to_direction())
     }
 }
