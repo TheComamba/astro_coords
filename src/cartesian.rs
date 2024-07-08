@@ -212,10 +212,10 @@ impl CartesianCoordinates {
         Ok(self.to_direction()?.to_earth_equatorial())
     }
 
-    pub fn to_ecliptic(&self) -> EclipticCoordinates {
-        EclipticCoordinates {
-            spherical: self.to_spherical(),
-        }
+    pub fn to_ecliptic(&self) -> Result<EclipticCoordinates, AstroCoordsError> {
+        Ok(EclipticCoordinates {
+            spherical: self.to_spherical()?,
+        })
     }
 
     pub fn to_equatorial(
@@ -229,7 +229,7 @@ impl CartesianCoordinates {
         Ok(EquatorialCoordinates::new(spherical, rotation_axis))
     }
 
-    pub fn to_spherical(&self) -> SphericalCoordinates {
+    pub fn to_spherical(&self) -> Result<SphericalCoordinates, AstroCoordsError> {
         SphericalCoordinates::cartesian_to_spherical((self.x.m, self.y.m, self.z.m))
     }
 }

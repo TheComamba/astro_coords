@@ -116,7 +116,7 @@ fn cartesian_to_earth_equatorial_roundtrip() {
 fn cartesian_to_ecliptic_roundtrip() {
     for cartesian in cartesian_examples() {
         let length = cartesian.length();
-        let ecliptic = cartesian.to_ecliptic();
+        let ecliptic = cartesian.to_ecliptic().unwrap();
         let new_cartesian = ecliptic.to_cartesian(length);
         assert!(cartesian.eq_within(&new_cartesian, DISTANCE_ACC));
     }
@@ -138,7 +138,7 @@ fn cartesian_to_equatorial_roundtrip() {
 fn cartesian_to_spherical_roundtrip() {
     for cartesian in cartesian_examples() {
         let length = cartesian.length();
-        let spherical = cartesian.to_spherical();
+        let spherical = cartesian.to_spherical().unwrap();
         let new_cartesian = spherical.to_cartesian(length);
         assert!(cartesian.eq_within(&new_cartesian, DISTANCE_ACC));
     }
@@ -245,7 +245,7 @@ fn ecliptic_to_cartesian_roundtrip() {
     for ecliptic in ecliptic_examples() {
         let length = Distance::from_m(10.);
         let cartesian = ecliptic.to_cartesian(length);
-        let new_ecliptic = cartesian.to_ecliptic();
+        let new_ecliptic = cartesian.to_ecliptic().unwrap();
         assert!(ecliptic.eq_within(&new_ecliptic, ANGLE_ACC));
     }
 }
@@ -344,7 +344,7 @@ fn spherical_to_cartesian_roundtrip() {
     for spherical in spherical_examples() {
         let length = Distance::from_m(10.);
         let cartesian = spherical.to_cartesian(length);
-        let new_spherical = cartesian.to_spherical();
+        let new_spherical = cartesian.to_spherical().unwrap();
         assert!(spherical.eq_within(&new_spherical, ANGLE_ACC));
     }
 }

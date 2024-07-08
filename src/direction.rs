@@ -7,17 +7,15 @@ use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
 use std::ops::Neg;
 
-use crate::angle_helper::*;
 use crate::equatorial::EquatorialCoordinates;
 use crate::error::AstroCoordsError;
+use crate::{angle_helper::*, NORMALIZATION_THRESHOLD};
 
 use super::{
     cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
     ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
     transformations::rotations::rotated_tuple,
 };
-
-pub(super) const NORMALIZATION_THRESHOLD: f64 = 1e-5;
 
 /// The Direction struct represents a normalised vector in 3D space.
 #[derive(Debug, Clone, PartialEq)]
@@ -117,7 +115,9 @@ impl Direction {
     /// assert!((spherical.longitude.to_degrees() - 0.).abs() < 1e-5);
     /// ```
     pub fn to_spherical(&self) -> SphericalCoordinates {
+        // Direction is normalised and thus guaranteed to produce valid spherical coordinates.
         SphericalCoordinates::cartesian_to_spherical((self.x, self.y, self.z))
+            .unwrap_or(SphericalCoordinates::new(ANGLE_ZERO, ANGLE_ZERO))
     }
 
     /// Returns the x-ordinate of the Direction.
@@ -391,7 +391,7 @@ mod tests {
                     let expected_x = x / length;
                     let expected_y = y / length;
                     let expected_z = z / length;
-                    let direction = cartesian.to_spherical().to_direction();
+                    let direction = cartesian.to_spherical().unwrap().to_direction();
 
                     assert!((direction.x() - expected_x).abs() < TEST_ACCURACY);
                     assert!((direction.y() - expected_y).abs() < TEST_ACCURACY);
