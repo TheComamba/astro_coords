@@ -56,9 +56,12 @@ use super::{
 /// ```
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CartesianCoordinates {
-    x: Distance<f64>,
-    y: Distance<f64>,
-    z: Distance<f64>,
+    /// The x-ordinate.
+    pub x: Distance<f64>,
+    /// The y-ordinate.
+    pub y: Distance<f64>,
+    /// The z-ordinate.
+    pub z: Distance<f64>,
 }
 
 impl CartesianCoordinates {
@@ -146,21 +149,6 @@ impl CartesianCoordinates {
     pub fn distance(&self, other: &CartesianCoordinates) -> Distance<f64> {
         let diff = self - other;
         diff.length()
-    }
-
-    /// Returns the x-ordinate.
-    pub fn x(&self) -> Distance<f64> {
-        self.x
-    }
-
-    /// Returns the y-ordinate.
-    pub fn y(&self) -> Distance<f64> {
-        self.y
-    }
-
-    /// Returns the z-ordinate.
-    pub fn z(&self) -> Distance<f64> {
-        self.z
     }
 
     /// Returns cartesian coordinates rotated around an axis by a certain angle.
