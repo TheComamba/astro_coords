@@ -20,8 +20,10 @@ use super::{
 /// Contrary to the mathematical definition of spherical coordinates, the longitude is measured from the x-axis, and the latitude is measured from the xy-plane.
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SphericalCoordinates {
-    longitude: Angle<f64>,
-    latitude: Angle<f64>,
+    /// The longitude of the SphericalCoordinates struct measures the angle between the x-axis and the vector projected on the x-y plane.
+    pub longitude: Angle<f64>,
+    /// The latitude of the SphericalCoordinates struct measures the angle between the vector and the x-y plane.
+    pub latitude: Angle<f64>,
 }
 
 impl SphericalCoordinates {
@@ -64,12 +66,12 @@ impl SphericalCoordinates {
     ///
     /// let mut coords = SphericalCoordinates::new(Angle::from_degrees(190.), Angle::from_degrees(0.));
     /// coords.normalize();
-    /// assert!((coords.get_longitude().to_degrees() + 170.).abs() < 1e-5);
+    /// assert!((coords.longitude.to_degrees() + 170.).abs() < 1e-5);
     ///
     /// let mut coords = SphericalCoordinates::new(Angle::from_degrees(10.), Angle::from_degrees(100.));
     /// coords.normalize();
-    /// assert!((coords.get_longitude().to_degrees() + 170.).abs() < 1e-5);
-    /// assert!((coords.get_latitude().to_degrees() - 80.).abs() < 1e-5);
+    /// assert!((coords.longitude.to_degrees() + 170.).abs() < 1e-5);
+    /// assert!((coords.latitude.to_degrees() - 80.).abs() < 1e-5);
     /// ```
     pub fn normalize(&mut self) {
         self.longitude = normalized_angle(self.longitude);
@@ -114,26 +116,6 @@ impl SphericalCoordinates {
         latitudes_equal && longitudes_equal
     }
 
-    /// Returns the longitude of the SphericalCoordinates struct.
-    pub fn get_longitude(&self) -> Angle<f64> {
-        self.longitude
-    }
-
-    /// Returns the latitude of the SphericalCoordinates struct.
-    pub fn get_latitude(&self) -> Angle<f64> {
-        self.latitude
-    }
-
-    /// Sets the longitude of the SphericalCoordinates struct.
-    pub fn set_longitude(&mut self, longitude: Angle<f64>) {
-        self.longitude = longitude;
-    }
-
-    /// Sets the latitude of the SphericalCoordinates struct.
-    pub fn set_latitude(&mut self, latitude: Angle<f64>) {
-        self.latitude = latitude;
-    }
-
     pub(super) fn cartesian_to_spherical(cart: (f64, f64, f64)) -> Self {
         let (x, y, z) = cart;
         let longitude = Angle::from_radians(y.atan2(x));
@@ -164,9 +146,9 @@ impl SphericalCoordinates {
     /// assert!(z.eq_within(&Direction::Z, 1e-5));
     /// ```
     pub fn to_direction(&self) -> Direction {
-        let x = self.get_longitude().rad.cos() * self.get_latitude().rad.cos();
-        let y = self.get_longitude().rad.sin() * self.get_latitude().rad.cos();
-        let z = self.get_latitude().rad.sin();
+        let x = self.longitude.rad.cos() * self.latitude.rad.cos();
+        let y = self.longitude.rad.sin() * self.latitude.rad.cos();
+        let z = self.latitude.rad.sin();
         Direction { x, y, z }
     }
 

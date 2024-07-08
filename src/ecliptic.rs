@@ -16,7 +16,7 @@ use super::{direction::Direction, spherical::SphericalCoordinates};
 /// Compare https://en.wikipedia.org/wiki/Ecliptic_coordinate_system
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct EclipticCoordinates {
-    pub(super) spherical: SphericalCoordinates,
+    pub spherical: SphericalCoordinates,
 }
 
 impl EclipticCoordinates {
@@ -42,26 +42,6 @@ impl EclipticCoordinates {
 
     pub fn eq_within(&self, other: &EclipticCoordinates, accuracy: Angle<f64>) -> bool {
         self.spherical.eq_within(&other.spherical, accuracy)
-    }
-
-    pub fn get_longitude(&self) -> Angle<f64> {
-        self.spherical.get_longitude()
-    }
-
-    pub fn get_latitude(&self) -> Angle<f64> {
-        self.spherical.get_latitude()
-    }
-
-    pub fn get_spherical(&self) -> &SphericalCoordinates {
-        &self.spherical
-    }
-
-    pub fn set_longitude(&mut self, longitude: Angle<f64>) {
-        self.spherical.set_longitude(longitude);
-    }
-
-    pub fn set_latitude(&mut self, latitude: Angle<f64>) {
-        self.spherical.set_latitude(latitude);
     }
 
     pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {

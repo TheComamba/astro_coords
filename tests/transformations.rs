@@ -291,7 +291,7 @@ fn ecliptic_to_spherical_roundtrip() {
 #[test]
 fn equatorial_to_cartesian_roundtrip() {
     for equatorial in equatorial_examples() {
-        let axis = equatorial.get_rotation_axis().clone();
+        let axis = equatorial.rotation_axis.clone();
         let length = Distance::from_m(10.);
         let cartesian = equatorial.to_cartesian(length);
         let new_equatorial = cartesian.to_equatorial(axis).unwrap();
@@ -302,7 +302,7 @@ fn equatorial_to_cartesian_roundtrip() {
 #[test]
 fn equatorial_to_direction_roundtrip() {
     for equatorial in equatorial_examples() {
-        let axis = equatorial.get_rotation_axis().clone();
+        let axis = equatorial.rotation_axis.clone();
         let direction = equatorial.to_direction();
         let new_equatorial = direction.to_equatorial(axis);
         assert!(equatorial.eq_within(&new_equatorial, ANGLE_ACC));
@@ -312,7 +312,7 @@ fn equatorial_to_direction_roundtrip() {
 #[test]
 fn equatorial_to_earth_equatorial_roundtrip() {
     for equatorial in equatorial_examples() {
-        let axis = equatorial.get_rotation_axis().clone();
+        let axis = equatorial.rotation_axis.clone();
         let earth_equatorial = equatorial.to_earth_equatorial();
         let new_equatorial = earth_equatorial.to_equatorial(axis);
         assert!(equatorial.eq_within(&new_equatorial, ANGLE_ACC));
@@ -322,7 +322,7 @@ fn equatorial_to_earth_equatorial_roundtrip() {
 #[test]
 fn equatorial_to_ecliptic_roundtrip() {
     for equatorial in equatorial_examples() {
-        let axis = equatorial.get_rotation_axis().clone();
+        let axis = equatorial.rotation_axis.clone();
         let ecliptic = equatorial.to_ecliptic();
         let new_equatorial = ecliptic.to_equatorial(axis);
         assert!(equatorial.eq_within(&new_equatorial, ANGLE_ACC));
@@ -332,7 +332,7 @@ fn equatorial_to_ecliptic_roundtrip() {
 #[test]
 fn equatorial_to_spherical_roundtrip() {
     for equatorial in equatorial_examples() {
-        let axis = equatorial.get_rotation_axis().clone();
+        let axis = equatorial.rotation_axis.clone();
         let spherical = equatorial.to_spherical();
         let new_equatorial = spherical.to_equatorial(axis);
         assert!(equatorial.eq_within(&new_equatorial, ANGLE_ACC));
