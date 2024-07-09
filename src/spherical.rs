@@ -110,17 +110,21 @@ impl SphericalCoordinates {
     pub fn active_rotation_to_new_z_axis(&self, new_z: &Self) -> Self {
         let (angle_to_old_z, polar_rotation_angle) =
             get_angle_to_old_z_and_polar_rotation_angle(new_z);
-        self.to_direction()
+        let mut rotated = self
+            .to_direction()
             .rotated(-angle_to_old_z, &Direction::X)
-            .rotated(-polar_rotation_angle, &Direction::Z)
-            .to_spherical()
+            .to_spherical();
+        rotated.longitude -= polar_rotation_angle;
+        rotated
     }
 
     pub fn passive_rotation_to_new_z_axis(&self, new_z: &Self) -> Self {
         let (angle_to_old_z, polar_rotation_angle) =
             get_angle_to_old_z_and_polar_rotation_angle(new_z);
-        self.to_direction()
-            .rotated(polar_rotation_angle, &Direction::Z)
+        let mut rotated = self.clone();
+        rotated.longitude += polar_rotation_angle;
+        rotated
+            .to_direction()
             .rotated(angle_to_old_z, &Direction::X)
             .to_spherical()
     }
