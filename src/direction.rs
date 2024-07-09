@@ -261,6 +261,7 @@ impl Direction {
     ///
     /// This is the inverse operation of `passive_rotation_to_new_z_axis`.
     ///
+    /// TODO: This example is not intuitive
     /// # Example
     /// ```
     /// use astro_coords::direction::Direction;
@@ -274,20 +275,10 @@ impl Direction {
     /// assert!(rotated_x.dot_product(&Direction::Z).abs() < 1e-5);
     /// ```
     pub fn active_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
-        let angle_to_old_z = new_z.angle_to(&Self::Z);
-
-        let axis_projected_onto_xy_plane = Direction::new(new_z.x(), new_z.y(), 0.);
-        let mut polar_rotation_angle = ANGLE_ZERO;
-        if let Ok(axis_projected_onto_xy_plane) = axis_projected_onto_xy_plane {
-            polar_rotation_angle = axis_projected_onto_xy_plane.angle_to(&Self::Y);
-            if axis_projected_onto_xy_plane.x() < 0. {
-                polar_rotation_angle = -polar_rotation_angle;
-            }
-        }
-
-        let mut dir = self.rotated(-angle_to_old_z, &Self::X);
-        dir = dir.rotated(-polar_rotation_angle, &Self::Z);
-        dir
+        let (angle_to_old_z, polar_rotation_angle) =
+            get_angle_to_old_z_and_polar_rotation_angle(new_z);
+        self.rotated(-angle_to_old_z, &Self::X)
+            .rotated(-polar_rotation_angle, &Self::Z)
     }
 
     /// Returns the Direction that results from passively rotating the Direction to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
@@ -298,21 +289,13 @@ impl Direction {
     /// 2. The vector is rotated around the old x-axis by the angle between new and old z-axis.
     ///
     /// This is the inverse operation of `active_rotation_to_new_z_axis`.
+    /// 
+    /// TODO: Example
     pub fn passive_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
-        let axis_projected_onto_xy_plane = Direction::new(new_z.x(), new_z.y(), 0.);
-        let mut polar_rotation_angle = ANGLE_ZERO;
-        if let Ok(axis_projected_onto_xy_plane) = axis_projected_onto_xy_plane {
-            polar_rotation_angle = axis_projected_onto_xy_plane.angle_to(&Self::Y);
-            if axis_projected_onto_xy_plane.x() < 0. {
-                polar_rotation_angle = -polar_rotation_angle;
-            }
-        }
-
-        let angle_to_old_z = new_z.angle_to(&Self::Z);
-
-        let mut dir = self.rotated(polar_rotation_angle, &Self::Z);
-        dir = dir.rotated(angle_to_old_z, &Self::X);
-        dir
+        let (angle_to_old_z, polar_rotation_angle) =
+            get_angle_to_old_z_and_polar_rotation_angle(new_z);
+        self.rotated(polar_rotation_angle, &Self::Z)
+            .rotated(angle_to_old_z, &Self::X)
     }
 
     pub fn to_earth_equatorial(&self) -> EarthEquatorialCoordinates {
@@ -330,6 +313,20 @@ impl Direction {
         let spherical = dir_in_equatorial.to_spherical();
         EquatorialCoordinates::new(spherical, axis)
     }
+}
+
+fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Direction) -> (Angle<f64>, Angle<f64>) {
+    let angle_to_old_z = new_z.angle_to(&Direction::Z);
+
+    let axis_projected_onto_xy_plane = Direction::new(new_z.x(), new_z.y(), 0.);
+    let mut polar_rotation_angle = ANGLE_ZERO;
+    if let Ok(axis_projected_onto_xy_plane) = axis_projected_onto_xy_plane {
+        polar_rotation_angle = axis_projected_onto_xy_plane.angle_to(&Direction::Y);
+        if axis_projected_onto_xy_plane.x() < 0. {
+            polar_rotation_angle = -polar_rotation_angle;
+        }
+    }
+    (angle_to_old_z, polar_rotation_angle)
 }
 
 impl Neg for &Direction {

@@ -87,6 +87,44 @@ impl SphericalCoordinates {
         }
     }
 
+    /// Returns the spherical coordinates that results from actively rotating the spherical vector to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
+    ///
+    /// This method is for example used to convert from equatorial coordinates to ecliptic coordinates.
+    /// It operates in the following way:
+    /// 1. The vector is rotated around the old x-axis by the angle between new and old z-axis.
+    /// 2. The vector is rotated around the old z-axis by the angle between the new z-axis and the old y-axis, projected onto the old x-y plane.
+    ///
+    /// This is the inverse operation of `passive_rotation_to_new_z_axis`.
+    ///
+    /// TODO: This example is not intuitive
+    /// # Example
+    /// ```
+    /// use astro_coords::spherical::SphericalCoordinates;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// let new_z = SphericalCoordinates::new(Angle::from_rad(1.), Angle::from_rad(1.));
+    ///
+    /// let rotated_z = SphericalCoordinates::Z_DIRECTION.active_rotation_to_new_z_axis(&new_z);
+    /// assert!(rotated_z.eq_within(&new_z, Angle::from_rad(1e-5)));
+    /// ```
+    pub fn active_rotation_to_new_z_axis(&self, new_z: &Self) -> Self {
+        let (angle_to_old_z, polar_rotation_angle) =
+            get_angle_to_old_z_and_polar_rotation_angle(new_z);
+        self.to_direction()
+            .rotated(-angle_to_old_z, &Direction::X)
+            .rotated(-polar_rotation_angle, &Direction::Z)
+            .to_spherical()
+    }
+
+    pub fn passive_rotation_to_new_z_axis(&self, new_z: &Self) -> Self {
+        let (angle_to_old_z, polar_rotation_angle) =
+            get_angle_to_old_z_and_polar_rotation_angle(new_z);
+        self.to_direction()
+            .rotated(polar_rotation_angle, &Direction::Z)
+            .rotated(angle_to_old_z, &Direction::X)
+            .to_spherical()
+    }
+
     /// Checks if the longitude and latitude of the SphericalCoordinates struct are quivalent to those of another SphericalCoordinates struct within a certain accuracy.
     ///
     /// # Examples
@@ -196,6 +234,20 @@ impl SphericalCoordinates {
 
         (ra, dec)
     }
+}
+
+fn get_angle_to_old_z_and_polar_rotation_angle(
+    new_z: &SphericalCoordinates,
+) -> (Angle<f64>, Angle<f64>) {
+    let angle_to_old_z = QUARTER_CIRC - new_z.latitude;
+    let is_polar =
+        angle_to_old_z.rad.abs() < 1e-20 || (angle_to_old_z - HALF_CIRC).rad.abs() < 1e-20;
+    let polar_rotation_angle = if is_polar {
+        Angle { rad: 0. }
+    } else {
+        QUARTER_CIRC - new_z.longitude
+    };
+    (angle_to_old_z, polar_rotation_angle)
 }
 
 impl Neg for &SphericalCoordinates {
