@@ -289,7 +289,7 @@ impl Direction {
     /// 2. The vector is rotated around the old x-axis by the angle between new and old z-axis.
     ///
     /// This is the inverse operation of `active_rotation_to_new_z_axis`.
-    /// 
+    ///
     /// TODO: Example
     pub fn passive_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
         let (angle_to_old_z, polar_rotation_angle) =
