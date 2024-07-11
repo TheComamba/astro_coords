@@ -6,7 +6,8 @@ use std::{fmt::Display, ops::Neg};
 
 use crate::{
     angle_helper::*, cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
-    equatorial::EquatorialCoordinates, error::AstroCoordsError, NORMALIZATION_THRESHOLD,
+    equatorial::EquatorialCoordinates, error::AstroCoordsError,
+    transformations::rotations::rotated_x_spherical, NORMALIZATION_THRESHOLD,
 };
 
 use super::{
@@ -92,7 +93,8 @@ impl SphericalCoordinates {
     }
 
     pub fn rotated_x(&self, angle: Angle<f64>) -> SphericalCoordinates {
-        todo!()
+        //rotated_x_spherical(self, angle)
+        self.to_direction().rotated_x(angle).to_spherical()
     }
 
     pub fn rotated_y(&self, angle: Angle<f64>) -> SphericalCoordinates {
