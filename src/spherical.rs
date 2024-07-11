@@ -128,23 +128,15 @@ impl Spherical {
     pub fn active_rotation_to_new_z_axis(&self, new_z: &Self) -> Self {
         let (angle_to_old_z, polar_rotation_angle) =
             get_angle_to_old_z_and_polar_rotation_angle(new_z);
-        let mut rotated = self
-            .to_direction()
-            .rotated(-angle_to_old_z, &Direction::X)
-            .to_spherical();
-        rotated.longitude -= polar_rotation_angle;
-        rotated
+        self.rotated_x(-angle_to_old_z)
+            .rotated_z(-polar_rotation_angle)
     }
 
     pub fn passive_rotation_to_new_z_axis(&self, new_z: &Self) -> Self {
         let (angle_to_old_z, polar_rotation_angle) =
             get_angle_to_old_z_and_polar_rotation_angle(new_z);
-        let mut rotated = self.clone();
-        rotated.longitude += polar_rotation_angle;
-        rotated
-            .to_direction()
-            .rotated(angle_to_old_z, &Direction::X)
-            .to_spherical()
+        self.rotated_z(polar_rotation_angle)
+            .rotated_x(angle_to_old_z)
     }
 
     /// Checks if the longitude and latitude of the Spherical struct are quivalent to those of another Spherical struct within a certain accuracy.
