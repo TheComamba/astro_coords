@@ -87,6 +87,22 @@ impl SphericalCoordinates {
         }
     }
 
+    pub fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> SphericalCoordinates {
+        todo!()
+    }
+
+    pub fn rotated_x(&self, angle: Angle<f64>) -> SphericalCoordinates {
+        todo!()
+    }
+
+    pub fn rotated_y(&self, angle: Angle<f64>) -> SphericalCoordinates {
+        todo!()
+    }
+
+    pub fn rotated_z(&self, angle: Angle<f64>) -> SphericalCoordinates {
+        todo!()
+    }
+
     /// Returns the spherical coordinates that results from actively rotating the spherical vector to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
     ///
     /// This method is for example used to convert from equatorial coordinates to ecliptic coordinates.

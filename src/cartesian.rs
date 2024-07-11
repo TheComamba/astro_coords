@@ -172,6 +172,18 @@ impl CartesianCoordinates {
         CartesianCoordinates { x, y, z }
     }
 
+    pub fn rotated_x(&self, angle: Angle<f64>) -> CartesianCoordinates {
+        todo!()
+    }
+
+    pub fn rotated_y(&self, angle: Angle<f64>) -> CartesianCoordinates {
+        todo!()
+    }
+
+    pub fn rotated_z(&self, angle: Angle<f64>) -> CartesianCoordinates {
+        todo!()
+    }
+
     /// Returns the angle between two sets of Cartesian coordinates.
     ///
     /// # Examples

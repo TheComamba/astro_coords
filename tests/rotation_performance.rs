@@ -4,6 +4,18 @@ use serial_test::serial;
 use simple_si_units::geometry::Angle;
 use std::{f64::consts::PI, time::Instant};
 
+fn many_angles(num: usize) -> Vec<Angle<f64>> {
+    let seed = [42; 32];
+    let mut rng = StdRng::from_seed(seed);
+
+    let mut angles = Vec::new();
+    for _ in 0..num {
+        let rad = rng.gen_range((-PI)..PI);
+        angles.push(Angle { rad });
+    }
+    angles
+}
+
 fn many_directions(num: usize) -> Vec<Direction> {
     let seed = [42; 32];
     let mut rng = StdRng::from_seed(seed);
@@ -36,6 +48,121 @@ fn many_sphericals(num: usize) -> Vec<SphericalCoordinates> {
         sphericals.push(SphericalCoordinates::new(longitude, latitude));
     }
     sphericals
+}
+
+#[test]
+#[ignore]
+#[serial]
+fn rotation_for_direction_is_fast() {
+    const NUM: usize = 100;
+    let angles = many_angles(NUM);
+    let vecs = many_directions(NUM);
+    let axes = many_directions(NUM);
+    let total_rotations = angles.len() * vecs.len() * axes.len();
+
+    let start = Instant::now();
+    let mut dummy = 0.;
+    for angle in angles {
+        for vec in vecs.iter() {
+            for axis in axes.iter() {
+                let rotated_dir = vec.rotated(angle, &axis);
+                dummy += rotated_dir.x();
+            }
+        }
+    }
+    let duration = start.elapsed();
+    println!("Dummy print: {}", dummy);
+
+    let duration_per_rotation = duration / total_rotations as u32;
+    println!(
+        "{} calls to Direction::rotated took {:?}, or {:?} per call.",
+        total_rotations, duration, duration_per_rotation
+    );
+    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+}
+
+#[test]
+#[ignore]
+#[serial]
+fn x_rotation_for_direction_is_fast() {
+    const NUM: usize = 1000;
+    let angles = many_angles(NUM);
+    let vecs = many_directions(NUM);
+    let total_rotations = angles.len() * vecs.len();
+
+    let start = Instant::now();
+    let mut dummy = 0.;
+    for angle in angles {
+        for vec in vecs.iter() {
+            let rotated_dir = vec.rotated_x(angle);
+            dummy += rotated_dir.y();
+        }
+    }
+    let duration = start.elapsed();
+    println!("Dummy print: {}", dummy);
+
+    let duration_per_rotation = duration / total_rotations as u32;
+    println!(
+        "{} calls to Direction::rotated_x took {:?}, or {:?} per call.",
+        total_rotations, duration, duration_per_rotation
+    );
+    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+}
+
+#[test]
+#[ignore]
+#[serial]
+fn y_rotation_for_direction_is_fast() {
+    const NUM: usize = 1000;
+    let angles = many_angles(NUM);
+    let vecs = many_directions(NUM);
+    let total_rotations = angles.len() * vecs.len();
+
+    let start = Instant::now();
+    let mut dummy = 0.;
+    for angle in angles {
+        for vec in vecs.iter() {
+            let rotated_dir = vec.rotated_y(angle);
+            dummy += rotated_dir.x();
+        }
+    }
+    let duration = start.elapsed();
+    println!("Dummy print: {}", dummy);
+
+    let duration_per_rotation = duration / total_rotations as u32;
+    println!(
+        "{} calls to Direction::rotated_y took {:?}, or {:?} per call.",
+        total_rotations, duration, duration_per_rotation
+    );
+    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+}
+
+#[test]
+#[ignore]
+#[serial]
+fn z_rotation_for_direction_is_fast() {
+    const NUM: usize = 1000;
+    let angles = many_angles(NUM);
+    let vecs = many_directions(NUM);
+    let total_rotations = angles.len() * vecs.len();
+
+    let start = Instant::now();
+    let mut dummy = 0.;
+    for angle in angles {
+        for vec in vecs.iter() {
+            let rotated_dir = vec.rotated_z(angle);
+            dummy += rotated_dir.x();
+        }
+    }
+    let duration = start.elapsed();
+    println!("Dummy print: {}", dummy);
+
+    let duration_per_rotation = duration / total_rotations as u32;
+    println!(
+        "{} calls to Direction::rotated_z took {:?}, or {:?} per call.",
+        total_rotations, duration, duration_per_rotation
+    );
+    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
 }
 
 #[test]
@@ -89,6 +216,121 @@ fn passive_rotation_for_direction_is_fast() {
     let duration_per_rotation = duration / total_rotations as u32;
     println!(
         "{} calls to Direction::passive_rotation_to_new_z_axis took {:?}, or {:?} per call.",
+        total_rotations, duration, duration_per_rotation
+    );
+    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+}
+
+#[test]
+#[ignore]
+#[serial]
+fn rotation_for_sphericals_is_fast() {
+    const NUM: usize = 100;
+    let angles = many_angles(NUM);
+    let vecs = many_sphericals(NUM);
+    let axes = many_directions(NUM);
+    let total_rotations = angles.len() * vecs.len() * axes.len();
+
+    let start = Instant::now();
+    let mut dummy = 0.;
+    for angle in angles {
+        for vec in vecs.iter() {
+            for axis in axes.iter() {
+                let rotated_dir = vec.rotated(angle, &axis);
+                dummy += rotated_dir.longitude.rad;
+            }
+        }
+    }
+    let duration = start.elapsed();
+    println!("Dummy print: {}", dummy);
+
+    let duration_per_rotation = duration / total_rotations as u32;
+    println!(
+        "{} calls to SphericalCoordinates::rotated took {:?}, or {:?} per call.",
+        total_rotations, duration, duration_per_rotation
+    );
+    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+}
+
+#[test]
+#[ignore]
+#[serial]
+fn x_rotation_for_sphericals_is_fast() {
+    const NUM: usize = 1000;
+    let angles = many_angles(NUM);
+    let vecs = many_sphericals(NUM);
+    let total_rotations = angles.len() * vecs.len();
+
+    let start = Instant::now();
+    let mut dummy = 0.;
+    for angle in angles {
+        for vec in vecs.iter() {
+            let rotated_dir = vec.rotated_x(angle);
+            dummy += rotated_dir.longitude.rad;
+        }
+    }
+    let duration = start.elapsed();
+    println!("Dummy print: {}", dummy);
+
+    let duration_per_rotation = duration / total_rotations as u32;
+    println!(
+        "{} calls to SphericalCoordinates::rotated_x took {:?}, or {:?} per call.",
+        total_rotations, duration, duration_per_rotation
+    );
+    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+}
+
+#[test]
+#[ignore]
+#[serial]
+fn y_rotation_for_sphericals_is_fast() {
+    const NUM: usize = 1000;
+    let angles = many_angles(NUM);
+    let vecs = many_sphericals(NUM);
+    let total_rotations = angles.len() * vecs.len();
+
+    let start = Instant::now();
+    let mut dummy = 0.;
+    for angle in angles {
+        for vec in vecs.iter() {
+            let rotated_dir = vec.rotated_y(angle);
+            dummy += rotated_dir.longitude.rad;
+        }
+    }
+    let duration = start.elapsed();
+    println!("Dummy print: {}", dummy);
+
+    let duration_per_rotation = duration / total_rotations as u32;
+    println!(
+        "{} calls to SphericalCoordinates::rotated_y took {:?}, or {:?} per call.",
+        total_rotations, duration, duration_per_rotation
+    );
+    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+}
+
+#[test]
+#[ignore]
+#[serial]
+fn z_rotation_for_sphericals_is_fast() {
+    const NUM: usize = 1000;
+    let angles = many_angles(NUM);
+    let vecs = many_sphericals(NUM);
+    let total_rotations = angles.len() * vecs.len();
+
+    let start = Instant::now();
+    let mut dummy = 0.;
+    for angle in angles {
+        for vec in vecs.iter() {
+            let rotated_dir = vec.rotated_z(angle);
+            dummy += rotated_dir.longitude.rad;
+        }
+    }
+    let duration = start.elapsed();
+    println!("Dummy print: {}", dummy);
+
+    let duration_per_rotation = duration / total_rotations as u32;
+    println!(
+        "{} calls to SphericalCoordinates::rotated_z took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
     assert!(duration_per_rotation < std::time::Duration::from_secs(1))

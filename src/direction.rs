@@ -153,6 +153,18 @@ impl Direction {
         Direction { x, y, z }
     }
 
+    pub fn rotated_x(&self, angle: Angle<f64>) -> Direction {
+        todo!()
+    }
+
+    pub fn rotated_y(&self, angle: Angle<f64>) -> Direction {
+        todo!()
+    }
+
+    pub fn rotated_z(&self, angle: Angle<f64>) -> Direction {
+        todo!()
+    }
+
     /// Returns true if the Direction is equal to the other Direction within the specified accuracy.
     ///
     /// # Example
