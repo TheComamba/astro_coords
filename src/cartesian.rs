@@ -10,13 +10,10 @@ use std::{
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
-use crate::{
-    earth_equatorial::EarthEquatorialCoordinates, equatorial::EquatorialCoordinates,
-    error::AstroCoordsError,
-};
+use crate::{earth_equatorial::EarthEquatorial, equatorial::Equatorial, error::AstroCoordsError};
 
 use super::{
-    direction::Direction, ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
+    direction::Direction, ecliptic::Ecliptic, spherical::Spherical,
     transformations::rotations::rotated_tuple,
 };
 
@@ -29,33 +26,33 @@ use super::{
 /// # Examples
 /// ```
 /// use simple_si_units::base::Distance;
-/// use astro_coords::cartesian::CartesianCoordinates;
+/// use astro_coords::cartesian::Cartesian;
 ///
-/// let c1 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
-/// let c2 = CartesianCoordinates::new(Distance::from_meters(4.), Distance::from_meters(5.), Distance::from_meters(6.));
+/// let c1 = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
+/// let c2 = Cartesian::new(Distance::from_meters(4.), Distance::from_meters(5.), Distance::from_meters(6.));
 ///
 /// let add = &c1 + &c2;
-/// let expected = CartesianCoordinates::new(Distance::from_meters(5.), Distance::from_meters(7.), Distance::from_meters(9.));
+/// let expected = Cartesian::new(Distance::from_meters(5.), Distance::from_meters(7.), Distance::from_meters(9.));
 /// assert!(add.eq_within(&expected, Distance::from_meters(1e-5)));
 ///
 /// let sub = &c1 - &c2;
-/// let expected = CartesianCoordinates::new(Distance::from_meters(-3.), Distance::from_meters(-3.), Distance::from_meters(-3.));
+/// let expected = Cartesian::new(Distance::from_meters(-3.), Distance::from_meters(-3.), Distance::from_meters(-3.));
 /// assert!(sub.eq_within(&expected, Distance::from_meters(1e-5)));
 ///
 /// let mul = &c1 * 2.;
-/// let expected = CartesianCoordinates::new(Distance::from_meters(2.), Distance::from_meters(4.), Distance::from_meters(6.));
+/// let expected = Cartesian::new(Distance::from_meters(2.), Distance::from_meters(4.), Distance::from_meters(6.));
 /// assert!(mul.eq_within(&expected, Distance::from_meters(1e-5)));
 ///
 /// let div = &c1 / 2.;
-/// let expected = CartesianCoordinates::new(Distance::from_meters(0.5), Distance::from_meters(1.), Distance::from_meters(1.5));
+/// let expected = Cartesian::new(Distance::from_meters(0.5), Distance::from_meters(1.), Distance::from_meters(1.5));
 /// assert!(div.eq_within(&expected, Distance::from_meters(1e-5)));
 ///
 /// let neg = -c1;
-/// let expected = CartesianCoordinates::new(Distance::from_meters(-1.), Distance::from_meters(-2.), Distance::from_meters(-3.));
+/// let expected = Cartesian::new(Distance::from_meters(-1.), Distance::from_meters(-2.), Distance::from_meters(-3.));
 /// assert!(neg.eq_within(&expected, Distance::from_meters(1e-5)));
 /// ```
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct CartesianCoordinates {
+pub struct Cartesian {
     /// The x-ordinate.
     pub x: Distance<f64>,
     /// The y-ordinate.
@@ -64,17 +61,17 @@ pub struct CartesianCoordinates {
     pub z: Distance<f64>,
 }
 
-impl CartesianCoordinates {
+impl Cartesian {
     /// The origin of the coordinate system, given by (x,y,z)=(0,0,0).
-    pub const ORIGIN: CartesianCoordinates = CartesianCoordinates {
+    pub const ORIGIN: Cartesian = Cartesian {
         x: Distance { m: 0. },
         y: Distance { m: 0. },
         z: Distance { m: 0. },
     };
 
-    /// Creates a new CartesianCoordinates object.
-    pub const fn new(x: Distance<f64>, y: Distance<f64>, z: Distance<f64>) -> CartesianCoordinates {
-        CartesianCoordinates { x, y, z }
+    /// Creates a new Cartesian object.
+    pub const fn new(x: Distance<f64>, y: Distance<f64>, z: Distance<f64>) -> Cartesian {
+        Cartesian { x, y, z }
     }
 
     /// Tests if the coordinates are equal to another set of coordinates within a certain accuracy.
@@ -82,13 +79,13 @@ impl CartesianCoordinates {
     /// # Examples
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coords::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let c1 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
-    /// let c2 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
+    /// let c1 = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
+    /// let c2 = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
     /// assert!(c1.eq_within(&c2, Distance::from_meters(0.1)));
     /// ```
-    pub fn eq_within(&self, other: &CartesianCoordinates, accuracy: Distance<f64>) -> bool {
+    pub fn eq_within(&self, other: &Cartesian, accuracy: Distance<f64>) -> bool {
         (self.x.m - other.x.m).abs() < accuracy.m
             && (self.y.m - other.y.m).abs() < accuracy.m
             && (self.z.m - other.z.m).abs() < accuracy.m
@@ -102,9 +99,9 @@ impl CartesianCoordinates {
     /// # Examples
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coords::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let coordinates = CartesianCoordinates::new(Distance::from_meters(3.), Distance::from_meters(4.), Distance::from_meters(5.));
+    /// let coordinates = Cartesian::new(Distance::from_meters(3.), Distance::from_meters(4.), Distance::from_meters(5.));
     /// assert!((coordinates.length().to_m() - 7.0710678118654755).abs() < 1e-5);
     /// ```
     pub fn length(&self) -> Distance<f64> {
@@ -121,9 +118,9 @@ impl CartesianCoordinates {
     /// # Examples
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coords::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let coordinates = CartesianCoordinates::new(Distance::from_meters(3.), Distance::from_meters(4.), Distance::from_meters(5.));
+    /// let coordinates = Cartesian::new(Distance::from_meters(3.), Distance::from_meters(4.), Distance::from_meters(5.));
     /// assert!((coordinates.length_squared().to_m2() - 50.).abs() < 1e-5);
     /// ```
     pub fn length_squared(&self) -> Area<f64> {
@@ -140,13 +137,13 @@ impl CartesianCoordinates {
     /// # Examples
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coords::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let c1 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
-    /// let c2 = CartesianCoordinates::new(Distance::from_meters(4.), Distance::from_meters(5.), Distance::from_meters(6.));
+    /// let c1 = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
+    /// let c2 = Cartesian::new(Distance::from_meters(4.), Distance::from_meters(5.), Distance::from_meters(6.));
     /// assert!((c1.distance(&c2).to_m() - 5.196152422706632).abs() < 1e-5);
     /// ```
-    pub fn distance(&self, other: &CartesianCoordinates) -> Distance<f64> {
+    pub fn distance(&self, other: &Cartesian) -> Distance<f64> {
         let diff = self - other;
         diff.length()
     }
@@ -157,30 +154,30 @@ impl CartesianCoordinates {
     /// ```
     /// use simple_si_units::base::Distance;
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::Cartesian;
     /// use astro_coords::direction::Direction;
     ///
-    /// let coordinates = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
+    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
     /// let angle = Angle::from_degrees(90.);
     /// let axis = Direction::new(0., 0., 1.).unwrap();
     /// let rotated = coordinates.rotated(angle, &axis);
-    /// let expected = CartesianCoordinates::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
     /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
     /// ```
-    pub fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> CartesianCoordinates {
+    pub fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Cartesian {
         let (x, y, z) = rotated_tuple((self.x, self.y, self.z), angle, axis);
-        CartesianCoordinates { x, y, z }
+        Cartesian { x, y, z }
     }
 
-    pub fn rotated_x(&self, angle: Angle<f64>) -> CartesianCoordinates {
+    pub fn rotated_x(&self, angle: Angle<f64>) -> Cartesian {
         todo!()
     }
 
-    pub fn rotated_y(&self, angle: Angle<f64>) -> CartesianCoordinates {
+    pub fn rotated_y(&self, angle: Angle<f64>) -> Cartesian {
         todo!()
     }
 
-    pub fn rotated_z(&self, angle: Angle<f64>) -> CartesianCoordinates {
+    pub fn rotated_z(&self, angle: Angle<f64>) -> Cartesian {
         todo!()
     }
 
@@ -190,14 +187,14 @@ impl CartesianCoordinates {
     /// ```
     /// use simple_si_units::base::Distance;
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let c1 = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
-    /// let c2 = CartesianCoordinates::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// let c1 = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
+    /// let c2 = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
     /// let angle = c1.angle_to(&c2).unwrap();
     /// assert!((angle.to_degrees() - 90.).abs() < 1e-5);
     /// ```
-    pub fn angle_to(&self, other: &CartesianCoordinates) -> Result<Angle<f64>, AstroCoordsError> {
+    pub fn angle_to(&self, other: &Cartesian) -> Result<Angle<f64>, AstroCoordsError> {
         Ok(self.to_direction()?.angle_to(&other.to_direction()?))
     }
 
@@ -208,9 +205,9 @@ impl CartesianCoordinates {
     /// # Examples
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coords::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let coordinates = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(1.), Distance::from_meters(0.));
     /// let direction = coordinates.to_direction().unwrap();
     /// assert!((direction.x() - 0.7071067811865476).abs() < 1e-5);
     /// assert!((direction.y() - 0.7071067811865476).abs() < 1e-5);
@@ -220,25 +217,22 @@ impl CartesianCoordinates {
         Direction::new(self.x.m, self.y.m, self.z.m)
     }
 
-    pub fn to_earth_equatorial(&self) -> Result<EarthEquatorialCoordinates, AstroCoordsError> {
+    pub fn to_earth_equatorial(&self) -> Result<EarthEquatorial, AstroCoordsError> {
         Ok(self.to_direction()?.to_earth_equatorial())
     }
 
-    pub fn to_ecliptic(&self) -> Result<EclipticCoordinates, AstroCoordsError> {
-        Ok(EclipticCoordinates {
+    pub fn to_ecliptic(&self) -> Result<Ecliptic, AstroCoordsError> {
+        Ok(Ecliptic {
             spherical: self.to_spherical()?,
         })
     }
 
-    pub fn to_equatorial(
-        &self,
-        rotation_axis: Direction,
-    ) -> Result<EquatorialCoordinates, AstroCoordsError> {
+    pub fn to_equatorial(&self, rotation_axis: Direction) -> Result<Equatorial, AstroCoordsError> {
         let spherical = self
             .to_direction()?
             .passive_rotation_to_new_z_axis(&rotation_axis)
             .to_spherical();
-        Ok(EquatorialCoordinates::new(spherical, rotation_axis))
+        Ok(Equatorial::new(spherical, rotation_axis))
     }
 
     /// Returns spherical coordinates representing the direction of the coordinates.
@@ -248,23 +242,23 @@ impl CartesianCoordinates {
     /// # Examples
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coords::cartesian::CartesianCoordinates;
+    /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let coordinates = CartesianCoordinates::new(Distance::from_meters(1.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(1.), Distance::from_meters(0.));
     /// let spherical = coordinates.to_spherical().unwrap();
     /// assert!((spherical.longitude.to_degrees() - 45.).abs() < 1e-5);
     /// assert!((spherical.latitude.to_degrees() - 0.).abs() < 1e-5);
     /// ```
-    pub fn to_spherical(&self) -> Result<SphericalCoordinates, AstroCoordsError> {
-        SphericalCoordinates::cartesian_to_spherical((self.x.m, self.y.m, self.z.m))
+    pub fn to_spherical(&self) -> Result<Spherical, AstroCoordsError> {
+        Spherical::cartesian_to_spherical((self.x.m, self.y.m, self.z.m))
     }
 }
 
-impl Add for &CartesianCoordinates {
-    type Output = CartesianCoordinates;
+impl Add for &Cartesian {
+    type Output = Cartesian;
 
-    fn add(self, other: &CartesianCoordinates) -> CartesianCoordinates {
-        CartesianCoordinates {
+    fn add(self, other: &Cartesian) -> Cartesian {
+        Cartesian {
             x: self.x + other.x,
             y: self.y + other.y,
             z: self.z + other.z,
@@ -272,11 +266,11 @@ impl Add for &CartesianCoordinates {
     }
 }
 
-impl Add for CartesianCoordinates {
-    type Output = CartesianCoordinates;
+impl Add for Cartesian {
+    type Output = Cartesian;
 
-    fn add(self, other: CartesianCoordinates) -> CartesianCoordinates {
-        CartesianCoordinates {
+    fn add(self, other: Cartesian) -> Cartesian {
+        Cartesian {
             x: self.x + other.x,
             y: self.y + other.y,
             z: self.z + other.z,
@@ -284,11 +278,11 @@ impl Add for CartesianCoordinates {
     }
 }
 
-impl Sub for &CartesianCoordinates {
-    type Output = CartesianCoordinates;
+impl Sub for &Cartesian {
+    type Output = Cartesian;
 
-    fn sub(self, other: &CartesianCoordinates) -> CartesianCoordinates {
-        CartesianCoordinates {
+    fn sub(self, other: &Cartesian) -> Cartesian {
+        Cartesian {
             x: self.x - other.x,
             y: self.y - other.y,
             z: self.z - other.z,
@@ -296,11 +290,11 @@ impl Sub for &CartesianCoordinates {
     }
 }
 
-impl Sub for CartesianCoordinates {
-    type Output = CartesianCoordinates;
+impl Sub for Cartesian {
+    type Output = Cartesian;
 
-    fn sub(self, other: CartesianCoordinates) -> CartesianCoordinates {
-        CartesianCoordinates {
+    fn sub(self, other: Cartesian) -> Cartesian {
+        Cartesian {
             x: self.x - other.x,
             y: self.y - other.y,
             z: self.z - other.z,
@@ -308,11 +302,11 @@ impl Sub for CartesianCoordinates {
     }
 }
 
-impl Mul<f64> for &CartesianCoordinates {
-    type Output = CartesianCoordinates;
+impl Mul<f64> for &Cartesian {
+    type Output = Cartesian;
 
-    fn mul(self, f: f64) -> CartesianCoordinates {
-        CartesianCoordinates {
+    fn mul(self, f: f64) -> Cartesian {
+        Cartesian {
             x: self.x * f,
             y: self.y * f,
             z: self.z * f,
@@ -320,11 +314,11 @@ impl Mul<f64> for &CartesianCoordinates {
     }
 }
 
-impl Mul<f64> for CartesianCoordinates {
-    type Output = CartesianCoordinates;
+impl Mul<f64> for Cartesian {
+    type Output = Cartesian;
 
-    fn mul(self, f: f64) -> CartesianCoordinates {
-        CartesianCoordinates {
+    fn mul(self, f: f64) -> Cartesian {
+        Cartesian {
             x: self.x * f,
             y: self.y * f,
             z: self.z * f,
@@ -332,11 +326,11 @@ impl Mul<f64> for CartesianCoordinates {
     }
 }
 
-impl Div<f64> for &CartesianCoordinates {
-    type Output = CartesianCoordinates;
+impl Div<f64> for &Cartesian {
+    type Output = Cartesian;
 
-    fn div(self, f: f64) -> CartesianCoordinates {
-        CartesianCoordinates {
+    fn div(self, f: f64) -> Cartesian {
+        Cartesian {
             x: self.x / f,
             y: self.y / f,
             z: self.z / f,
@@ -344,11 +338,11 @@ impl Div<f64> for &CartesianCoordinates {
     }
 }
 
-impl Div<f64> for CartesianCoordinates {
-    type Output = CartesianCoordinates;
+impl Div<f64> for Cartesian {
+    type Output = Cartesian;
 
-    fn div(self, f: f64) -> CartesianCoordinates {
-        CartesianCoordinates {
+    fn div(self, f: f64) -> Cartesian {
+        Cartesian {
             x: self.x / f,
             y: self.y / f,
             z: self.z / f,
@@ -356,11 +350,11 @@ impl Div<f64> for CartesianCoordinates {
     }
 }
 
-impl Neg for CartesianCoordinates {
-    type Output = CartesianCoordinates;
+impl Neg for Cartesian {
+    type Output = Cartesian;
 
-    fn neg(self) -> CartesianCoordinates {
-        CartesianCoordinates {
+    fn neg(self) -> Cartesian {
+        Cartesian {
             x: -self.x,
             y: -self.y,
             z: -self.z,
@@ -368,11 +362,11 @@ impl Neg for CartesianCoordinates {
     }
 }
 
-impl Neg for &CartesianCoordinates {
-    type Output = CartesianCoordinates;
+impl Neg for &Cartesian {
+    type Output = Cartesian;
 
-    fn neg(self) -> CartesianCoordinates {
-        CartesianCoordinates {
+    fn neg(self) -> Cartesian {
+        Cartesian {
             x: -self.x,
             y: -self.y,
             z: -self.z,
@@ -380,7 +374,7 @@ impl Neg for &CartesianCoordinates {
     }
 }
 
-impl Display for CartesianCoordinates {
+impl Display for Cartesian {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let length = self.length();
         if length.to_parsec() > 0.1 {
@@ -419,7 +413,7 @@ mod tests {
 
     #[test]
     fn test_length() {
-        let coordinates = CartesianCoordinates {
+        let coordinates = Cartesian {
             x: Distance::from_meters(3.),
             y: Distance::from_meters(4.),
             z: Distance::from_meters(5.),
@@ -437,12 +431,12 @@ mod tests {
                     for x2 in ordinates.iter() {
                         for y2 in ordinates.iter() {
                             for z2 in ordinates.iter() {
-                                let c1 = CartesianCoordinates::new(
+                                let c1 = Cartesian::new(
                                     Distance::from_meters(*x1),
                                     Distance::from_meters(*y1),
                                     Distance::from_meters(*z1),
                                 );
-                                let c2 = CartesianCoordinates::new(
+                                let c2 = Cartesian::new(
                                     Distance::from_meters(*x2),
                                     Distance::from_meters(*y2),
                                     Distance::from_meters(*z2),

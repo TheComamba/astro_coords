@@ -1,12 +1,12 @@
-//! This module contains the EclipticCoordinates struct and its implementation.
+//! This module contains the Ecliptic struct and its implementation.
 
 use serde::{Deserialize, Serialize};
 use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
 
-use crate::{cartesian::CartesianCoordinates, equatorial::EquatorialCoordinates};
+use crate::{cartesian::Cartesian, equatorial::Equatorial};
 
-use super::{direction::Direction, spherical::SphericalCoordinates};
+use super::{direction::Direction, spherical::Spherical};
 
 /// Ecliptic coordinates are a spherical coordinate system that is centered on the sun.
 ///
@@ -15,36 +15,36 @@ use super::{direction::Direction, spherical::SphericalCoordinates};
 /// Latitude denotes the angle between the ecliptic plane and the body.
 /// Compare https://en.wikipedia.org/wiki/Ecliptic_coordinate_system
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct EclipticCoordinates {
-    pub spherical: SphericalCoordinates,
+pub struct Ecliptic {
+    pub spherical: Spherical,
 }
 
-impl EclipticCoordinates {
-    pub const X_DIRECTION: EclipticCoordinates = EclipticCoordinates {
-        spherical: SphericalCoordinates::X_DIRECTION,
+impl Ecliptic {
+    pub const X_DIRECTION: Ecliptic = Ecliptic {
+        spherical: Spherical::X_DIRECTION,
     };
 
-    pub const Y_DIRECTION: EclipticCoordinates = EclipticCoordinates {
-        spherical: SphericalCoordinates::Y_DIRECTION,
+    pub const Y_DIRECTION: Ecliptic = Ecliptic {
+        spherical: Spherical::Y_DIRECTION,
     };
 
-    pub const Z_DIRECTION: EclipticCoordinates = EclipticCoordinates {
-        spherical: SphericalCoordinates::Z_DIRECTION,
+    pub const Z_DIRECTION: Ecliptic = Ecliptic {
+        spherical: Spherical::Z_DIRECTION,
     };
 
-    pub const fn new(spherical: SphericalCoordinates) -> EclipticCoordinates {
-        EclipticCoordinates { spherical }
+    pub const fn new(spherical: Spherical) -> Ecliptic {
+        Ecliptic { spherical }
     }
 
     pub fn normalize(&mut self) {
         self.spherical.normalize();
     }
 
-    pub fn eq_within(&self, other: &EclipticCoordinates, accuracy: Angle<f64>) -> bool {
+    pub fn eq_within(&self, other: &Ecliptic, accuracy: Angle<f64>) -> bool {
         self.spherical.eq_within(&other.spherical, accuracy)
     }
 
-    pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
+    pub fn to_cartesian(&self, length: Distance<f64>) -> Cartesian {
         self.to_direction().to_cartesian(length)
     }
 
@@ -52,15 +52,15 @@ impl EclipticCoordinates {
         self.spherical.to_direction()
     }
 
-    pub fn to_earth_equatorial(&self) -> crate::earth_equatorial::EarthEquatorialCoordinates {
+    pub fn to_earth_equatorial(&self) -> crate::earth_equatorial::EarthEquatorial {
         self.to_direction().to_earth_equatorial()
     }
 
-    pub fn to_equatorial(&self, axis: Direction) -> EquatorialCoordinates {
+    pub fn to_equatorial(&self, axis: Direction) -> Equatorial {
         self.to_direction().to_equatorial(axis)
     }
 
-    pub fn to_spherical(&self) -> SphericalCoordinates {
+    pub fn to_spherical(&self) -> Spherical {
         self.spherical
     }
 
@@ -69,33 +69,33 @@ impl EclipticCoordinates {
     }
 }
 
-impl Neg for &EclipticCoordinates {
-    type Output = EclipticCoordinates;
+impl Neg for &Ecliptic {
+    type Output = Ecliptic;
 
-    fn neg(self) -> EclipticCoordinates {
-        EclipticCoordinates {
+    fn neg(self) -> Ecliptic {
+        Ecliptic {
             spherical: -self.spherical,
         }
     }
 }
 
-impl Neg for EclipticCoordinates {
-    type Output = EclipticCoordinates;
+impl Neg for Ecliptic {
+    type Output = Ecliptic;
 
-    fn neg(self) -> EclipticCoordinates {
+    fn neg(self) -> Ecliptic {
         -&self
     }
 }
 
-impl Display for EclipticCoordinates {
+impl Display for Ecliptic {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.spherical)
     }
 }
 
 #[cfg(test)]
-pub(super) const EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES: EclipticCoordinates =
-    EclipticCoordinates::new(SphericalCoordinates::new(
+pub(super) const EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES: Ecliptic =
+    Ecliptic::new(Spherical::new(
         crate::angle_helper::QUARTER_CIRC,
         Angle {
             rad: crate::angle_helper::QUARTER_CIRC.rad - crate::angle_helper::EARTH_AXIS_TILT.rad,

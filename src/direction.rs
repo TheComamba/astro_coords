@@ -7,14 +7,14 @@ use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
 use std::ops::Neg;
 
-use crate::equatorial::EquatorialCoordinates;
+use crate::equatorial::Equatorial;
 use crate::error::AstroCoordsError;
 use crate::transformations::rotations::*;
 use crate::{angle_helper::*, NORMALIZATION_THRESHOLD};
 
 use super::{
-    cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
-    ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
+    cartesian::Cartesian, earth_equatorial::EarthEquatorial, ecliptic::Ecliptic,
+    spherical::Spherical,
 };
 
 /// The Direction struct represents a normalised vector in 3D space.
@@ -75,22 +75,22 @@ impl Direction {
         Direction::new(array[0], array[1], array[2])
     }
 
-    /// Returns a CartesianCoordinates struct with the specified length, pointing in the direction.
+    /// Returns a Cartesian struct with the specified length, pointing in the direction.
     ///
     /// # Example
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coords::{direction::Direction, cartesian::CartesianCoordinates};
+    /// use astro_coords::{direction::Direction, cartesian::Cartesian};
     ///
     /// let direction = Direction::new(1., 1., 1.).unwrap();
     /// let length = Distance::from_meters(10.);
     /// let ordinate_length = length / 3f64.sqrt();
     /// let cartesian = direction.to_cartesian(length);
-    /// let expected = CartesianCoordinates::new(ordinate_length, ordinate_length, ordinate_length);
+    /// let expected = Cartesian::new(ordinate_length, ordinate_length, ordinate_length);
     /// assert!(cartesian.eq_within(&expected, Distance::from_meters(1e-5)));
     /// ```
-    pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
-        CartesianCoordinates::new(self.x * length, self.y * length, self.z * length)
+    pub fn to_cartesian(&self, length: Distance<f64>) -> Cartesian {
+        Cartesian::new(self.x * length, self.y * length, self.z * length)
     }
 
     /// Returns the spherical coordinates of the Direction.
@@ -114,10 +114,10 @@ impl Direction {
     /// assert!((spherical.latitude.to_degrees() - 90.).abs() < 1e-5);
     /// assert!((spherical.longitude.to_degrees() - 0.).abs() < 1e-5);
     /// ```
-    pub fn to_spherical(&self) -> SphericalCoordinates {
+    pub fn to_spherical(&self) -> Spherical {
         // Direction is normalised and thus guaranteed to produce valid spherical coordinates.
-        SphericalCoordinates::cartesian_to_spherical((self.x, self.y, self.z))
-            .unwrap_or(SphericalCoordinates::new(ANGLE_ZERO, ANGLE_ZERO))
+        Spherical::cartesian_to_spherical((self.x, self.y, self.z))
+            .unwrap_or(Spherical::new(ANGLE_ZERO, ANGLE_ZERO))
     }
 
     /// Returns the x-ordinate of the Direction.
@@ -313,20 +313,20 @@ impl Direction {
             .rotated(angle_to_old_z, &Self::X)
     }
 
-    pub fn to_earth_equatorial(&self) -> EarthEquatorialCoordinates {
+    pub fn to_earth_equatorial(&self) -> EarthEquatorial {
         let dir_in_equatorial = self.rotated(EARTH_AXIS_TILT, &Direction::X);
         let spherical = dir_in_equatorial.to_spherical();
-        EarthEquatorialCoordinates::new(spherical.longitude, spherical.latitude)
+        EarthEquatorial::new(spherical.longitude, spherical.latitude)
     }
 
-    pub fn to_ecliptic(&self) -> EclipticCoordinates {
-        EclipticCoordinates::new(self.to_spherical())
+    pub fn to_ecliptic(&self) -> Ecliptic {
+        Ecliptic::new(self.to_spherical())
     }
 
-    pub fn to_equatorial(&self, axis: Direction) -> EquatorialCoordinates {
+    pub fn to_equatorial(&self, axis: Direction) -> Equatorial {
         let dir_in_equatorial = self.passive_rotation_to_new_z_axis(&axis);
         let spherical = dir_in_equatorial.to_spherical();
-        EquatorialCoordinates::new(spherical, axis)
+        Equatorial::new(spherical, axis)
     }
 }
 
@@ -398,7 +398,7 @@ mod tests {
                     let x = Distance::from_meters(*x);
                     let y = Distance::from_meters(*y);
                     let z = Distance::from_meters(*z);
-                    let cartesian = CartesianCoordinates::new(x, y, z);
+                    let cartesian = Cartesian::new(x, y, z);
                     let length = cartesian.length();
                     let expected_x = x / length;
                     let expected_y = y / length;
@@ -693,7 +693,7 @@ mod tests {
         let x = Distance::from_lyr(2000.);
         let y = Distance::from_lyr(1e-10);
         let z = Distance::from_lyr(-2000.);
-        let cartesian = CartesianCoordinates::new(x, y, z);
+        let cartesian = Cartesian::new(x, y, z);
         let expected = Direction::new(1., 0., -1.).unwrap();
         let actual = cartesian.to_direction().unwrap();
         println!("expected: {}, actual: {}", expected, actual);

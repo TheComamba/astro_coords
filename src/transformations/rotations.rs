@@ -3,7 +3,7 @@
 use simple_si_units::geometry::Angle;
 use std::ops::{Add, Mul, Sub};
 
-use crate::{direction::Direction, spherical::SphericalCoordinates};
+use crate::{direction::Direction, spherical::Spherical};
 
 /// Rotates a 3-tuple around an arbitrary axis.
 pub(crate) fn rotated_tuple<T>(tup: (T, T, T), angle: Angle<f64>, axis: &Direction) -> (T, T, T)
@@ -53,10 +53,7 @@ where
     (x_out, y_out, z_out)
 }
 
-pub(crate) fn rotated_x_spherical(
-    spherical: &SphericalCoordinates,
-    angle: Angle<f64>,
-) -> SphericalCoordinates {
+pub(crate) fn rotated_x_spherical(spherical: &Spherical, angle: Angle<f64>) -> Spherical {
     let cos_a = angle.rad.cos();
     let sin_a = angle.rad.sin();
 
@@ -80,7 +77,7 @@ pub(crate) fn rotated_x_spherical(
     let longitude = Angle::from_radians(y_out.atan2(x_out));
     let latitude = Angle::from_radians(z_out.atan2(r_xy));
 
-    SphericalCoordinates::new(longitude, latitude)
+    Spherical::new(longitude, latitude)
 }
 
 /// Rotates a 3-tuple around the y-axis.

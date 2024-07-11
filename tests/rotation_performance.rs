@@ -1,4 +1,4 @@
-use astro_coords::{direction::Direction, spherical::SphericalCoordinates};
+use astro_coords::{direction::Direction, spherical::Spherical};
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use serial_test::serial;
 use simple_si_units::geometry::Angle;
@@ -33,7 +33,7 @@ fn many_directions(num: usize) -> Vec<Direction> {
     directions
 }
 
-fn many_sphericals(num: usize) -> Vec<SphericalCoordinates> {
+fn many_sphericals(num: usize) -> Vec<Spherical> {
     let seed = [42; 32];
     let mut rng = StdRng::from_seed(seed);
 
@@ -45,7 +45,7 @@ fn many_sphericals(num: usize) -> Vec<SphericalCoordinates> {
         let latitude = Angle {
             rad: rng.gen_range((-PI / 2.)..(PI / 2.)),
         };
-        sphericals.push(SphericalCoordinates::new(longitude, latitude));
+        sphericals.push(Spherical::new(longitude, latitude));
     }
     sphericals
 }
@@ -246,7 +246,7 @@ fn rotation_for_sphericals_is_fast() {
 
     let duration_per_rotation = duration / total_rotations as u32;
     println!(
-        "{} calls to SphericalCoordinates::rotated took {:?}, or {:?} per call.",
+        "{} calls to Spherical::rotated took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
     assert!(duration_per_rotation < std::time::Duration::from_secs(1))
@@ -274,7 +274,7 @@ fn x_rotation_for_sphericals_is_fast() {
 
     let duration_per_rotation = duration / total_rotations as u32;
     println!(
-        "{} calls to SphericalCoordinates::rotated_x took {:?}, or {:?} per call.",
+        "{} calls to Spherical::rotated_x took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
     assert!(duration_per_rotation < std::time::Duration::from_secs(1))
@@ -302,7 +302,7 @@ fn y_rotation_for_sphericals_is_fast() {
 
     let duration_per_rotation = duration / total_rotations as u32;
     println!(
-        "{} calls to SphericalCoordinates::rotated_y took {:?}, or {:?} per call.",
+        "{} calls to Spherical::rotated_y took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
     assert!(duration_per_rotation < std::time::Duration::from_secs(1))
@@ -330,7 +330,7 @@ fn z_rotation_for_sphericals_is_fast() {
 
     let duration_per_rotation = duration / total_rotations as u32;
     println!(
-        "{} calls to SphericalCoordinates::rotated_z took {:?}, or {:?} per call.",
+        "{} calls to Spherical::rotated_z took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
     assert!(duration_per_rotation < std::time::Duration::from_secs(1))
@@ -358,7 +358,7 @@ fn active_rotation_for_spherical_is_fast() {
 
     let duration_per_rotation = duration / total_rotations as u32;
     println!(
-        "{} calls to SphericalCoordinates::active_rotation_to_new_z_axis took {:?}, or {:?} per call.",
+        "{} calls to Spherical::active_rotation_to_new_z_axis took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
     assert!(duration_per_rotation < std::time::Duration::from_secs(1))
@@ -386,7 +386,7 @@ fn passive_rotation_for_spherical_is_fast() {
 
     let duration_per_rotation = duration / total_rotations as u32;
     println!(
-        "{} calls to SphericalCoordinates::passive_rotation_to_new_z_axis took {:?}, or {:?} per call.",
+        "{} calls to Spherical::passive_rotation_to_new_z_axis took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
     assert!(duration_per_rotation < std::time::Duration::from_secs(1))
