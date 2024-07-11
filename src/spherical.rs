@@ -100,7 +100,9 @@ impl SphericalCoordinates {
     }
 
     pub fn rotated_z(&self, angle: Angle<f64>) -> SphericalCoordinates {
-        todo!()
+        let mut rotated = self.clone();
+        rotated.longitude += angle;
+        rotated
     }
 
     /// Returns the spherical coordinates that results from actively rotating the spherical vector to the new z-axis, in a manner that preserves the old z-projection of the x-axis.

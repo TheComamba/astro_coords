@@ -9,12 +9,12 @@ use std::ops::Neg;
 
 use crate::equatorial::EquatorialCoordinates;
 use crate::error::AstroCoordsError;
+use crate::transformations::rotations::*;
 use crate::{angle_helper::*, NORMALIZATION_THRESHOLD};
 
 use super::{
     cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
     ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
-    transformations::rotations::rotated_tuple,
 };
 
 /// The Direction struct represents a normalised vector in 3D space.
@@ -154,15 +154,18 @@ impl Direction {
     }
 
     pub fn rotated_x(&self, angle: Angle<f64>) -> Direction {
-        todo!()
+        let (x, y, z) = rotated_x_tuple((self.x, self.y, self.z), angle);
+        Direction { x, y, z }
     }
 
     pub fn rotated_y(&self, angle: Angle<f64>) -> Direction {
-        todo!()
+        let (x, y, z) = rotated_y_tuple((self.x, self.y, self.z), angle);
+        Direction { x, y, z }
     }
 
     pub fn rotated_z(&self, angle: Angle<f64>) -> Direction {
-        todo!()
+        let (x, y, z) = rotated_z_tuple((self.x, self.y, self.z), angle);
+        Direction { x, y, z }
     }
 
     /// Returns true if the Direction is equal to the other Direction within the specified accuracy.
