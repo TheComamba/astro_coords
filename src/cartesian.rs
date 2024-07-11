@@ -13,8 +13,7 @@ use std::{
 use crate::{earth_equatorial::EarthEquatorial, equatorial::Equatorial, error::AstroCoordsError};
 
 use super::{
-    direction::Direction, ecliptic::Ecliptic, spherical::Spherical,
-    transformations::rotations::rotated_tuple,
+    direction::Direction, ecliptic::Ecliptic, spherical::Spherical, transformations::rotations::*,
 };
 
 /// Cartesian coordinates in 3D space.
@@ -170,15 +169,18 @@ impl Cartesian {
     }
 
     pub fn rotated_x(&self, angle: Angle<f64>) -> Cartesian {
-        todo!()
+        let (x, y, z) = rotated_x_tuple((self.x, self.y, self.z), angle);
+        Cartesian { x, y, z }
     }
 
     pub fn rotated_y(&self, angle: Angle<f64>) -> Cartesian {
-        todo!()
+        let (x, y, z) = rotated_y_tuple((self.x, self.y, self.z), angle);
+        Cartesian { x, y, z }
     }
 
     pub fn rotated_z(&self, angle: Angle<f64>) -> Cartesian {
-        todo!()
+        let (x, y, z) = rotated_z_tuple((self.x, self.y, self.z), angle);
+        Cartesian { x, y, z }
     }
 
     /// Returns the angle between two sets of Cartesian coordinates.

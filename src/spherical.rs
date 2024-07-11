@@ -6,8 +6,7 @@ use std::{fmt::Display, ops::Neg};
 
 use crate::{
     angle_helper::*, cartesian::Cartesian, earth_equatorial::EarthEquatorial,
-    equatorial::Equatorial, error::AstroCoordsError,
-    transformations::rotations::rotated_x_spherical, NORMALIZATION_THRESHOLD,
+    equatorial::Equatorial, error::AstroCoordsError, NORMALIZATION_THRESHOLD,
 };
 
 use super::{
@@ -89,16 +88,15 @@ impl Spherical {
     }
 
     pub fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Spherical {
-        todo!()
+        self.to_direction().rotated(angle, axis).to_spherical()
     }
 
     pub fn rotated_x(&self, angle: Angle<f64>) -> Spherical {
-        //rotated_x_spherical(self, angle)
         self.to_direction().rotated_x(angle).to_spherical()
     }
 
     pub fn rotated_y(&self, angle: Angle<f64>) -> Spherical {
-        todo!()
+        self.to_direction().rotated_y(angle).to_spherical()
     }
 
     pub fn rotated_z(&self, angle: Angle<f64>) -> Spherical {

@@ -53,33 +53,6 @@ where
     (x_out, y_out, z_out)
 }
 
-pub(crate) fn rotated_x_spherical(spherical: &Spherical, angle: Angle<f64>) -> Spherical {
-    let cos_a = angle.rad.cos();
-    let sin_a = angle.rad.sin();
-
-    let lon = spherical.longitude.rad;
-    let lat = spherical.latitude.rad;
-
-    let cos_lon = lon.cos();
-    let cos_lat = lat.cos();
-    let sin_lon = lon.sin();
-    let sin_lat = lat.sin();
-
-    let x = cos_lon * cos_lat;
-    let y = sin_lon * cos_lat;
-    let z = sin_lat;
-
-    let x_out = x;
-    let y_out = y * cos_a - z * sin_a;
-    let z_out = y * sin_a + z * cos_a;
-
-    let r_xy = (x_out * x_out + y_out * y_out).sqrt();
-    let longitude = Angle::from_radians(y_out.atan2(x_out));
-    let latitude = Angle::from_radians(z_out.atan2(r_xy));
-
-    Spherical::new(longitude, latitude)
-}
-
 /// Rotates a 3-tuple around the y-axis.
 pub(crate) fn rotated_y_tuple<T>(tup: (T, T, T), angle: Angle<f64>) -> (T, T, T)
 where
