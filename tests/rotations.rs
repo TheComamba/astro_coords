@@ -114,7 +114,7 @@ fn rotated_x_is_the_same_for_direction_and_spherical() {
 fn rotated_y_is_the_same_for_direction_and_spherical() {
     for vec in example_directions() {
         for angle in example_angles() {
-            let rotated_dir = vec.rotated_x(angle);
+            let rotated_dir = vec.rotated_y(angle);
 
             let spherical_dir = vec.to_spherical();
             let rotated_spherical = spherical_dir.rotated_y(angle);
@@ -134,7 +134,7 @@ fn rotated_y_is_the_same_for_direction_and_spherical() {
 fn rotated_z_is_the_same_for_direction_and_spherical() {
     for vec in example_directions() {
         for angle in example_angles() {
-            let rotated_dir = vec.rotated_x(angle);
+            let rotated_dir = vec.rotated_z(angle);
 
             let spherical_dir = vec.to_spherical();
             let rotated_spherical = spherical_dir.rotated_z(angle);
@@ -142,7 +142,9 @@ fn rotated_z_is_the_same_for_direction_and_spherical() {
             let expected = rotated_dir.to_spherical();
             assert!(
                 rotated_spherical.eq_within(&expected, ANGLE_ACC),
-                "{} != {}",
+                "vec: {}\nangle: {}\n{} != {}",
+                vec,
+                angle,
                 rotated_spherical,
                 expected
             );
