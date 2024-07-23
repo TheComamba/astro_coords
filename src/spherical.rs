@@ -168,6 +168,11 @@ impl Spherical {
         latitudes_equal && longitudes_equal
     }
 
+    // https://en.wikipedia.org/wiki/Great-circle_distance
+    pub fn angle_to(&self, other: &Self) -> Angle<f64> {
+        todo!()
+    }
+
     pub(crate) fn cartesian_to_spherical(cart: (f64, f64, f64)) -> Result<Self, AstroCoordsError> {
         let (x, y, z) = cart;
         if x * x + y * y + z * z < NORMALIZATION_THRESHOLD {
