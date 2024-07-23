@@ -1,10 +1,11 @@
 //! Functions for rotating vectors.
 
 use simple_si_units::geometry::Angle;
-use std::ops::{Add, Mul};
+use std::ops::{Add, Mul, Sub};
 
-use crate::direction::Direction;
+use crate::{direction::Direction, spherical::Spherical};
 
+/// Rotates a 3-tuple around an arbitrary axis.
 pub(crate) fn rotated_tuple<T>(tup: (T, T, T), angle: Angle<f64>, axis: &Direction) -> (T, T, T)
 where
     T: Mul<f64, Output = T> + Add<Output = T> + Copy,
@@ -33,6 +34,54 @@ where
     let x_out = x * r_11 + y * r_12 + z * r_13;
     let y_out = x * r_21 + y * r_22 + z * r_23;
     let z_out = x * r_31 + y * r_32 + z * r_33;
+    (x_out, y_out, z_out)
+}
+
+/// Rotates a 3-tuple around the x-axis.
+pub(crate) fn rotated_x_tuple<T>(tup: (T, T, T), angle: Angle<f64>) -> (T, T, T)
+where
+    T: Mul<f64, Output = T> + Add<Output = T> + Sub<Output = T> + Copy,
+{
+    let cos = angle.rad.cos();
+    let sin = angle.rad.sin();
+
+    let (x, y, z) = tup;
+
+    let x_out = x;
+    let y_out = y * cos - z * sin;
+    let z_out = y * sin + z * cos;
+    (x_out, y_out, z_out)
+}
+
+/// Rotates a 3-tuple around the y-axis.
+pub(crate) fn rotated_y_tuple<T>(tup: (T, T, T), angle: Angle<f64>) -> (T, T, T)
+where
+    T: Mul<f64, Output = T> + Add<Output = T> + Sub<Output = T> + Copy,
+{
+    let cos = angle.rad.cos();
+    let sin = angle.rad.sin();
+
+    let (x, y, z) = tup;
+
+    let x_out = x * cos + z * sin;
+    let y_out = y;
+    let z_out = z * cos - x * sin;
+    (x_out, y_out, z_out)
+}
+
+/// Rotates a 3-tuple around the z-axis.
+pub(crate) fn rotated_z_tuple<T>(tup: (T, T, T), angle: Angle<f64>) -> (T, T, T)
+where
+    T: Mul<f64, Output = T> + Add<Output = T> + Sub<Output = T> + Copy,
+{
+    let cos = angle.rad.cos();
+    let sin = angle.rad.sin();
+
+    let (x, y, z) = tup;
+
+    let x_out = x * cos - y * sin;
+    let y_out = x * sin + y * cos;
+    let z_out = z;
     (x_out, y_out, z_out)
 }
 

@@ -1,29 +1,26 @@
-//! This module contains the EquatorialCoordinates struct and its implementation.
+//! This module contains the Equatorial struct and its implementation.
 
 use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
 
-use crate::{
-    cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
-    ecliptic::EclipticCoordinates,
-};
+use crate::{cartesian::Cartesian, earth_equatorial::EarthEquatorial, ecliptic::Ecliptic};
 
-use super::{direction::Direction, spherical::SphericalCoordinates};
+use super::{direction::Direction, spherical::Spherical};
 
-pub struct EquatorialCoordinates {
-    pub spherical: SphericalCoordinates,
+pub struct Equatorial {
+    pub spherical: Spherical,
     pub rotation_axis: Direction,
 }
 
-impl EquatorialCoordinates {
-    pub const fn new(spherical: SphericalCoordinates, rotation_axis: Direction) -> Self {
+impl Equatorial {
+    pub const fn new(spherical: Spherical, rotation_axis: Direction) -> Self {
         Self {
             spherical,
             rotation_axis,
         }
     }
 
-    pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
+    pub fn to_cartesian(&self, length: Distance<f64>) -> Cartesian {
         self.to_direction().to_cartesian(length)
     }
 
@@ -33,24 +30,24 @@ impl EquatorialCoordinates {
             .active_rotation_to_new_z_axis(&self.rotation_axis)
     }
 
-    pub fn to_earth_equatorial(&self) -> EarthEquatorialCoordinates {
+    pub fn to_earth_equatorial(&self) -> EarthEquatorial {
         self.to_direction().to_earth_equatorial()
     }
 
-    pub fn to_ecliptic(&self) -> EclipticCoordinates {
+    pub fn to_ecliptic(&self) -> Ecliptic {
         self.to_direction().to_ecliptic()
     }
 
-    pub fn to_spherical(&self) -> SphericalCoordinates {
+    pub fn to_spherical(&self) -> Spherical {
         self.to_ecliptic().to_spherical()
     }
 
-    pub fn eq_within(&self, other: &EquatorialCoordinates, accuracy: Angle<f64>) -> bool {
+    pub fn eq_within(&self, other: &Equatorial, accuracy: Angle<f64>) -> bool {
         self.to_ecliptic().eq_within(&other.to_ecliptic(), accuracy)
     }
 }
 
-impl Display for EquatorialCoordinates {
+impl Display for Equatorial {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
@@ -63,8 +60,7 @@ impl Display for EquatorialCoordinates {
 #[cfg(test)]
 mod tests {
     use crate::{
-        earth_equatorial::EarthEquatorialCoordinates,
-        ecliptic::EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES,
+        earth_equatorial::EarthEquatorial, ecliptic::EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES,
     };
 
     use super::*;
@@ -83,8 +79,7 @@ mod tests {
                     }
                     let axis = axis.unwrap();
 
-                    let coordinates =
-                        EquatorialCoordinates::new(SphericalCoordinates::Z_DIRECTION, axis.clone());
+                    let coordinates = Equatorial::new(Spherical::Z_DIRECTION, axis.clone());
                     let expected = axis;
                     let actual = coordinates.to_direction();
                     println!("expected: {},\n actual: {}", expected, actual);
@@ -106,10 +101,7 @@ mod tests {
                     }
                     let axis = axis.unwrap();
 
-                    let coordinates = EquatorialCoordinates::new(
-                        -SphericalCoordinates::Z_DIRECTION,
-                        axis.clone(),
-                    );
+                    let coordinates = Equatorial::new(-Spherical::Z_DIRECTION, axis.clone());
                     let expected = -&axis;
                     let actual = coordinates.to_direction();
                     println!("expected: {},\n actual: {}", expected, actual);
@@ -131,8 +123,7 @@ mod tests {
                     }
                     let axis = axis.unwrap();
 
-                    let coordinates =
-                        EquatorialCoordinates::new(SphericalCoordinates::X_DIRECTION, axis);
+                    let coordinates = Equatorial::new(Spherical::X_DIRECTION, axis);
                     let direction = coordinates.to_direction();
                     assert!(direction.z().abs() < TEST_ACCURACY);
                 }
@@ -152,8 +143,7 @@ mod tests {
                     }
                     let axis = axis.unwrap();
 
-                    let coordinates =
-                        EquatorialCoordinates::new(-SphericalCoordinates::X_DIRECTION, axis);
+                    let coordinates = Equatorial::new(-Spherical::X_DIRECTION, axis);
                     let direction = coordinates.to_direction();
                     assert!(direction.z().abs() < TEST_ACCURACY);
                 }
@@ -172,11 +162,10 @@ mod tests {
             for lat in ordinates.clone() {
                 let long = Angle::from_radians(long);
                 let lat = Angle::from_radians(lat);
-                let spherical = SphericalCoordinates::new(long, lat);
+                let spherical = Spherical::new(long, lat);
 
-                let equatorial_coordinates =
-                    EquatorialCoordinates::new(spherical, earth_north.clone());
-                let earth_equatorial_coordinates = EarthEquatorialCoordinates::new(long, lat);
+                let equatorial_coordinates = Equatorial::new(spherical, earth_north.clone());
+                let earth_equatorial_coordinates = EarthEquatorial::new(long, lat);
 
                 let expected = earth_equatorial_coordinates.to_direction();
                 let actual = equatorial_coordinates.to_direction();
@@ -190,15 +179,13 @@ mod tests {
     fn axis_tilted_to_y() {
         let axis = Direction::Y;
 
-        let equatorial_x =
-            EquatorialCoordinates::new(SphericalCoordinates::X_DIRECTION, axis.clone());
+        let equatorial_x = Equatorial::new(Spherical::X_DIRECTION, axis.clone());
         let expected = Direction::X;
         let actual = equatorial_x.to_direction();
         println!("expected: {},\n actual: {}", expected, actual);
         assert!(actual.eq_within(&expected, TEST_ACCURACY));
 
-        let equatorial_y =
-            EquatorialCoordinates::new(SphericalCoordinates::Y_DIRECTION, axis.clone());
+        let equatorial_y = Equatorial::new(Spherical::Y_DIRECTION, axis.clone());
         let expected = -&Direction::Z;
         let actual = equatorial_y.to_direction();
         println!("expected: {},\n actual: {}", expected, actual);
@@ -209,15 +196,13 @@ mod tests {
     fn axis_tilted_to_x() {
         let axis = Direction::X;
 
-        let equatorial_x =
-            EquatorialCoordinates::new(SphericalCoordinates::X_DIRECTION, axis.clone());
+        let equatorial_x = Equatorial::new(Spherical::X_DIRECTION, axis.clone());
         let expected = -&Direction::Y;
         let actual = equatorial_x.to_direction();
         println!("expected: {},\n actual: {}", expected, actual);
         assert!(actual.eq_within(&expected, TEST_ACCURACY));
 
-        let equatorial_y =
-            EquatorialCoordinates::new(SphericalCoordinates::Y_DIRECTION, axis.clone());
+        let equatorial_y = Equatorial::new(Spherical::Y_DIRECTION, axis.clone());
         let expected = -&Direction::Z;
         let actual = equatorial_y.to_direction();
         println!("expected: {},\n actual: {}", expected, actual);

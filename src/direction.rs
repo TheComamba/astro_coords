@@ -7,14 +7,14 @@ use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
 use std::ops::Neg;
 
-use crate::equatorial::EquatorialCoordinates;
+use crate::equatorial::Equatorial;
 use crate::error::AstroCoordsError;
+use crate::transformations::rotations::*;
 use crate::{angle_helper::*, NORMALIZATION_THRESHOLD};
 
 use super::{
-    cartesian::CartesianCoordinates, earth_equatorial::EarthEquatorialCoordinates,
-    ecliptic::EclipticCoordinates, spherical::SphericalCoordinates,
-    transformations::rotations::rotated_tuple,
+    cartesian::Cartesian, earth_equatorial::EarthEquatorial, ecliptic::Ecliptic,
+    spherical::Spherical,
 };
 
 /// The Direction struct represents a normalised vector in 3D space.
@@ -75,22 +75,22 @@ impl Direction {
         Direction::new(array[0], array[1], array[2])
     }
 
-    /// Returns a CartesianCoordinates struct with the specified length, pointing in the direction.
+    /// Returns a Cartesian struct with the specified length, pointing in the direction.
     ///
     /// # Example
     /// ```
     /// use simple_si_units::base::Distance;
-    /// use astro_coords::{direction::Direction, cartesian::CartesianCoordinates};
+    /// use astro_coords::{direction::Direction, cartesian::Cartesian};
     ///
     /// let direction = Direction::new(1., 1., 1.).unwrap();
     /// let length = Distance::from_meters(10.);
     /// let ordinate_length = length / 3f64.sqrt();
     /// let cartesian = direction.to_cartesian(length);
-    /// let expected = CartesianCoordinates::new(ordinate_length, ordinate_length, ordinate_length);
+    /// let expected = Cartesian::new(ordinate_length, ordinate_length, ordinate_length);
     /// assert!(cartesian.eq_within(&expected, Distance::from_meters(1e-5)));
     /// ```
-    pub fn to_cartesian(&self, length: Distance<f64>) -> CartesianCoordinates {
-        CartesianCoordinates::new(self.x * length, self.y * length, self.z * length)
+    pub fn to_cartesian(&self, length: Distance<f64>) -> Cartesian {
+        Cartesian::new(self.x * length, self.y * length, self.z * length)
     }
 
     /// Returns the spherical coordinates of the Direction.
@@ -114,10 +114,10 @@ impl Direction {
     /// assert!((spherical.latitude.to_degrees() - 90.).abs() < 1e-5);
     /// assert!((spherical.longitude.to_degrees() - 0.).abs() < 1e-5);
     /// ```
-    pub fn to_spherical(&self) -> SphericalCoordinates {
+    pub fn to_spherical(&self) -> Spherical {
         // Direction is normalised and thus guaranteed to produce valid spherical coordinates.
-        SphericalCoordinates::cartesian_to_spherical((self.x, self.y, self.z))
-            .unwrap_or(SphericalCoordinates::new(ANGLE_ZERO, ANGLE_ZERO))
+        Spherical::cartesian_to_spherical((self.x, self.y, self.z))
+            .unwrap_or(Spherical::new(ANGLE_ZERO, ANGLE_ZERO))
     }
 
     /// Returns the x-ordinate of the Direction.
@@ -150,6 +150,21 @@ impl Direction {
     /// ```
     pub fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Direction {
         let (x, y, z) = rotated_tuple((self.x, self.y, self.z), angle, axis);
+        Direction { x, y, z }
+    }
+
+    pub fn rotated_x(&self, angle: Angle<f64>) -> Direction {
+        let (x, y, z) = rotated_x_tuple((self.x, self.y, self.z), angle);
+        Direction { x, y, z }
+    }
+
+    pub fn rotated_y(&self, angle: Angle<f64>) -> Direction {
+        let (x, y, z) = rotated_y_tuple((self.x, self.y, self.z), angle);
+        Direction { x, y, z }
+    }
+
+    pub fn rotated_z(&self, angle: Angle<f64>) -> Direction {
+        let (x, y, z) = rotated_z_tuple((self.x, self.y, self.z), angle);
         Direction { x, y, z }
     }
 
@@ -261,6 +276,7 @@ impl Direction {
     ///
     /// This is the inverse operation of `passive_rotation_to_new_z_axis`.
     ///
+    /// TODO: This example is not intuitive
     /// # Example
     /// ```
     /// use astro_coords::direction::Direction;
@@ -274,20 +290,10 @@ impl Direction {
     /// assert!(rotated_x.dot_product(&Direction::Z).abs() < 1e-5);
     /// ```
     pub fn active_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
-        let angle_to_old_z = new_z.angle_to(&Self::Z);
-
-        let axis_projected_onto_xy_plane = Direction::new(new_z.x(), new_z.y(), 0.);
-        let mut polar_rotation_angle = ANGLE_ZERO;
-        if let Ok(axis_projected_onto_xy_plane) = axis_projected_onto_xy_plane {
-            polar_rotation_angle = axis_projected_onto_xy_plane.angle_to(&Self::Y);
-            if axis_projected_onto_xy_plane.x() < 0. {
-                polar_rotation_angle = -polar_rotation_angle;
-            }
-        }
-
-        let mut dir = self.rotated(-angle_to_old_z, &Self::X);
-        dir = dir.rotated(-polar_rotation_angle, &Self::Z);
-        dir
+        let (angle_to_old_z, polar_rotation_angle) =
+            get_angle_to_old_z_and_polar_rotation_angle(new_z);
+        self.rotated(-angle_to_old_z, &Self::X)
+            .rotated(-polar_rotation_angle, &Self::Z)
     }
 
     /// Returns the Direction that results from passively rotating the Direction to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
@@ -298,38 +304,44 @@ impl Direction {
     /// 2. The vector is rotated around the old x-axis by the angle between new and old z-axis.
     ///
     /// This is the inverse operation of `active_rotation_to_new_z_axis`.
+    ///
+    /// TODO: Example
     pub fn passive_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
-        let axis_projected_onto_xy_plane = Direction::new(new_z.x(), new_z.y(), 0.);
-        let mut polar_rotation_angle = ANGLE_ZERO;
-        if let Ok(axis_projected_onto_xy_plane) = axis_projected_onto_xy_plane {
-            polar_rotation_angle = axis_projected_onto_xy_plane.angle_to(&Self::Y);
-            if axis_projected_onto_xy_plane.x() < 0. {
-                polar_rotation_angle = -polar_rotation_angle;
-            }
-        }
-
-        let angle_to_old_z = new_z.angle_to(&Self::Z);
-
-        let mut dir = self.rotated(polar_rotation_angle, &Self::Z);
-        dir = dir.rotated(angle_to_old_z, &Self::X);
-        dir
+        let (angle_to_old_z, polar_rotation_angle) =
+            get_angle_to_old_z_and_polar_rotation_angle(new_z);
+        self.rotated(polar_rotation_angle, &Self::Z)
+            .rotated(angle_to_old_z, &Self::X)
     }
 
-    pub fn to_earth_equatorial(&self) -> EarthEquatorialCoordinates {
+    pub fn to_earth_equatorial(&self) -> EarthEquatorial {
         let dir_in_equatorial = self.rotated(EARTH_AXIS_TILT, &Direction::X);
         let spherical = dir_in_equatorial.to_spherical();
-        EarthEquatorialCoordinates::new(spherical.longitude, spherical.latitude)
+        EarthEquatorial::new(spherical.longitude, spherical.latitude)
     }
 
-    pub fn to_ecliptic(&self) -> EclipticCoordinates {
-        EclipticCoordinates::new(self.to_spherical())
+    pub fn to_ecliptic(&self) -> Ecliptic {
+        Ecliptic::new(self.to_spherical())
     }
 
-    pub fn to_equatorial(&self, axis: Direction) -> EquatorialCoordinates {
+    pub fn to_equatorial(&self, axis: Direction) -> Equatorial {
         let dir_in_equatorial = self.passive_rotation_to_new_z_axis(&axis);
         let spherical = dir_in_equatorial.to_spherical();
-        EquatorialCoordinates::new(spherical, axis)
+        Equatorial::new(spherical, axis)
     }
+}
+
+fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Direction) -> (Angle<f64>, Angle<f64>) {
+    let angle_to_old_z = new_z.angle_to(&Direction::Z);
+
+    let axis_projected_onto_xy_plane = Direction::new(new_z.x(), new_z.y(), 0.);
+    let mut polar_rotation_angle = ANGLE_ZERO;
+    if let Ok(axis_projected_onto_xy_plane) = axis_projected_onto_xy_plane {
+        polar_rotation_angle = axis_projected_onto_xy_plane.angle_to(&Direction::Y);
+        if axis_projected_onto_xy_plane.x() < 0. {
+            polar_rotation_angle = -polar_rotation_angle;
+        }
+    }
+    (angle_to_old_z, polar_rotation_angle)
 }
 
 impl Neg for &Direction {
@@ -386,7 +398,7 @@ mod tests {
                     let x = Distance::from_meters(*x);
                     let y = Distance::from_meters(*y);
                     let z = Distance::from_meters(*z);
-                    let cartesian = CartesianCoordinates::new(x, y, z);
+                    let cartesian = Cartesian::new(x, y, z);
                     let length = cartesian.length();
                     let expected_x = x / length;
                     let expected_y = y / length;
@@ -681,7 +693,7 @@ mod tests {
         let x = Distance::from_lyr(2000.);
         let y = Distance::from_lyr(1e-10);
         let z = Distance::from_lyr(-2000.);
-        let cartesian = CartesianCoordinates::new(x, y, z);
+        let cartesian = Cartesian::new(x, y, z);
         let expected = Direction::new(1., 0., -1.).unwrap();
         let actual = cartesian.to_direction().unwrap();
         println!("expected: {}, actual: {}", expected, actual);

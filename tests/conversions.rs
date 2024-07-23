@@ -1,7 +1,6 @@
 use astro_coords::{
-    cartesian::CartesianCoordinates, direction::Direction,
-    earth_equatorial::EarthEquatorialCoordinates, ecliptic::EclipticCoordinates,
-    equatorial::EquatorialCoordinates, spherical::SphericalCoordinates,
+    cartesian::Cartesian, direction::Direction, earth_equatorial::EarthEquatorial,
+    ecliptic::Ecliptic, equatorial::Equatorial, spherical::Spherical,
 };
 use simple_si_units::{base::Distance, geometry::Angle};
 
@@ -29,22 +28,22 @@ fn angle_examples() -> Vec<Angle<f64>> {
     ]
 }
 
-fn spherical_examples() -> Vec<SphericalCoordinates> {
+fn spherical_examples() -> Vec<Spherical> {
     let mut examples = vec![];
     for lon in angle_examples() {
         for lat in angle_examples() {
-            examples.push(SphericalCoordinates::new(lon, lat));
+            examples.push(Spherical::new(lon, lat));
         }
     }
     examples
 }
 
-fn cartesian_examples() -> Vec<CartesianCoordinates> {
+fn cartesian_examples() -> Vec<Cartesian> {
     let mut examples = vec![];
     for x in distance_examples() {
         for y in distance_examples() {
             for z in distance_examples() {
-                examples.push(CartesianCoordinates::new(x, y, z));
+                examples.push(Cartesian::new(x, y, z));
             }
         }
     }
@@ -64,29 +63,29 @@ fn direction_examples() -> Vec<Direction> {
     examples
 }
 
-fn earth_equatorial_examples() -> Vec<EarthEquatorialCoordinates> {
+fn earth_equatorial_examples() -> Vec<EarthEquatorial> {
     let mut examples = vec![];
     for ra in angle_examples() {
         for dec in angle_examples() {
-            examples.push(EarthEquatorialCoordinates::new(ra, dec));
+            examples.push(EarthEquatorial::new(ra, dec));
         }
     }
     examples
 }
 
-fn ecliptic_examples() -> Vec<EclipticCoordinates> {
+fn ecliptic_examples() -> Vec<Ecliptic> {
     let mut examples = vec![];
     for spherical in spherical_examples() {
-        examples.push(EclipticCoordinates::new(spherical));
+        examples.push(Ecliptic::new(spherical));
     }
     examples
 }
 
-fn equatorial_examples() -> Vec<EquatorialCoordinates> {
+fn equatorial_examples() -> Vec<Equatorial> {
     let mut examples = vec![];
     for spherical in spherical_examples() {
         for axis in direction_examples() {
-            examples.push(EquatorialCoordinates::new(spherical, axis));
+            examples.push(Equatorial::new(spherical, axis));
         }
     }
     examples
