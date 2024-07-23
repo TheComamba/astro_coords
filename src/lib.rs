@@ -13,4 +13,4 @@ pub mod ra_and_dec;
 pub mod spherical;
 pub mod transformations;
 
-pub(crate) const NORMALIZATION_THRESHOLD: f64 = 1e-30; // This is way above the smallest possible value for f64
+pub(crate) const NORMALIZATION_THRESHOLD: f64 = 1e-12; // When subtracting two f64 numbers around unity, the uncertainty is around 1e-17.
