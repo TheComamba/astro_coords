@@ -168,7 +168,21 @@ impl Spherical {
         latitudes_equal && longitudes_equal
     }
 
-    // https://en.wikipedia.org/wiki/Great-circle_distance
+    /// Calculates the angle between two points on a sphere (great-circle distance) given in spherical coordinates.
+    ///
+    /// This method uses the Haversine formula:
+    /// https://en.wikipedia.org/wiki/Haversine_formula
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::spherical::Spherical;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// let a = Spherical::new(Angle::from_degrees(0.), Angle::from_degrees(0.));
+    /// let b = Spherical::new(Angle::from_degrees(90.), Angle::from_degrees(0.));
+    /// let angle = a.angle_to(&b);
+    /// assert!((angle - Angle::from_degrees(90.)).rad.abs() < 1e-5);
+    /// ```
     pub fn angle_to(&self, other: &Self) -> Angle<f64> {
         let lat_diff = other.latitude - self.latitude;
         let lat_sum = other.latitude + self.latitude;

@@ -3,7 +3,7 @@
 use simple_si_units::geometry::Angle;
 use std::ops::{Add, Mul, Sub};
 
-use crate::{direction::Direction, spherical::Spherical};
+use crate::direction::Direction;
 
 /// Rotates a 3-tuple around an arbitrary axis.
 pub(crate) fn rotated_tuple<T>(tup: (T, T, T), angle: Angle<f64>, axis: &Direction) -> (T, T, T)
