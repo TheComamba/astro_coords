@@ -1,9 +1,9 @@
-mod utils;
-
 use serial_test::serial;
 use std::time::Instant;
 
 use utils::benchmarks::*;
+
+mod utils;
 
 #[test]
 #[ignore]

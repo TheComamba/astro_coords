@@ -1,7 +1,7 @@
-mod utils;
-
 use simple_si_units::base::Distance;
 use utils::{constants::*, examples::*};
+
+mod utils;
 
 #[test]
 fn cartesian_to_direction_roundtrip() {

@@ -29,6 +29,14 @@ pub mod examples {
         ]
     }
 
+    pub fn positive_distance_examples() -> Vec<Distance<f64>> {
+        vec![
+            Distance::from_m(0.1),
+            Distance::from_m(2.0),
+            Distance::from_m(30.),
+        ]
+    }
+
     pub fn angle_examples() -> Vec<Angle<f64>> {
         vec![
             Angle::from_degrees(0.0),
