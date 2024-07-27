@@ -5,8 +5,6 @@ use utils::benchmarks::{many_cartesians, many_directions, many_sphericals};
 
 mod utils;
 
-//TODO
-
 const MAX_DURATION_PER_CALL: Duration = Duration::from_nanos(100);
 
 #[test]
