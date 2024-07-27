@@ -1,54 +1,9 @@
-use astro_coords::{direction::Direction, spherical::Spherical};
-use rand::{rngs::StdRng, Rng, SeedableRng};
+mod utils;
+
 use serial_test::serial;
-use simple_si_units::geometry::Angle;
-use std::{f64::consts::PI, time::Instant};
+use std::time::Instant;
 
-fn many_angles(num: usize) -> Vec<Angle<f64>> {
-    let seed = [42; 32];
-    let mut rng = StdRng::from_seed(seed);
-
-    let mut angles = Vec::new();
-    for _ in 0..num {
-        let rad = rng.gen_range((-PI)..PI);
-        angles.push(Angle { rad });
-    }
-    angles
-}
-
-fn many_directions(num: usize) -> Vec<Direction> {
-    let seed = [42; 32];
-    let mut rng = StdRng::from_seed(seed);
-
-    let mut directions = Vec::new();
-    for _ in 0..num {
-        let x = rng.gen_range((-5.)..5.);
-        let y = rng.gen_range((-5.)..5.);
-        let z = rng.gen_range((-5.)..5.);
-        let direction = Direction::new(x, y, z);
-        if let Ok(dir) = direction {
-            directions.push(dir);
-        }
-    }
-    directions
-}
-
-fn many_sphericals(num: usize) -> Vec<Spherical> {
-    let seed = [42; 32];
-    let mut rng = StdRng::from_seed(seed);
-
-    let mut sphericals = Vec::new();
-    for _ in 0..num {
-        let longitude = Angle {
-            rad: rng.gen_range((-PI)..PI),
-        };
-        let latitude = Angle {
-            rad: rng.gen_range((-PI / 2.)..(PI / 2.)),
-        };
-        sphericals.push(Spherical::new(longitude, latitude));
-    }
-    sphericals
-}
+use utils::benchmarks::*;
 
 #[test]
 #[ignore]
