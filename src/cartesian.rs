@@ -6,11 +6,18 @@ use simple_si_units::{
     geometry::{Angle, Area},
 };
 use std::{
+    f64::consts::PI,
     fmt::Display,
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
-use crate::{earth_equatorial::EarthEquatorial, equatorial::Equatorial, error::AstroCoordsError};
+use crate::{
+    angle_helper::{safe_acos, HALF_CIRC},
+    earth_equatorial::EarthEquatorial,
+    equatorial::Equatorial,
+    error::AstroCoordsError,
+    NORMALIZATION_THRESHOLD,
+};
 
 use super::{
     direction::Direction, ecliptic::Ecliptic, spherical::Spherical, transformations::rotations::*,
@@ -197,7 +204,24 @@ impl Cartesian {
     /// assert!((angle.to_degrees() - 90.).abs() < 1e-5);
     /// ```
     pub fn angle_to(&self, other: &Cartesian) -> Result<Angle<f64>, AstroCoordsError> {
-        Ok(self.to_direction()?.angle_to(&other.to_direction()?))
+        // Use that
+        // cos²(θ) = (a · b)² / (|a|² |b|²) = 1/2 + cos(2 θ) / 2
+        // => cos(2 θ) = 2 (a · b)² / (|a|² |b|²) - 1
+        // => θ = 1/2 arccos(2 (a · b)² / (|a|² |b|²) - 1)
+        let len_sqrd_a = self.length_squared().m2;
+        let len_sqrd_b = other.length_squared().m2;
+        let len_sqrd_prod = len_sqrd_a * len_sqrd_b;
+        if len_sqrd_prod < NORMALIZATION_THRESHOLD {
+            return Err(AstroCoordsError::NormalizingZeroVector);
+        }
+        let dot_prod = self.x.m * other.x.m + self.y.m * other.y.m + self.z.m * other.z.m;
+        let cos_2_theta = 2. * dot_prod * dot_prod / len_sqrd_prod - 1.;
+        let angle = safe_acos(cos_2_theta) / 2.;
+        if dot_prod >= 0. {
+            Ok(angle)
+        } else {
+            Ok(HALF_CIRC - angle)
+        }
     }
 
     /// Returns a unit vector in the direction of the coordinates.
