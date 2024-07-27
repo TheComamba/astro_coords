@@ -42,9 +42,17 @@ pub(crate) fn haversine(theta: Angle<f64>) -> f64 {
 /// <=> cos(θ) = 1 - 2 * hav(θ)
 /// => archav(x) = arccos(1 - 2x)
 pub(crate) fn arcushaversine(h: f64) -> Angle<f64> {
-    Angle {
-        rad: (1.0 - 2.0 * h).acos(),
+    safe_acos(1.0 - 2.0 * h)
+}
+
+/// Saves acos from being called with an argument outside of its definition range due to numerical instability
+pub(crate) fn safe_acos(cosine_argument: f64) -> Angle<f64> {
+    if cosine_argument > 1. {
+        return ANGLE_ZERO;
+    } else if cosine_argument < -1. {
+        return HALF_CIRC;
     }
+    Angle::from_radians(cosine_argument.acos())
 }
 
 #[cfg(test)]

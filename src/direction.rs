@@ -200,13 +200,7 @@ impl Direction {
         let (bx, by, bz) = (other.x(), other.y(), other.z());
 
         let cosine_argument = ax * bx + ay * by + az * bz; //Directions have unit Distance
-        if cosine_argument > 1. {
-            //Saving acos from being called with an argument > 1 due to numerical instability
-            return ANGLE_ZERO;
-        } else if cosine_argument < -1. {
-            return HALF_CIRC;
-        }
-        Angle::from_radians(cosine_argument.acos())
+        safe_acos(cosine_argument)
     }
 
     /// Constructs a Direction that is guaranteed to be orthogonal to the Direction.
