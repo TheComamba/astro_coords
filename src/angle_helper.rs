@@ -33,6 +33,16 @@ pub fn normalized_angle(mut angle: Angle<f64>) -> Angle<f64> {
     angle
 }
 
+pub(crate) fn haversine(theta: Angle<f64>) -> f64 {
+    (1.0 - theta.rad.cos()) / 2.0
+}
+
+pub(crate) fn arcushaversine(h: f64) -> Angle<f64> {
+    Angle {
+        rad: 2.0 * (h.sqrt()).asin(),
+    }
+}
+
 #[cfg(test)]
 pub(crate) mod test {
     use super::*;

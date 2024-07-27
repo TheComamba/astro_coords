@@ -170,7 +170,14 @@ impl Spherical {
 
     // https://en.wikipedia.org/wiki/Great-circle_distance
     pub fn angle_to(&self, other: &Self) -> Angle<f64> {
-        todo!()
+        let lat_diff = other.latitude - self.latitude;
+        let lat_sum = other.latitude + self.latitude;
+        let long_diff = other.longitude - self.longitude;
+        let hav_lat_diff = haversine(lat_diff);
+        let hav_lat_sum = haversine(lat_sum);
+        let hav_long_diff = haversine(long_diff);
+        let arg = hav_lat_diff + (1. - hav_lat_diff - hav_lat_sum) * hav_long_diff;
+        arcushaversine(arg)
     }
 
     pub(crate) fn cartesian_to_spherical(cart: (f64, f64, f64)) -> Result<Self, AstroCoordsError> {
