@@ -33,6 +33,20 @@ pub fn normalized_angle(mut angle: Angle<f64>) -> Angle<f64> {
     angle
 }
 
+/// hav(θ) = sin²(θ/2) = (1 - cos(θ)) / 2
+pub(crate) fn haversine(theta: Angle<f64>) -> f64 {
+    (1.0 - theta.rad.cos()) / 2.0
+}
+
+/// hav(θ) = sin²(θ/2) = (1 - cos(θ)) / 2
+/// <=> cos(θ) = 1 - 2 * hav(θ)
+/// => archav(x) = arccos(1 - 2x)
+pub(crate) fn arcushaversine(h: f64) -> Angle<f64> {
+    Angle {
+        rad: (1.0 - 2.0 * h).acos(),
+    }
+}
+
 #[cfg(test)]
 pub(crate) mod test {
     use super::*;

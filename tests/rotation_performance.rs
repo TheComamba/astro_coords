@@ -1,54 +1,13 @@
-use astro_coords::{direction::Direction, spherical::Spherical};
-use rand::{rngs::StdRng, Rng, SeedableRng};
 use serial_test::serial;
-use simple_si_units::geometry::Angle;
-use std::{f64::consts::PI, time::Instant};
+use std::time::{Duration, Instant};
 
-fn many_angles(num: usize) -> Vec<Angle<f64>> {
-    let seed = [42; 32];
-    let mut rng = StdRng::from_seed(seed);
+use utils::benchmarks::*;
 
-    let mut angles = Vec::new();
-    for _ in 0..num {
-        let rad = rng.gen_range((-PI)..PI);
-        angles.push(Angle { rad });
-    }
-    angles
-}
+mod utils;
 
-fn many_directions(num: usize) -> Vec<Direction> {
-    let seed = [42; 32];
-    let mut rng = StdRng::from_seed(seed);
-
-    let mut directions = Vec::new();
-    for _ in 0..num {
-        let x = rng.gen_range((-5.)..5.);
-        let y = rng.gen_range((-5.)..5.);
-        let z = rng.gen_range((-5.)..5.);
-        let direction = Direction::new(x, y, z);
-        if let Ok(dir) = direction {
-            directions.push(dir);
-        }
-    }
-    directions
-}
-
-fn many_sphericals(num: usize) -> Vec<Spherical> {
-    let seed = [42; 32];
-    let mut rng = StdRng::from_seed(seed);
-
-    let mut sphericals = Vec::new();
-    for _ in 0..num {
-        let longitude = Angle {
-            rad: rng.gen_range((-PI)..PI),
-        };
-        let latitude = Angle {
-            rad: rng.gen_range((-PI / 2.)..(PI / 2.)),
-        };
-        sphericals.push(Spherical::new(longitude, latitude));
-    }
-    sphericals
-}
+const MAX_DURATION_PER_SIMPLE_ROTATION_FOR_DIRECTION: Duration = Duration::from_nanos(100);
+const MAX_DURATION_PER_SIMPLE_ROTATION_FOR_SPHERICAL: Duration = Duration::from_nanos(1000);
+const MAX_DURATION_PER_ELABORATE_ROTATION: Duration = Duration::from_nanos(1000);
 
 #[test]
 #[ignore]
@@ -78,7 +37,7 @@ fn rotation_for_direction_is_fast() {
         "{} calls to Direction::rotated took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_DIRECTION)
 }
 
 #[test]
@@ -106,7 +65,7 @@ fn x_rotation_for_direction_is_fast() {
         "{} calls to Direction::rotated_x took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_DIRECTION)
 }
 
 #[test]
@@ -134,7 +93,7 @@ fn y_rotation_for_direction_is_fast() {
         "{} calls to Direction::rotated_y took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_DIRECTION)
 }
 
 #[test]
@@ -162,7 +121,7 @@ fn z_rotation_for_direction_is_fast() {
         "{} calls to Direction::rotated_z took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_DIRECTION)
 }
 
 #[test]
@@ -190,7 +149,7 @@ fn active_rotation_for_direction_is_fast() {
         "{} calls to Direction::active_rotation_to_new_z_axis took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_ELABORATE_ROTATION)
 }
 
 #[test]
@@ -218,7 +177,7 @@ fn passive_rotation_for_direction_is_fast() {
         "{} calls to Direction::passive_rotation_to_new_z_axis took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_ELABORATE_ROTATION)
 }
 
 #[test]
@@ -249,7 +208,7 @@ fn rotation_for_sphericals_is_fast() {
         "{} calls to Spherical::rotated took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_SPHERICAL)
 }
 
 #[test]
@@ -277,7 +236,7 @@ fn x_rotation_for_sphericals_is_fast() {
         "{} calls to Spherical::rotated_x took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_SPHERICAL)
 }
 
 #[test]
@@ -305,7 +264,7 @@ fn y_rotation_for_sphericals_is_fast() {
         "{} calls to Spherical::rotated_y took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_SPHERICAL)
 }
 
 #[test]
@@ -333,7 +292,7 @@ fn z_rotation_for_sphericals_is_fast() {
         "{} calls to Spherical::rotated_z took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_SPHERICAL)
 }
 
 #[test]
@@ -361,7 +320,7 @@ fn active_rotation_for_spherical_is_fast() {
         "{} calls to Spherical::active_rotation_to_new_z_axis took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_ELABORATE_ROTATION)
 }
 
 #[test]
@@ -389,5 +348,5 @@ fn passive_rotation_for_spherical_is_fast() {
         "{} calls to Spherical::passive_rotation_to_new_z_axis took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < std::time::Duration::from_secs(1))
+    assert!(duration_per_rotation < MAX_DURATION_PER_ELABORATE_ROTATION)
 }
