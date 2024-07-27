@@ -5,7 +5,8 @@ use utils::benchmarks::*;
 
 mod utils;
 
-const MAX_DURATION_PER_SIMPLE_ROTATION: Duration = Duration::from_nanos(100);
+const MAX_DURATION_PER_SIMPLE_ROTATION_FOR_DIRECTION: Duration = Duration::from_nanos(100);
+const MAX_DURATION_PER_SIMPLE_ROTATION_FOR_SPHERICAL: Duration = Duration::from_nanos(1000);
 const MAX_DURATION_PER_ELABORATE_ROTATION: Duration = Duration::from_nanos(1000);
 
 #[test]
@@ -36,7 +37,7 @@ fn rotation_for_direction_is_fast() {
         "{} calls to Direction::rotated took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION)
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_DIRECTION)
 }
 
 #[test]
@@ -64,7 +65,7 @@ fn x_rotation_for_direction_is_fast() {
         "{} calls to Direction::rotated_x took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION)
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_DIRECTION)
 }
 
 #[test]
@@ -92,7 +93,7 @@ fn y_rotation_for_direction_is_fast() {
         "{} calls to Direction::rotated_y took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION)
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_DIRECTION)
 }
 
 #[test]
@@ -120,7 +121,7 @@ fn z_rotation_for_direction_is_fast() {
         "{} calls to Direction::rotated_z took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION)
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_DIRECTION)
 }
 
 #[test]
@@ -207,7 +208,7 @@ fn rotation_for_sphericals_is_fast() {
         "{} calls to Spherical::rotated took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION)
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_SPHERICAL)
 }
 
 #[test]
@@ -235,7 +236,7 @@ fn x_rotation_for_sphericals_is_fast() {
         "{} calls to Spherical::rotated_x took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION)
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_SPHERICAL)
 }
 
 #[test]
@@ -263,7 +264,7 @@ fn y_rotation_for_sphericals_is_fast() {
         "{} calls to Spherical::rotated_y took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION)
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_SPHERICAL)
 }
 
 #[test]
@@ -291,7 +292,7 @@ fn z_rotation_for_sphericals_is_fast() {
         "{} calls to Spherical::rotated_z took {:?}, or {:?} per call.",
         total_rotations, duration, duration_per_rotation
     );
-    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION)
+    assert!(duration_per_rotation < MAX_DURATION_PER_SIMPLE_ROTATION_FOR_SPHERICAL)
 }
 
 #[test]

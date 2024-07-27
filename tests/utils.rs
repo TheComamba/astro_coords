@@ -146,6 +146,24 @@ pub mod benchmarks {
         directions
     }
 
+    pub fn many_cartesians(num: usize) -> Vec<Cartesian> {
+        let seed = [42; 32];
+        let mut rng = StdRng::from_seed(seed);
+
+        let mut cartesians = Vec::new();
+        for _ in 0..num {
+            let x = rng.gen_range((-5.)..5.);
+            let y = rng.gen_range((-5.)..5.);
+            let z = rng.gen_range((-5.)..5.);
+            cartesians.push(Cartesian::new(
+                Distance::from_m(x),
+                Distance::from_m(y),
+                Distance::from_m(z),
+            ));
+        }
+        cartesians
+    }
+
     pub fn many_sphericals(num: usize) -> Vec<Spherical> {
         let seed = [42; 32];
         let mut rng = StdRng::from_seed(seed);
