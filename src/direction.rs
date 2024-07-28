@@ -310,21 +310,7 @@ impl Direction {
     /// 1. The vector is rotated around the old x-axis by the angle between new and old z-axis.
     /// 2. The vector is rotated around the old z-axis by the angle between the new z-axis and the old y-axis, projected onto the old x-y plane.
     ///
-    /// This is the inverse operation of `passive_rotation_to_new_z_axis`.
-    ///
-    /// TODO: This example is not intuitive
-    /// # Example
-    /// ```
-    /// use astro_coords::direction::Direction;
-    ///
-    /// let new_z = Direction::new(1., 1., 1.).unwrap();
-    ///
-    /// let rotated_z = Direction::Z.active_rotation_to_new_z_axis(&new_z);
-    /// assert!(rotated_z.eq_within(&new_z, 1e-5));
-    ///
-    /// let rotated_x = Direction::X.active_rotation_to_new_z_axis(&new_z);
-    /// assert!(rotated_x.dot_product(&Direction::Z).abs() < 1e-5);
-    /// ```
+    /// This is the inverse operation of `passive_rotation_to_new_z_axis`. See there for a somewhat intuitive example.
     pub fn active_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
         let (angle_to_old_z, polar_rotation_angle) =
             get_angle_to_old_z_and_polar_rotation_angle(new_z);
@@ -341,7 +327,28 @@ impl Direction {
     ///
     /// This is the inverse operation of `active_rotation_to_new_z_axis`.
     ///
-    /// TODO: Example
+    /// # Example
+    /// ```
+    /// use astro_coords::direction::Direction;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
+    /// let dir_of_sun_in_ecliptic = Direction::Y;
+    ///
+    /// // Now we want to express the sun's direction in earth equatorial coordinates.
+    /// // The rotation axis of the earth expressed in ecliptic coordinates is given by:
+    /// let earth_axis_tilt = Angle::from_degrees(23.44);
+    /// let earth_rotation_axis_in_ecliptic = Direction::Z.rotated_x(-earth_axis_tilt);
+    ///
+    /// // The sun's direction in earth equatorial coordinates is then:
+    /// let dir_of_sun_in_equatorial = dir_of_sun_in_ecliptic.passive_rotation_to_new_z_axis(&earth_rotation_axis_in_ecliptic);
+    ///
+    /// // At summer solstice, the sun is highest in the sky in the northern hemisphere, so its x-projection is zero, and its y- and z-projection are both positive.
+    /// println!("{}", dir_of_sun_in_equatorial);
+    /// assert!(dir_of_sun_in_equatorial.x().abs() < 1e-5);
+    /// assert!(dir_of_sun_in_equatorial.y() > 0.);
+    /// assert!(dir_of_sun_in_equatorial.z() > 0.);
+    /// ```
     pub fn passive_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
         let (angle_to_old_z, polar_rotation_angle) =
             get_angle_to_old_z_and_polar_rotation_angle(new_z);
