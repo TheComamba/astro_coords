@@ -6,7 +6,6 @@ use simple_si_units::{
     geometry::{Angle, Area},
 };
 use std::{
-    f64::consts::PI,
     fmt::Display,
     ops::{Add, Div, Mul, Neg, Sub},
 };
@@ -175,16 +174,64 @@ impl Cartesian {
         Cartesian { x, y, z }
     }
 
+    /// Returns cartesian coordinates rotated around the x-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use simple_si_units::base::Distance;
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::cartesian::Cartesian;
+    ///
+    /// let coordinates = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = coordinates.rotated_x(angle);
+    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(0.), Distance::from_meters(1.));
+    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// ```
     pub fn rotated_x(&self, angle: Angle<f64>) -> Cartesian {
         let (x, y, z) = rotated_x_tuple((self.x, self.y, self.z), angle);
         Cartesian { x, y, z }
     }
 
+    /// Returns cartesian coordinates rotated around the y-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use simple_si_units::base::Distance;
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::cartesian::Cartesian;
+    ///
+    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = coordinates.rotated_y(angle);
+    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(0.), Distance::from_meters(-1.));
+    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// ```
     pub fn rotated_y(&self, angle: Angle<f64>) -> Cartesian {
         let (x, y, z) = rotated_y_tuple((self.x, self.y, self.z), angle);
         Cartesian { x, y, z }
     }
 
+    /// Returns cartesian coordinates rotated around the z-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use simple_si_units::base::Distance;
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::cartesian::Cartesian;
+    ///
+    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = coordinates.rotated_z(angle);
+    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// ```
     pub fn rotated_z(&self, angle: Angle<f64>) -> Cartesian {
         let (x, y, z) = rotated_z_tuple((self.x, self.y, self.z), angle);
         Cartesian { x, y, z }

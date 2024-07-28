@@ -87,18 +87,69 @@ impl Spherical {
         }
     }
 
+    /// Rotates the Spherical struct around the specified axis by the specified angle.
+    ///
+    /// # Examples
+    /// ```
+    /// use astro_coords::spherical::Spherical;
+    /// use astro_coords::direction::Direction;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// let mut coords = Spherical::X_DIRECTION;
+    /// let rotated = coords.rotated(Angle::from_degrees(90.), &Direction::Z);
+    /// assert!(rotated.eq_within(&Spherical::Y_DIRECTION, Angle::from_degrees(1e-5)));
+    /// ```
     pub fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Spherical {
         self.to_direction().rotated(angle, axis).to_spherical()
     }
 
+    /// Rotates the Spherical struct around the x-axis by the specified angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use astro_coords::spherical::Spherical;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// let mut coords = Spherical::Y_DIRECTION;
+    /// let rotated = coords.rotated_x(Angle::from_degrees(90.));
+    /// assert!((rotated.eq_within(&Spherical::Z_DIRECTION, Angle::from_degrees(1e-5))));
+    /// ```
     pub fn rotated_x(&self, angle: Angle<f64>) -> Spherical {
         self.to_direction().rotated_x(angle).to_spherical()
     }
 
+    /// Rotates the Spherical struct around the y-axis by the specified angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use astro_coords::spherical::Spherical;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// let mut coords = Spherical::Z_DIRECTION;
+    /// let rotated = coords.rotated_y(Angle::from_degrees(90.));
+    /// assert!((rotated.eq_within(&Spherical::X_DIRECTION, Angle::from_degrees(1e-5))));
+    /// ```
     pub fn rotated_y(&self, angle: Angle<f64>) -> Spherical {
         self.to_direction().rotated_y(angle).to_spherical()
     }
 
+    /// Rotates the Spherical struct around the z-axis by the specified angle.
+    ///
+    /// This is much faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use astro_coords::spherical::Spherical;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// let mut coords = Spherical::X_DIRECTION;
+    /// let rotated = coords.rotated_z(Angle::from_degrees(90.));
+    /// assert!((rotated.eq_within(&Spherical::Y_DIRECTION, Angle::from_degrees(1e-5))));
+    /// ```
     pub fn rotated_z(&self, angle: Angle<f64>) -> Spherical {
         let mut rotated = self.clone();
         rotated.longitude += angle;

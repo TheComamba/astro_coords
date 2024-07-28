@@ -153,16 +153,58 @@ impl Direction {
         Direction { x, y, z }
     }
 
+    /// Returns a new Direction that is rotated around the x-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Example
+    /// ```
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::direction::Direction;
+    ///
+    /// let direction = Direction::Y;
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = direction.rotated_x(angle);
+    /// assert!(rotated.eq_within(&Direction::Z, 1e-5));
+    /// ```
     pub fn rotated_x(&self, angle: Angle<f64>) -> Direction {
         let (x, y, z) = rotated_x_tuple((self.x, self.y, self.z), angle);
         Direction { x, y, z }
     }
 
+    /// Returns a new Direction that is rotated around the y-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Example
+    /// ```
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::direction::Direction;
+    ///
+    /// let direction = Direction::Z;
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = direction.rotated_y(angle);
+    /// assert!(rotated.eq_within(&Direction::X, 1e-5));
+    /// ```
     pub fn rotated_y(&self, angle: Angle<f64>) -> Direction {
         let (x, y, z) = rotated_y_tuple((self.x, self.y, self.z), angle);
         Direction { x, y, z }
     }
 
+    /// Returns a new Direction that is rotated around the z-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Example
+    /// ```
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::direction::Direction;
+    ///
+    /// let direction = Direction::X;
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = direction.rotated_z(angle);
+    /// assert!(rotated.eq_within(&Direction::Y, 1e-5));
+    /// ```
     pub fn rotated_z(&self, angle: Angle<f64>) -> Direction {
         let (x, y, z) = rotated_z_tuple((self.x, self.y, self.z), angle);
         Direction { x, y, z }
