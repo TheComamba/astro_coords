@@ -7,6 +7,21 @@ use crate::{angle_helper::EARTH_AXIS_TILT, cartesian::Cartesian, equatorial::Equ
 
 use super::{direction::Direction, ecliptic::Ecliptic, spherical::Spherical};
 
+/// The EarthEquatorial coordinate struct.
+/// 
+/// Earth equatorial coordinates are oriented such that the z-axis points along the Earth's axis of rotation or north pole. The remaining orientation ambiguity is resolved by any of the four following facts: 
+/// - At the vernal equinox, the x-axis points directly towards the sun.
+/// - At the summer solstice, when the sun appears high in the sky on the northern hemisphere, its y-projection and z-projection are both positive.
+/// - At the autumn equinox, the x-axis points directly away from the sun.
+/// - At the winter solstice, when the sun appears high in the sky on the southern hemisphere, its y-projection and z-projection are both negative.
+/// 
+/// Note that the orientation of the coordinate system does not change with time, even though the Earth is rotating.
+/// 
+/// The coordinates in this system are expressed in right ascension and declination, a form of spherical representation.
+/// - Right ascension is the angle between the vernal equinox and the point in the sky, measured along the equator.
+/// - Declination is the angle between the point in the sky and the equator.
+/// 
+/// The EarthEquatorial struct provides methods to convert to and from other coordinate systems.
 pub struct EarthEquatorial {
     right_ascension: Angle<f64>,
     declination: Angle<f64>,
