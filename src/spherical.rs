@@ -87,44 +87,83 @@ impl Spherical {
         }
     }
 
+    /// Rotates the Spherical struct around the specified axis by the specified angle.
+    ///
+    /// # Examples
+    /// ```
+    /// use astro_coords::spherical::Spherical;
+    /// use astro_coords::direction::Direction;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// let mut coords = Spherical::X_DIRECTION;
+    /// let rotated = coords.rotated(Angle::from_degrees(90.), &Direction::Z);
+    /// assert!(rotated.eq_within(&Spherical::Y_DIRECTION, Angle::from_degrees(1e-5)));
+    /// ```
     pub fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Spherical {
         self.to_direction().rotated(angle, axis).to_spherical()
     }
 
+    /// Rotates the Spherical struct around the x-axis by the specified angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use astro_coords::spherical::Spherical;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// let mut coords = Spherical::Y_DIRECTION;
+    /// let rotated = coords.rotated_x(Angle::from_degrees(90.));
+    /// assert!((rotated.eq_within(&Spherical::Z_DIRECTION, Angle::from_degrees(1e-5))));
+    /// ```
     pub fn rotated_x(&self, angle: Angle<f64>) -> Spherical {
         self.to_direction().rotated_x(angle).to_spherical()
     }
 
+    /// Rotates the Spherical struct around the y-axis by the specified angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use astro_coords::spherical::Spherical;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// let mut coords = Spherical::Z_DIRECTION;
+    /// let rotated = coords.rotated_y(Angle::from_degrees(90.));
+    /// assert!((rotated.eq_within(&Spherical::X_DIRECTION, Angle::from_degrees(1e-5))));
+    /// ```
     pub fn rotated_y(&self, angle: Angle<f64>) -> Spherical {
         self.to_direction().rotated_y(angle).to_spherical()
     }
 
+    /// Rotates the Spherical struct around the z-axis by the specified angle.
+    ///
+    /// This is much faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use astro_coords::spherical::Spherical;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// let mut coords = Spherical::X_DIRECTION;
+    /// let rotated = coords.rotated_z(Angle::from_degrees(90.));
+    /// assert!((rotated.eq_within(&Spherical::Y_DIRECTION, Angle::from_degrees(1e-5))));
+    /// ```
     pub fn rotated_z(&self, angle: Angle<f64>) -> Spherical {
         let mut rotated = self.clone();
         rotated.longitude += angle;
         rotated
     }
 
-    /// Returns the spherical coordinates that results from actively rotating the spherical vector to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
+    /// Returns the spherical coordinates that result from actively rotating the spherical vector to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
     ///
     /// This method is for example used to convert from equatorial coordinates to ecliptic coordinates.
     /// It operates in the following way:
     /// 1. The vector is rotated around the old x-axis by the angle between new and old z-axis.
     /// 2. The vector is rotated around the old z-axis by the angle between the new z-axis and the old y-axis, projected onto the old x-y plane.
     ///
-    /// This is the inverse operation of `passive_rotation_to_new_z_axis`.
-    ///
-    /// TODO: This example is not intuitive
-    /// # Example
-    /// ```
-    /// use astro_coords::spherical::Spherical;
-    /// use simple_si_units::geometry::Angle;
-    ///
-    /// let new_z = Spherical::new(Angle::from_rad(1.), Angle::from_rad(1.));
-    ///
-    /// let rotated_z = Spherical::Z_DIRECTION.active_rotation_to_new_z_axis(&new_z);
-    /// assert!(rotated_z.eq_within(&new_z, Angle::from_rad(1e-5)));
-    /// ```
+    /// This is the inverse operation of `passive_rotation_to_new_z_axis`. See there for a somewhat intuitive example.
     pub fn active_rotation_to_new_z_axis(&self, new_z: &Self) -> Self {
         let (angle_to_old_z, polar_rotation_angle) =
             get_angle_to_old_z_and_polar_rotation_angle(new_z);
@@ -132,6 +171,36 @@ impl Spherical {
             .rotated_z(-polar_rotation_angle)
     }
 
+    /// Returns the spherical coordinates that result from passively rotating the spherical vector to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
+    ///
+    /// This method is for example used to convert from ecliptic coordinates to equatorial coordinates.
+    /// It operates in the following way:
+    /// 1. The vector is rotated around the old z-axis by the angle between the new z-axis and the old y-axis, projected onto the old x-y plane.
+    /// 2. The vector is rotated around the old x-axis by the angle between new and old z-axis.
+    ///
+    /// This is the inverse operation of `active_rotation_to_new_z_axis`.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::spherical::Spherical;
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
+    /// let dir_of_sun_in_ecliptic = Spherical::Y_DIRECTION;
+    ///
+    /// // Now we want to express the sun's direction in earth equatorial coordinates.
+    /// // The rotation axis of the earth expressed in ecliptic coordinates is given by:
+    /// let earth_axis_tilt = Angle::from_degrees(23.44);
+    /// let earth_rotation_axis_in_ecliptic = Spherical::Z_DIRECTION.rotated_x(-earth_axis_tilt);
+    ///
+    /// // The sun's direction in earth equatorial coordinates is then:
+    /// let dir_of_sun_in_equatorial = dir_of_sun_in_ecliptic.passive_rotation_to_new_z_axis(&earth_rotation_axis_in_ecliptic);
+    ///
+    /// // At summer solstice, the sun is highest in the sky in the northern hemisphere, so its longitude is a quarter turn, and its latitude is positive.
+    /// println!("{}", dir_of_sun_in_equatorial);
+    /// assert!((dir_of_sun_in_equatorial.longitude.to_degrees() - 90.).abs() < 1e-5);
+    /// assert!(dir_of_sun_in_equatorial.latitude.to_degrees() > 0.);
+    /// ```
     pub fn passive_rotation_to_new_z_axis(&self, new_z: &Self) -> Self {
         let (angle_to_old_z, polar_rotation_angle) =
             get_angle_to_old_z_and_polar_rotation_angle(new_z);

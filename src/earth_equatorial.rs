@@ -7,6 +7,21 @@ use crate::{angle_helper::EARTH_AXIS_TILT, cartesian::Cartesian, equatorial::Equ
 
 use super::{direction::Direction, ecliptic::Ecliptic, spherical::Spherical};
 
+/// The EarthEquatorial coordinate struct.
+///
+/// Earth equatorial coordinates are oriented such that the z-axis points along the Earth's axis of rotation or north pole. The remaining orientation ambiguity is resolved by any of the four following facts:
+/// - At the vernal equinox, the x-axis points directly towards the sun.
+/// - At the summer solstice, when the sun appears high in the sky on the northern hemisphere, its y-projection and z-projection are both positive.
+/// - At the autumn equinox, the x-axis points directly away from the sun.
+/// - At the winter solstice, when the sun appears high in the sky on the southern hemisphere, its y-projection and z-projection are both negative.
+///
+/// Note that the orientation of the coordinate system does not change with time, even though the Earth is rotating.
+///
+/// The coordinates in this system are expressed in right ascension and declination, a form of spherical representation.
+/// - Right ascension is the angle between the vernal equinox and the point in the sky, measured along the equator.
+/// - Declination is the angle between the point in the sky and the equator.
+///
+/// The EarthEquatorial struct provides methods to convert to and from other coordinate systems.
 pub struct EarthEquatorial {
     right_ascension: Angle<f64>,
     declination: Angle<f64>,
@@ -61,7 +76,7 @@ impl Display for EarthEquatorial {
 pub(super) mod tests {
     use simple_si_units::geometry::Angle;
 
-    use crate::{angle_helper::*, ecliptic::Ecliptic, spherical::Spherical};
+    use crate::{angle_helper::*, direction::Direction, ecliptic::Ecliptic, spherical::Spherical};
 
     use super::EarthEquatorial;
 
@@ -75,6 +90,13 @@ pub(super) mod tests {
                 rad: QUARTER_CIRC.rad - EARTH_AXIS_TILT.rad,
             },
         ));
+
+    #[test]
+    fn the_sun_is_high_in_northern_hemisphere_during_summer_solstice() {
+        let direction = Direction::Y;
+        let equatorial = direction.to_earth_equatorial();
+        assert!(equatorial.declination.rad > 0.);
+    }
 
     /*
      * https://ned.ipac.caltech.edu/coordinate_calculator?in_csys=Equatorial&in_equinox=J2000.0&obs_epoch=2000.0&ra=0&dec=90&pa=0.0&out_csys=Ecliptic&out_equinox=J2000.0
