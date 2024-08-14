@@ -34,18 +34,44 @@ pub enum ReferenceFrame {
 /// assert!((dec-custom_dec).to_degrees() < 1e-5);
 /// ```
 pub enum CelestialBody {
+    /// A celestial body with an arbitrary north-pole, provided as Right Ascension and Declination in Earth-Equatorial coordinates.
     Custom(Angle<f64>, Angle<f64>),
+    /// The central body of our solar system.
+    Sun,
+    /// The innermost planet of our solar system.
+    Mercury,
+    /// The second system of our solar system.
+    Venus,
+    /// The third planet of our solar system, and probably where you are right now.
     Earth,
+    /// The fourth and outermost known rocky planet of our solar system.
+    Mars,
+    /// The fifth planet of our solar system.
+    Jupiter,
+    /// The sixth planet of our solar system.
+    Saturn,
+    /// The sevenths planet of our solar system.
+    Uranus,
+    /// The eightths and outermost known planet of our solar system.
+    Neptune,
 }
 
 impl CelestialBody {
     /// Returns the right ascension and declination (in earth-equatorial coordinates) of the north pole of the celestial body.
     ///
-    /// The data is taken from the [Report of the IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf).
+    /// The data is taken from the [Report of the IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf). Any time dependency is ignored.
     pub fn get_ra_and_dec(&self) -> (Angle<f64>, Angle<f64>) {
         match self {
             CelestialBody::Custom(ra, dec) => (*ra, *dec),
-            CelestialBody::Earth => (Angle::from_degrees(0.0), Angle::from_degrees(90.0)),
+            CelestialBody::Sun => (Angle::from_deg(286.13), Angle::from_deg(63.87)),
+            CelestialBody::Mercury => (Angle::from_deg(281.0103), Angle::from_deg(61.4155)),
+            CelestialBody::Venus => (Angle::from_deg(272.76),Angle::from_deg(67.16)),
+            CelestialBody::Earth => (Angle::from_deg(0.0), Angle::from_deg(90.0)),
+            CelestialBody::Mars => (Angle::from_deg(317.269202),Angle::from_deg(54.432516)),
+            CelestialBody::Jupiter => (Angle::from_deg(268.056595), Angle::from_deg(64.495303)),
+            CelestialBody::Saturn => (Angle::from_deg(40.589), Angle::from_deg(83.537)),
+            CelestialBody::Uranus => (Angle::from_deg(257.311), Angle::from_deg(-15.175)),
+            CelestialBody::Neptune => (Angle::from_deg(299.36), Angle::from_deg(43.46)),
         }
     }
 }
