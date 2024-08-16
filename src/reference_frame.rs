@@ -36,23 +36,23 @@ pub enum ReferenceFrame {
 pub enum CelestialBody {
     /// A celestial body with an arbitrary north-pole, provided as Right Ascension and Declination in Earth-Equatorial coordinates.
     Custom(Angle<f64>, Angle<f64>),
-    /// The central body of our solar system.
+    /// The central body in our solar system.
     Sun,
-    /// The innermost planet of our solar system.
+    /// The innermost and smallest planet in our solar system.
     Mercury,
-    /// The second system of our solar system.
+    /// The second system in our solar system.
     Venus,
-    /// The third planet of our solar system, and probably where you are right now.
+    /// The third planet in our solar system, and probably where you are right now.
     Earth,
-    /// The fourth and outermost known rocky planet of our solar system.
+    /// The fourth and outermost known rocky planet in our solar system.
     Mars,
-    /// The fifth planet of our solar system.
+    /// The fifth and largest planet in our solar system.
     Jupiter,
-    /// The sixth planet of our solar system.
+    /// The sixth planet in our solar system, known for its prominent rings.
     Saturn,
-    /// The sevenths planet of our solar system.
+    /// The sevenths planet in our solar system, a gaseous ice-giant.
     Uranus,
-    /// The eightths and outermost known planet of our solar system.
+    /// The eightths and outermost known planet in our solar system.
     Neptune,
 }
 
