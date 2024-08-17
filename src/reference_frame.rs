@@ -5,6 +5,7 @@ use simple_si_units::geometry::Angle;
 /// A reference frame provides the connection between mathematical coordinates (say, (0,0,1) or the z-direction) and physical positions or directions (say, the direction of the North Pole of earth).
 ///
 /// This enum needs to be provided  to eliminate ambiguity when converting between different coordinate systems.
+#[derive(Clone, Copy)]
 pub enum ReferenceFrame {
     Equatorial(CelestialBody),
     Ecliptic,
@@ -33,6 +34,7 @@ pub enum ReferenceFrame {
 /// assert!((ra-custom_ra).to_degrees() < 1e-5);
 /// assert!((dec-custom_dec).to_degrees() < 1e-5);
 /// ```
+#[derive(Clone, Copy)]
 pub enum CelestialBody {
     /// A celestial body with an arbitrary north-pole, provided as Right Ascension and Declination in Earth-Equatorial coordinates.
     Custom(Angle<f64>, Angle<f64>),
@@ -65,9 +67,9 @@ impl CelestialBody {
             CelestialBody::Custom(ra, dec) => (*ra, *dec),
             CelestialBody::Sun => (Angle::from_deg(286.13), Angle::from_deg(63.87)),
             CelestialBody::Mercury => (Angle::from_deg(281.0103), Angle::from_deg(61.4155)),
-            CelestialBody::Venus => (Angle::from_deg(272.76),Angle::from_deg(67.16)),
+            CelestialBody::Venus => (Angle::from_deg(272.76), Angle::from_deg(67.16)),
             CelestialBody::Earth => (Angle::from_deg(0.0), Angle::from_deg(90.0)),
-            CelestialBody::Mars => (Angle::from_deg(317.269202),Angle::from_deg(54.432516)),
+            CelestialBody::Mars => (Angle::from_deg(317.269202), Angle::from_deg(54.432516)),
             CelestialBody::Jupiter => (Angle::from_deg(268.056595), Angle::from_deg(64.495303)),
             CelestialBody::Saturn => (Angle::from_deg(40.589), Angle::from_deg(83.537)),
             CelestialBody::Uranus => (Angle::from_deg(257.311), Angle::from_deg(-15.175)),

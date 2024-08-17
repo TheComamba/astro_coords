@@ -9,6 +9,7 @@ pub mod earth_equatorial;
 pub mod ecliptic;
 pub mod equatorial;
 pub mod error;
+pub mod physical_cartesian;
 pub mod ra_and_dec;
 pub mod reference_frame;
 pub mod spherical;
