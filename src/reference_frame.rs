@@ -5,7 +5,7 @@ use simple_si_units::geometry::Angle;
 /// A reference frame provides the connection between mathematical coordinates (say, (0,0,1) or the z-direction) and physical positions or directions (say, the direction of the North Pole of earth).
 ///
 /// This enum needs to be provided  to eliminate ambiguity when converting between different coordinate systems.
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ReferenceFrame {
     Equatorial(CelestialBody),
     Ecliptic,
@@ -34,7 +34,7 @@ pub enum ReferenceFrame {
 /// assert!((ra-custom_ra).to_degrees() < 1e-5);
 /// assert!((dec-custom_dec).to_degrees() < 1e-5);
 /// ```
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum CelestialBody {
     /// A celestial body with an arbitrary north-pole, provided as Right Ascension and Declination in Earth-Equatorial coordinates.
     Custom(Angle<f64>, Angle<f64>),
@@ -88,3 +88,25 @@ impl PartialEq for CelestialBody {
 }
 
 impl Eq for CelestialBody {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn custom_celestial_bodies_are_never_equal() {
+        let custom_ra = Angle::from_degrees(27.5);
+        let custom_dec = Angle::from_degrees(119.24);
+        let custom_body = CelestialBody::Custom(custom_ra, custom_dec);
+
+        assert_ne!(custom_body, CelestialBody::Sun);
+        assert_ne!(custom_body, CelestialBody::Custom(custom_ra, custom_dec));
+    }
+
+    #[test]
+    fn non_custom_celestial_bodies_are_comparable() {
+        assert_eq!(CelestialBody::Sun, CelestialBody::Sun);
+        assert_eq!(CelestialBody::Earth, CelestialBody::Earth);
+        assert_ne!(CelestialBody::Sun, CelestialBody::Earth);
+    }
+}
