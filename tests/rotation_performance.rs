@@ -1,3 +1,4 @@
+use astro_coords::traits::*;
 use serial_test::serial;
 use std::time::{Duration, Instant};
 

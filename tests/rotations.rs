@@ -1,4 +1,4 @@
-use astro_coords::direction::Direction;
+use astro_coords::{direction::Direction, traits::*};
 use simple_si_units::geometry::Angle;
 
 const ACC: f64 = 1e-5;

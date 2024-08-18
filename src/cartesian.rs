@@ -11,10 +11,11 @@ use std::{
 };
 
 use crate::{
-    angle_helper::{safe_acos, HALF_CIRC},
+    angle_helper::{safe_acos, ANGLE_ZERO, HALF_CIRC},
     earth_equatorial::EarthEquatorial,
     equatorial::Equatorial,
     error::AstroCoordsError,
+    traits::*,
     NORMALIZATION_THRESHOLD,
 };
 
@@ -72,6 +73,24 @@ impl Cartesian {
         x: Distance { m: 0. },
         y: Distance { m: 0. },
         z: Distance { m: 0. },
+    };
+
+    pub const X_DIRECTION: Cartesian = Cartesian {
+        x: Distance { m: 1. },
+        y: Distance { m: 0. },
+        z: Distance { m: 0. },
+    };
+
+    pub const Y_DIRECTION: Cartesian = Cartesian {
+        x: Distance { m: 0. },
+        y: Distance { m: 1. },
+        z: Distance { m: 0. },
+    };
+
+    pub const Z_DIRECTION: Cartesian = Cartesian {
+        x: Distance { m: 0. },
+        y: Distance { m: 0. },
+        z: Distance { m: 1. },
     };
 
     /// Creates a new Cartesian object.
@@ -151,90 +170,6 @@ impl Cartesian {
     pub fn distance(&self, other: &Cartesian) -> Distance<f64> {
         let diff = self - other;
         diff.length()
-    }
-
-    /// Returns cartesian coordinates rotated around an axis by a certain angle.
-    ///
-    /// # Examples
-    /// ```
-    /// use simple_si_units::base::Distance;
-    /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::cartesian::Cartesian;
-    /// use astro_coords::direction::Direction;
-    ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
-    /// let angle = Angle::from_degrees(90.);
-    /// let axis = Direction::new(0., 0., 1.).unwrap();
-    /// let rotated = coordinates.rotated(angle, &axis);
-    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
-    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
-    /// ```
-    pub fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Cartesian {
-        let (x, y, z) = rotated_tuple((self.x, self.y, self.z), angle, axis);
-        Cartesian { x, y, z }
-    }
-
-    /// Returns cartesian coordinates rotated around the x-axis by a certain angle.
-    ///
-    /// This is an ever so tiny bit faster than `rotated()`.
-    ///
-    /// # Examples
-    /// ```
-    /// use simple_si_units::base::Distance;
-    /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::cartesian::Cartesian;
-    ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
-    /// let angle = Angle::from_degrees(90.);
-    /// let rotated = coordinates.rotated_x(angle);
-    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(0.), Distance::from_meters(1.));
-    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
-    /// ```
-    pub fn rotated_x(&self, angle: Angle<f64>) -> Cartesian {
-        let (x, y, z) = rotated_x_tuple((self.x, self.y, self.z), angle);
-        Cartesian { x, y, z }
-    }
-
-    /// Returns cartesian coordinates rotated around the y-axis by a certain angle.
-    ///
-    /// This is an ever so tiny bit faster than `rotated()`.
-    ///
-    /// # Examples
-    /// ```
-    /// use simple_si_units::base::Distance;
-    /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::cartesian::Cartesian;
-    ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
-    /// let angle = Angle::from_degrees(90.);
-    /// let rotated = coordinates.rotated_y(angle);
-    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(0.), Distance::from_meters(-1.));
-    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
-    /// ```
-    pub fn rotated_y(&self, angle: Angle<f64>) -> Cartesian {
-        let (x, y, z) = rotated_y_tuple((self.x, self.y, self.z), angle);
-        Cartesian { x, y, z }
-    }
-
-    /// Returns cartesian coordinates rotated around the z-axis by a certain angle.
-    ///
-    /// This is an ever so tiny bit faster than `rotated()`.
-    ///
-    /// # Examples
-    /// ```
-    /// use simple_si_units::base::Distance;
-    /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::cartesian::Cartesian;
-    ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
-    /// let angle = Angle::from_degrees(90.);
-    /// let rotated = coordinates.rotated_z(angle);
-    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
-    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
-    /// ```
-    pub fn rotated_z(&self, angle: Angle<f64>) -> Cartesian {
-        let (x, y, z) = rotated_z_tuple((self.x, self.y, self.z), angle);
-        Cartesian { x, y, z }
     }
 
     /// Returns the angle between two sets of Cartesian coordinates.
@@ -325,6 +260,164 @@ impl Cartesian {
     pub fn to_spherical(&self) -> Result<Spherical, AstroCoordsError> {
         Spherical::cartesian_to_spherical((self.x.m, self.y.m, self.z.m))
     }
+}
+
+impl ActiveRotation<Cartesian> for Cartesian {
+    /// Returns cartesian coordinates rotated around an axis by a certain angle.
+    ///
+    /// # Examples
+    /// ```
+    /// use simple_si_units::base::Distance;
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::{cartesian::Cartesian, direction::Direction, traits::*};
+    ///
+    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
+    /// let angle = Angle::from_degrees(90.);
+    /// let axis = Direction::new(0., 0., 1.).unwrap();
+    /// let rotated = coordinates.rotated(angle, &axis);
+    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// ```
+    fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Cartesian {
+        let (x, y, z) = rotated_tuple((self.x, self.y, self.z), angle, axis);
+        Cartesian { x, y, z }
+    }
+
+    /// Returns cartesian coordinates rotated around the x-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use simple_si_units::base::Distance;
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::{cartesian::Cartesian, traits::*};
+    ///
+    /// let coordinates = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = coordinates.rotated_x(angle);
+    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(0.), Distance::from_meters(1.));
+    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// ```
+    fn rotated_x(&self, angle: Angle<f64>) -> Cartesian {
+        let (x, y, z) = rotated_x_tuple((self.x, self.y, self.z), angle);
+        Cartesian { x, y, z }
+    }
+
+    /// Returns cartesian coordinates rotated around the y-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use simple_si_units::base::Distance;
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::{cartesian::Cartesian, traits::*};
+    ///
+    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = coordinates.rotated_y(angle);
+    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(0.), Distance::from_meters(-1.));
+    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// ```
+    fn rotated_y(&self, angle: Angle<f64>) -> Cartesian {
+        let (x, y, z) = rotated_y_tuple((self.x, self.y, self.z), angle);
+        Cartesian { x, y, z }
+    }
+
+    /// Returns cartesian coordinates rotated around the z-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use simple_si_units::base::Distance;
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::{cartesian::Cartesian, traits::*};
+    ///
+    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = coordinates.rotated_z(angle);
+    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// ```
+    fn rotated_z(&self, angle: Angle<f64>) -> Cartesian {
+        let (x, y, z) = rotated_z_tuple((self.x, self.y, self.z), angle);
+        Cartesian { x, y, z }
+    }
+
+    /// Returns the Cartesian vector that results from actively rotating the Cartesian to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
+    ///
+    /// This method is for example used to convert from equatorial coordinates to ecliptic coordinates.
+    /// It operates in the following way:
+    /// 1. The vector is rotated around the old x-axis by the angle between new and old z-axis.
+    /// 2. The vector is rotated around the old z-axis by the angle between the new z-axis and the old y-axis, projected onto the old x-y plane.
+    ///
+    /// This is the inverse operation of `passive_rotation_to_new_z_axis`. See there for a somewhat intuitive example.
+    fn active_rotation_to_new_z_axis(&self, new_z: &Cartesian) -> Cartesian {
+        let (angle_to_old_z, polar_rotation_angle) =
+            get_angle_to_old_z_and_polar_rotation_angle(new_z);
+        self.rotated(-angle_to_old_z, &Direction::X)
+            .rotated(-polar_rotation_angle, &Direction::Z)
+    }
+}
+
+impl PassiveRotation<Cartesian> for Cartesian {
+    /// Returns the Cartesian vector that results from passively rotating the vector to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
+    ///
+    /// This method is for example used to convert from ecliptic coordinates to equatorial coordinates.
+    /// It operates in the following way:
+    /// 1. The vector is rotated around the old z-axis by the angle between the new z-axis and the old y-axis, projected onto the old x-y plane.
+    /// 2. The vector is rotated around the old x-axis by the angle between new and old z-axis.
+    ///
+    /// This is the inverse operation of `active_rotation_to_new_z_axis`.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::{cartesian::Cartesian, traits::*};
+    /// use simple_si_units::geometry::Angle;
+    ///
+    /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
+    /// let dir_of_sun_in_ecliptic = Cartesian::Y_DIRECTION;
+    ///
+    /// // Now we want to express the sun's direction in earth equatorial coordinates.
+    /// // The rotation axis of the earth expressed in ecliptic coordinates is given by:
+    /// let earth_axis_tilt = Angle::from_degrees(23.44);
+    /// let earth_rotation_axis_in_ecliptic = Cartesian::Z_DIRECTION.rotated_x(-earth_axis_tilt);
+    ///
+    /// // The sun's direction in earth equatorial coordinates is then:
+    /// let dir_of_sun_in_equatorial = dir_of_sun_in_ecliptic.passive_rotation_to_new_z_axis(&earth_rotation_axis_in_ecliptic);
+    ///
+    /// // At summer solstice, the sun is highest in the sky in the northern hemisphere, so its x-projection is zero, and its y- and z-projection are both positive.
+    /// println!("{}", dir_of_sun_in_equatorial);
+    /// assert!(dir_of_sun_in_equatorial.x.m.abs() < 1e-5);
+    /// assert!(dir_of_sun_in_equatorial.y.m > 0.);
+    /// assert!(dir_of_sun_in_equatorial.z.m > 0.);
+    /// ```
+    fn passive_rotation_to_new_z_axis(&self, new_z: &Cartesian) -> Cartesian {
+        let (angle_to_old_z, polar_rotation_angle) =
+            get_angle_to_old_z_and_polar_rotation_angle(new_z);
+        self.rotated(polar_rotation_angle, &Direction::Z)
+            .rotated(angle_to_old_z, &Direction::X)
+    }
+}
+
+fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Cartesian) -> (Angle<f64>, Angle<f64>) {
+    let angle_to_old_z = match new_z.angle_to(&Cartesian::Z_DIRECTION) {
+        Ok(angle) => angle,
+        Err(_) => return (ANGLE_ZERO, ANGLE_ZERO),
+    };
+
+    let axis_projected_onto_xy_plane = Cartesian::new(new_z.x, new_z.y, Distance { m: 0. });
+    let mut polar_rotation_angle =
+        match axis_projected_onto_xy_plane.angle_to(&Cartesian::Y_DIRECTION) {
+            Ok(angle) => angle,
+            Err(_) => return (ANGLE_ZERO, ANGLE_ZERO),
+        };
+    if axis_projected_onto_xy_plane.x.m < 0. {
+        polar_rotation_angle = -polar_rotation_angle;
+    }
+    (angle_to_old_z, polar_rotation_angle)
 }
 
 impl Add for &Cartesian {

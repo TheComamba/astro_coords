@@ -9,6 +9,7 @@ use std::ops::Neg;
 
 use crate::equatorial::Equatorial;
 use crate::error::AstroCoordsError;
+use crate::traits::*;
 use crate::transformations::rotations::*;
 use crate::{angle_helper::*, NORMALIZATION_THRESHOLD};
 
@@ -135,81 +136,6 @@ impl Direction {
         self.z
     }
 
-    /// Returns a new Direction that is rotated by the specified angle around the specified axis.
-    ///
-    /// # Example
-    /// ```
-    /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::direction::Direction;
-    ///
-    /// let direction = Direction::X;
-    /// let angle = Angle::from_degrees(90.);
-    /// let axis = Direction::Z;
-    /// let rotated = direction.rotated(angle, &axis);
-    /// assert!(rotated.eq_within(&Direction::Y, 1e-5));
-    /// ```
-    pub fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Direction {
-        let (x, y, z) = rotated_tuple((self.x, self.y, self.z), angle, axis);
-        Direction { x, y, z }
-    }
-
-    /// Returns a new Direction that is rotated around the x-axis by a certain angle.
-    ///
-    /// This is an ever so tiny bit faster than `rotated()`.
-    ///
-    /// # Example
-    /// ```
-    /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::direction::Direction;
-    ///
-    /// let direction = Direction::Y;
-    /// let angle = Angle::from_degrees(90.);
-    /// let rotated = direction.rotated_x(angle);
-    /// assert!(rotated.eq_within(&Direction::Z, 1e-5));
-    /// ```
-    pub fn rotated_x(&self, angle: Angle<f64>) -> Direction {
-        let (x, y, z) = rotated_x_tuple((self.x, self.y, self.z), angle);
-        Direction { x, y, z }
-    }
-
-    /// Returns a new Direction that is rotated around the y-axis by a certain angle.
-    ///
-    /// This is an ever so tiny bit faster than `rotated()`.
-    ///
-    /// # Example
-    /// ```
-    /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::direction::Direction;
-    ///
-    /// let direction = Direction::Z;
-    /// let angle = Angle::from_degrees(90.);
-    /// let rotated = direction.rotated_y(angle);
-    /// assert!(rotated.eq_within(&Direction::X, 1e-5));
-    /// ```
-    pub fn rotated_y(&self, angle: Angle<f64>) -> Direction {
-        let (x, y, z) = rotated_y_tuple((self.x, self.y, self.z), angle);
-        Direction { x, y, z }
-    }
-
-    /// Returns a new Direction that is rotated around the z-axis by a certain angle.
-    ///
-    /// This is an ever so tiny bit faster than `rotated()`.
-    ///
-    /// # Example
-    /// ```
-    /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::direction::Direction;
-    ///
-    /// let direction = Direction::X;
-    /// let angle = Angle::from_degrees(90.);
-    /// let rotated = direction.rotated_z(angle);
-    /// assert!(rotated.eq_within(&Direction::Y, 1e-5));
-    /// ```
-    pub fn rotated_z(&self, angle: Angle<f64>) -> Direction {
-        let (x, y, z) = rotated_z_tuple((self.x, self.y, self.z), angle);
-        Direction { x, y, z }
-    }
-
     /// Returns true if the Direction is equal to the other Direction within the specified accuracy.
     ///
     /// # Example
@@ -303,6 +229,99 @@ impl Direction {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
+    pub fn to_earth_equatorial(&self) -> EarthEquatorial {
+        let dir_in_equatorial = self.rotated(EARTH_AXIS_TILT, &Direction::X);
+        let spherical = dir_in_equatorial.to_spherical();
+        EarthEquatorial::new(spherical.longitude, spherical.latitude)
+    }
+
+    pub fn to_ecliptic(&self) -> Ecliptic {
+        Ecliptic::new(self.to_spherical())
+    }
+
+    pub fn to_equatorial(&self, axis: Direction) -> Equatorial {
+        let dir_in_equatorial = self.passive_rotation_to_new_z_axis(&axis);
+        let spherical = dir_in_equatorial.to_spherical();
+        Equatorial::new(spherical, axis)
+    }
+}
+
+impl ActiveRotation<Direction> for Direction {
+    /// Returns a new Direction that is rotated by the specified angle around the specified axis.
+    ///
+    /// # Example
+    /// ```
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::{direction::Direction, traits::*};
+    ///
+    /// let direction = Direction::X;
+    /// let angle = Angle::from_degrees(90.);
+    /// let axis = Direction::Z;
+    /// let rotated = direction.rotated(angle, &axis);
+    /// assert!(rotated.eq_within(&Direction::Y, 1e-5));
+    /// ```
+    fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Direction {
+        let (x, y, z) = rotated_tuple((self.x, self.y, self.z), angle, axis);
+        Direction { x, y, z }
+    }
+
+    /// Returns a new Direction that is rotated around the x-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Example
+    /// ```
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::{direction::Direction, traits::*};
+    ///
+    /// let direction = Direction::Y;
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = direction.rotated_x(angle);
+    /// assert!(rotated.eq_within(&Direction::Z, 1e-5));
+    /// ```
+    fn rotated_x(&self, angle: Angle<f64>) -> Direction {
+        let (x, y, z) = rotated_x_tuple((self.x, self.y, self.z), angle);
+        Direction { x, y, z }
+    }
+
+    /// Returns a new Direction that is rotated around the y-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Example
+    /// ```
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::{direction::Direction, traits::*};
+    ///
+    /// let direction = Direction::Z;
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = direction.rotated_y(angle);
+    /// assert!(rotated.eq_within(&Direction::X, 1e-5));
+    /// ```
+    fn rotated_y(&self, angle: Angle<f64>) -> Direction {
+        let (x, y, z) = rotated_y_tuple((self.x, self.y, self.z), angle);
+        Direction { x, y, z }
+    }
+
+    /// Returns a new Direction that is rotated around the z-axis by a certain angle.
+    ///
+    /// This is an ever so tiny bit faster than `rotated()`.
+    ///
+    /// # Example
+    /// ```
+    /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::{direction::Direction, traits::*};
+    ///
+    /// let direction = Direction::X;
+    /// let angle = Angle::from_degrees(90.);
+    /// let rotated = direction.rotated_z(angle);
+    /// assert!(rotated.eq_within(&Direction::Y, 1e-5));
+    /// ```
+    fn rotated_z(&self, angle: Angle<f64>) -> Direction {
+        let (x, y, z) = rotated_z_tuple((self.x, self.y, self.z), angle);
+        Direction { x, y, z }
+    }
+
     /// Returns the Direction that results from actively rotating the Direction to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
     ///
     /// This method is for example used to convert from equatorial coordinates to ecliptic coordinates.
@@ -311,13 +330,15 @@ impl Direction {
     /// 2. The vector is rotated around the old z-axis by the angle between the new z-axis and the old y-axis, projected onto the old x-y plane.
     ///
     /// This is the inverse operation of `passive_rotation_to_new_z_axis`. See there for a somewhat intuitive example.
-    pub fn active_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
+    fn active_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
         let (angle_to_old_z, polar_rotation_angle) =
             get_angle_to_old_z_and_polar_rotation_angle(new_z);
         self.rotated(-angle_to_old_z, &Self::X)
             .rotated(-polar_rotation_angle, &Self::Z)
     }
+}
 
+impl PassiveRotation<Direction> for Direction {
     /// Returns the Direction that results from passively rotating the Direction to the new z-axis, in a manner that preserves the old z-projection of the x-axis.
     ///
     /// This method is for example used to convert from ecliptic coordinates to equatorial coordinates.
@@ -329,8 +350,8 @@ impl Direction {
     ///
     /// # Example
     /// ```
-    /// use astro_coords::direction::Direction;
     /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
     /// let dir_of_sun_in_ecliptic = Direction::Y;
@@ -349,27 +370,11 @@ impl Direction {
     /// assert!(dir_of_sun_in_equatorial.y() > 0.);
     /// assert!(dir_of_sun_in_equatorial.z() > 0.);
     /// ```
-    pub fn passive_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
+    fn passive_rotation_to_new_z_axis(&self, new_z: &Direction) -> Direction {
         let (angle_to_old_z, polar_rotation_angle) =
             get_angle_to_old_z_and_polar_rotation_angle(new_z);
         self.rotated(polar_rotation_angle, &Self::Z)
             .rotated(angle_to_old_z, &Self::X)
-    }
-
-    pub fn to_earth_equatorial(&self) -> EarthEquatorial {
-        let dir_in_equatorial = self.rotated(EARTH_AXIS_TILT, &Direction::X);
-        let spherical = dir_in_equatorial.to_spherical();
-        EarthEquatorial::new(spherical.longitude, spherical.latitude)
-    }
-
-    pub fn to_ecliptic(&self) -> Ecliptic {
-        Ecliptic::new(self.to_spherical())
-    }
-
-    pub fn to_equatorial(&self, axis: Direction) -> Equatorial {
-        let dir_in_equatorial = self.passive_rotation_to_new_z_axis(&axis);
-        let spherical = dir_in_equatorial.to_spherical();
-        Equatorial::new(spherical, axis)
     }
 }
 

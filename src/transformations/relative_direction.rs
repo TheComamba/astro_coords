@@ -1,6 +1,7 @@
 //! Functions for transforming directions relative to a normal vector.
 
 use crate::direction::Direction;
+use crate::traits::*;
 
 /// Rotates object_direction as it would seem to an observer looking in the direction of observer_normal.
 ///
