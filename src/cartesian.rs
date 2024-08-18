@@ -269,8 +269,7 @@ impl ActiveRotation<Cartesian> for Cartesian {
     /// ```
     /// use simple_si_units::base::Distance;
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::cartesian::Cartesian;
-    /// use astro_coords::direction::Direction;
+    /// use astro_coords::{cartesian::Cartesian, direction::Direction, traits::*};
     ///
     /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
     /// let angle = Angle::from_degrees(90.);
@@ -292,7 +291,7 @@ impl ActiveRotation<Cartesian> for Cartesian {
     /// ```
     /// use simple_si_units::base::Distance;
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::cartesian::Cartesian;
+    /// use astro_coords::{cartesian::Cartesian, traits::*};
     ///
     /// let coordinates = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
     /// let angle = Angle::from_degrees(90.);
@@ -313,7 +312,7 @@ impl ActiveRotation<Cartesian> for Cartesian {
     /// ```
     /// use simple_si_units::base::Distance;
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::cartesian::Cartesian;
+    /// use astro_coords::{cartesian::Cartesian, traits::*};
     ///
     /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
     /// let angle = Angle::from_degrees(90.);
@@ -334,7 +333,7 @@ impl ActiveRotation<Cartesian> for Cartesian {
     /// ```
     /// use simple_si_units::base::Distance;
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::cartesian::Cartesian;
+    /// use astro_coords::{cartesian::Cartesian, traits::*};
     ///
     /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
     /// let angle = Angle::from_degrees(90.);
@@ -375,7 +374,7 @@ impl PassiveRotation<Cartesian> for Cartesian {
     ///
     /// # Example
     /// ```
-    /// use astro_coords::cartesian::Cartesian;
+    /// use astro_coords::{cartesian::Cartesian, traits::*};
     /// use simple_si_units::geometry::Angle;
     ///
     /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
@@ -391,9 +390,9 @@ impl PassiveRotation<Cartesian> for Cartesian {
     ///
     /// // At summer solstice, the sun is highest in the sky in the northern hemisphere, so its x-projection is zero, and its y- and z-projection are both positive.
     /// println!("{}", dir_of_sun_in_equatorial);
-    /// assert!(dir_of_sun_in_equatorial.x.abs() < 1e-5);
-    /// assert!(dir_of_sun_in_equatorial.y > 0.);
-    /// assert!(dir_of_sun_in_equatorial.z > 0.);
+    /// assert!(dir_of_sun_in_equatorial.x.m.abs() < 1e-5);
+    /// assert!(dir_of_sun_in_equatorial.y.m > 0.);
+    /// assert!(dir_of_sun_in_equatorial.z.m > 0.);
     /// ```
     fn passive_rotation_to_new_z_axis(&self, new_z: &Cartesian) -> Cartesian {
         let (angle_to_old_z, polar_rotation_angle) =

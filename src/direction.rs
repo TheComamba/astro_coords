@@ -252,7 +252,7 @@ impl ActiveRotation<Direction> for Direction {
     /// # Example
     /// ```
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::direction::Direction;
+    /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::X;
     /// let angle = Angle::from_degrees(90.);
@@ -272,7 +272,7 @@ impl ActiveRotation<Direction> for Direction {
     /// # Example
     /// ```
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::direction::Direction;
+    /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::Y;
     /// let angle = Angle::from_degrees(90.);
@@ -291,7 +291,7 @@ impl ActiveRotation<Direction> for Direction {
     /// # Example
     /// ```
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::direction::Direction;
+    /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::Z;
     /// let angle = Angle::from_degrees(90.);
@@ -310,7 +310,7 @@ impl ActiveRotation<Direction> for Direction {
     /// # Example
     /// ```
     /// use simple_si_units::geometry::Angle;
-    /// use astro_coords::direction::Direction;
+    /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::X;
     /// let angle = Angle::from_degrees(90.);
@@ -350,8 +350,8 @@ impl PassiveRotation<Direction> for Direction {
     ///
     /// # Example
     /// ```
-    /// use astro_coords::direction::Direction;
     /// use simple_si_units::geometry::Angle;
+    /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
     /// let dir_of_sun_in_ecliptic = Direction::Y;

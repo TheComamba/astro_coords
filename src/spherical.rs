@@ -231,6 +231,7 @@ impl ActiveRotation<Spherical> for Spherical {
     /// ```
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::direction::Direction;
+    /// use astro_coords::traits::*;
     /// use simple_si_units::geometry::Angle;
     ///
     /// let mut coords = Spherical::X_DIRECTION;
@@ -248,6 +249,7 @@ impl ActiveRotation<Spherical> for Spherical {
     /// # Examples
     /// ```
     /// use astro_coords::spherical::Spherical;
+    /// use astro_coords::traits::*;
     /// use simple_si_units::geometry::Angle;
     ///
     /// let mut coords = Spherical::Y_DIRECTION;
@@ -265,6 +267,7 @@ impl ActiveRotation<Spherical> for Spherical {
     /// # Examples
     /// ```
     /// use astro_coords::spherical::Spherical;
+    /// use astro_coords::traits::*;
     /// use simple_si_units::geometry::Angle;
     ///
     /// let mut coords = Spherical::Z_DIRECTION;
@@ -282,6 +285,7 @@ impl ActiveRotation<Spherical> for Spherical {
     /// # Examples
     /// ```
     /// use astro_coords::spherical::Spherical;
+    /// use astro_coords::traits::*;
     /// use simple_si_units::geometry::Angle;
     ///
     /// let mut coords = Spherical::X_DIRECTION;
@@ -323,6 +327,7 @@ impl PassiveRotation<Spherical> for Spherical {
     /// # Example
     /// ```
     /// use astro_coords::spherical::Spherical;
+    /// use astro_coords::traits::*;
     /// use simple_si_units::geometry::Angle;
     ///
     /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
