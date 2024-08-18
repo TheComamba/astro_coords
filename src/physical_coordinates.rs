@@ -32,3 +32,43 @@ where
         self.reference_frame
     }
 }
+
+impl<T> ActiveRotation<PhysicalCartesian<T>> for PhysicalCartesian<T>
+where
+    T: Mathematical + ActiveRotation<T>,
+{
+    fn rotated(&self, angle: simple_si_units::geometry::Angle<f64>, axis: &crate::direction::Direction) -> PhysicalCartesian<T> {
+        Self {
+            reference_frame: self.reference_frame,
+            mathematical_coordinates: self.mathematical_coordinates.rotated(angle, axis),
+        }
+    }
+
+    fn rotated_x(&self, angle: simple_si_units::geometry::Angle<f64>) -> PhysicalCartesian<T> {
+        Self {
+            reference_frame: self.reference_frame,
+            mathematical_coordinates: self.mathematical_coordinates.rotated_x(angle),
+        }
+    }
+
+    fn rotated_y(&self, angle: simple_si_units::geometry::Angle<f64>) -> PhysicalCartesian<T> {
+        Self {
+            reference_frame: self.reference_frame,
+            mathematical_coordinates: self.mathematical_coordinates.rotated_y(angle),
+        }
+    }
+
+    fn rotated_z(&self, angle: simple_si_units::geometry::Angle<f64>) -> PhysicalCartesian<T> {
+        Self {
+            reference_frame: self.reference_frame,
+            mathematical_coordinates: self.mathematical_coordinates.rotated_z(angle),
+        }
+    }
+
+    fn active_rotation_to_new_z_axis(&self, new_z: &PhysicalCartesian<T>) -> PhysicalCartesian<T> {
+        Self {
+            reference_frame: self.reference_frame,
+            mathematical_coordinates: self.mathematical_coordinates.active_rotation_to_new_z_axis(&new_z.mathematical_coordinates),
+        }
+    }
+}
