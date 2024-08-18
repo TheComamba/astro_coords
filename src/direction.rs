@@ -26,6 +26,8 @@ pub struct Direction {
     pub(super) z: f64,
 }
 
+impl Mathematical for Direction {}
+
 impl Direction {
     /// A normalised vector pointing in x-Direction.
     pub const X: Direction = Direction {

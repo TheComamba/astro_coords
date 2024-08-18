@@ -26,6 +26,8 @@ pub struct Spherical {
     pub latitude: Angle<f64>,
 }
 
+impl Mathematical for Spherical {}
+
 impl Spherical {
     /// The x-axis direction represented in spherical coordinates.
     pub const X_DIRECTION: Spherical = Spherical {
