@@ -6,7 +6,7 @@ use std::{fmt::Display, ops::Neg};
 
 use crate::{
     angle_helper::*, cartesian::Cartesian, earth_equatorial::EarthEquatorial,
-    equatorial::Equatorial, error::AstroCoordsError, NORMALIZATION_THRESHOLD,
+    equatorial::Equatorial, error::AstroCoordsError, traits::*, NORMALIZATION_THRESHOLD,
 };
 
 use super::{

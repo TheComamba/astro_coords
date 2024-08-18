@@ -106,7 +106,7 @@ pub(super) const EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES: Ecliptic =
 mod tests {
     use simple_si_units::geometry::Angle;
 
-    use crate::{angle_helper::angle_eq_within, direction::Direction};
+    use crate::{angle_helper::angle_eq_within, direction::Direction, traits::*};
 
     #[test]
     fn test_angle_function() {
