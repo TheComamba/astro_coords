@@ -1,7 +1,9 @@
 use simple_si_units::geometry::Angle;
 
+use crate::direction::Direction;
+
 pub trait ActiveRotation<T> {
-    fn rotated(&self, angle: Angle<f64>, axis: &T) -> T;
+    fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> T;
 
     fn rotated_x(&self, angle: Angle<f64>) -> T;
 
