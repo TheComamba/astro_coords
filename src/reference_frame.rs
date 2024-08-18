@@ -5,7 +5,7 @@ use simple_si_units::geometry::Angle;
 /// A reference frame provides the connection between mathematical coordinates (say, (0,0,1) or the z-direction) and physical positions or directions (say, the direction of the North Pole of earth).
 ///
 /// This enum needs to be provided  to eliminate ambiguity when converting between different coordinate systems.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum ReferenceFrame {
     Equatorial(CelestialBody),
     Ecliptic,
@@ -77,3 +77,14 @@ impl CelestialBody {
         }
     }
 }
+
+impl PartialEq for CelestialBody {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (CelestialBody::Custom(_, _), _) | (_, CelestialBody::Custom(_, _)) => false,
+            _ => std::mem::discriminant(self) == std::mem::discriminant(other),
+        }
+    }
+}
+
+impl Eq for CelestialBody {}
