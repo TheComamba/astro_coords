@@ -114,6 +114,7 @@ pub fn get_rotation_parameters(start: &Direction, end: &Direction) -> (Angle<f64
 #[cfg(test)]
 mod tests {
     use crate::angle_helper::{test::*, *};
+    use crate::traits::*;
 
     use super::*;
 

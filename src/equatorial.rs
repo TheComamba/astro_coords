@@ -3,7 +3,9 @@
 use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
 
-use crate::{cartesian::Cartesian, earth_equatorial::EarthEquatorial, ecliptic::Ecliptic};
+use crate::{
+    cartesian::Cartesian, earth_equatorial::EarthEquatorial, ecliptic::Ecliptic, traits::*,
+};
 
 use super::{direction::Direction, spherical::Spherical};
 
