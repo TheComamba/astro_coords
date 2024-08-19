@@ -28,6 +28,12 @@ pub struct Spherical {
 
 impl Mathematical for Spherical {}
 
+impl AsRef<Spherical> for Spherical {
+    fn as_ref(&self) -> &Spherical {
+        self
+    }
+}
+
 impl Spherical {
     /// The x-axis direction represented in spherical coordinates.
     pub const X_DIRECTION: Spherical = Spherical {

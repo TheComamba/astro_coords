@@ -3,9 +3,10 @@
 use crate::{reference_frame::ReferenceFrame, traits::*};
 
 /// A wrapper around a Cartesian coordinate that is in a physical reference frame.
+#[derive(Debug, Clone)]
 pub struct PhysicalCoords<T>
 where
-    T: Mathematical + ActiveRotation<T>,
+    T: Mathematical + ActiveRotation<T> + AsRef<T>,
 {
     reference_frame: ReferenceFrame,
     mathematical_coordinates: T,
@@ -13,7 +14,7 @@ where
 
 impl<T> PhysicalCoords<T>
 where
-    T: Mathematical + ActiveRotation<T>,
+    T: Mathematical + ActiveRotation<T> + AsRef<T>,
 {
     /// Create a new PhysicalCartesian object.
     pub fn new(inner: T, reference_frame: ReferenceFrame) -> Self {
@@ -26,7 +27,7 @@ where
 
 impl<T> Physical for PhysicalCoords<T>
 where
-    T: Mathematical + ActiveRotation<T>,
+    T: Mathematical + ActiveRotation<T> + AsRef<T>,
 {
     /// Returns the frame of reference that the mathematical coordinates are defined in.
     fn reference_frame(&self) -> ReferenceFrame {
@@ -42,10 +43,13 @@ where
     /// - Rotate around the old z-axis by 90°-a. The current x-axis now points to the intermediate direction Q.
     /// - Rotate around Q by 90°-d. The current z-axis now points to the new z-axis.
     /// - Rotate around the new z-axis by W. The current x-axis now points to the new x-axis.
-    /// 
+    ///
     /// # Example
     /// TODO
     fn change_reference_frame(&mut self, new_frame: ReferenceFrame) {
+        if self.reference_frame == new_frame {
+            return;
+        }
         todo!();
         self.reference_frame = new_frame;
     }
@@ -54,11 +58,15 @@ where
     fn overwrite_reference_frame(&mut self, new_frame: ReferenceFrame) {
         self.reference_frame = new_frame;
     }
+
+    fn mathematical_coordinates(&self) -> &dyn Mathematical {
+        self.mathematical_coordinates.as_ref()
+    }
 }
 
 impl<T> ActiveRotation<PhysicalCoords<T>> for PhysicalCoords<T>
 where
-    T: Mathematical + ActiveRotation<T>,
+    T: Mathematical + ActiveRotation<T> + AsRef<T>,
 {
     fn rotated(
         &self,
@@ -99,5 +107,25 @@ where
                 .mathematical_coordinates
                 .active_rotation_to_new_z_axis(&new_z.mathematical_coordinates),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::direction::Direction;
+
+    use super::*;
+
+    #[test]
+    fn changing_from_equatorial_to_ecliptic_preserves_x_axis() {
+        let equatorial = ReferenceFrame::Equatorial;
+        let ecliptic = ReferenceFrame::Ecliptic;
+
+        let mut physical = PhysicalCoords::new(Direction::X, equatorial);
+        physical.change_reference_frame(ecliptic);
+
+        assert!(physical
+            .mathematical_coordinates
+            .eq_within(&Direction::X, 1e-5));
     }
 }
