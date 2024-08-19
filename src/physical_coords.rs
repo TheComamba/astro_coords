@@ -42,6 +42,9 @@ where
     /// - Rotate around the old z-axis by 90°-a. The current x-axis now points to the intermediate direction Q.
     /// - Rotate around Q by 90°-d. The current z-axis now points to the new z-axis.
     /// - Rotate around the new z-axis by W. The current x-axis now points to the new x-axis.
+    /// 
+    /// # Example
+    /// TODO
     fn change_reference_frame(&mut self, new_frame: ReferenceFrame) {
         todo!();
         self.reference_frame = new_frame;
