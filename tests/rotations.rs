@@ -1,8 +1,5 @@
 use astro_coords::{direction::Direction, traits::*};
-use utils::{
-    constants::{ACC, ANGLE_ACC},
-    examples::*,
-};
+use utils::{constants::*, examples::*};
 
 mod utils;
 

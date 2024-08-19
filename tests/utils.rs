@@ -19,6 +19,8 @@ pub mod constants {
 
 #[cfg(test)]
 pub mod examples {
+    use astro_coords::{physical_coords::PhysicalCoords, reference_frame::ReferenceFrame};
+
     use super::*;
 
     pub fn distance_examples() -> Vec<Distance<f64>> {
@@ -107,6 +109,44 @@ pub mod examples {
         for spherical in spherical_examples() {
             for axis in direction_examples() {
                 examples.push(Equatorial::new(spherical, axis));
+            }
+        }
+        examples
+    }
+
+    pub fn reference_frame_examples() -> Vec<ReferenceFrame> {
+        vec![
+            ReferenceFrame::Equatorial,
+            ReferenceFrame::Ecliptic,
+            ReferenceFrame::Galactic,
+        ]
+    }
+
+    pub fn physical_cartesian_examples() -> Vec<PhysicalCoords<Cartesian>> {
+        let mut examples = vec![];
+        for frame in reference_frame_examples() {
+            for cartesian in cartesian_examples() {
+                examples.push(PhysicalCoords::new(cartesian, frame));
+            }
+        }
+        examples
+    }
+
+    pub fn physical_direction_examples() -> Vec<PhysicalCoords<Direction>> {
+        let mut examples = vec![];
+        for frame in reference_frame_examples() {
+            for direction in direction_examples() {
+                examples.push(PhysicalCoords::new(direction, frame));
+            }
+        }
+        examples
+    }
+
+    pub fn physical_spherical_examples() -> Vec<PhysicalCoords<Spherical>> {
+        let mut examples = vec![];
+        for frame in reference_frame_examples() {
+            for spherical in spherical_examples() {
+                examples.push(PhysicalCoords::new(spherical, frame));
             }
         }
         examples
