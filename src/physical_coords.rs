@@ -17,11 +17,11 @@ where
     T: Mathematical + ActiveRotation<T> + AsRef<T>,
 {
     /// Create a new PhysicalCartesian object.
-    /// 
+    ///
     /// # Example
     /// ```
     /// use astro_coords::{PhysicalCoords, ReferenceFrame, Direction};
-    /// 
+    ///
     /// let physical = PhysicalCoords::new(Direction::X, ReferenceFrame::Equatorial);
     /// println!("{}", physical);
     /// ```
