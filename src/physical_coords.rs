@@ -17,6 +17,14 @@ where
     T: Mathematical + ActiveRotation<T> + AsRef<T>,
 {
     /// Create a new PhysicalCartesian object.
+    /// 
+    /// # Example
+    /// ```
+    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Direction};
+    /// 
+    /// let physical = PhysicalCoords::new(Direction::X, ReferenceFrame::Equatorial);
+    /// println!("{}", physical);
+    /// ```
     pub fn new(inner: T, reference_frame: ReferenceFrame) -> Self {
         Self {
             reference_frame,
@@ -30,6 +38,14 @@ where
     T: Mathematical + ActiveRotation<T> + AsRef<T>,
 {
     /// Returns the frame of reference that the mathematical coordinates are defined in.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Direction};
+    ///
+    /// let physical = PhysicalCoords::new(Direction::X, ReferenceFrame::Equatorial);
+    /// assert_eq!(physical.reference_frame(), ReferenceFrame::Equatorial);
+    /// ```
     fn reference_frame(&self) -> ReferenceFrame {
         self.reference_frame
     }
@@ -55,12 +71,30 @@ where
     }
 
     /// Overwrites the frame of reference without transforming the mathematical coordinates.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Direction};
+    ///
+    /// let mut physical = PhysicalCoords::new(Direction::X, ReferenceFrame::Equatorial);
+    /// physical.overwrite_reference_frame(ReferenceFrame::Ecliptic);
+    /// assert_eq!(physical.reference_frame(), ReferenceFrame::Ecliptic);
+    /// ```
     fn overwrite_reference_frame(&mut self, new_frame: ReferenceFrame) {
         self.reference_frame = new_frame;
     }
 
+    /// Returns a reference to the mathematical coordinates object as it is represented in the physical frame of reference.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Direction};
+    ///
+    /// let physical = PhysicalCoords::new(Direction::X, ReferenceFrame::Equatorial);
+    /// assert_eq!(physical.mathematical_coordinates(), &Direction::X);
+    /// ```
     fn mathematical_coordinates(&self) -> &T {
-        self.mathematical_coordinates.as_ref()
+        &self.mathematical_coordinates
     }
 }
 
