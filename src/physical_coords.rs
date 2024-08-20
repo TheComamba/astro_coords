@@ -25,7 +25,7 @@ where
     }
 }
 
-impl<T> Physical for PhysicalCoords<T>
+impl<T> Physical<T> for PhysicalCoords<T>
 where
     T: Mathematical + ActiveRotation<T> + AsRef<T>,
 {
@@ -59,7 +59,7 @@ where
         self.reference_frame = new_frame;
     }
 
-    fn mathematical_coordinates(&self) -> &dyn Mathematical {
+    fn mathematical_coordinates(&self) -> &T {
         self.mathematical_coordinates.as_ref()
     }
 }
