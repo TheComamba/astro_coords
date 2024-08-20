@@ -1,5 +1,7 @@
 //! This module contains the `ReferenceFrame` enum, which connects mathematical coordinates to physical positions and directions.
 
+use std::fmt::Display;
+
 use simple_si_units::geometry::Angle;
 
 /// A reference frame provides the connection between mathematical coordinates (say, (0,0,1) or the z-direction) and physical positions or directions (say, the direction of the North Pole of earth).
@@ -25,6 +27,16 @@ pub enum ReferenceFrame {
     ///
     /// Galactic coordinates are oriented such that the z-axis points along the normal of the plane of the Milky Way galaxy. The x-axis points towards the galactic center, and the y-axis completes the right-handed coordinate system.
     Galactic,
+}
+
+impl Display for ReferenceFrame {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ReferenceFrame::Equatorial => write!(f, "Equatorial"),
+            ReferenceFrame::Ecliptic => write!(f, "Ecliptic"),
+            ReferenceFrame::Galactic => write!(f, "Galactic"),
+        }
+    }
 }
 
 /// This enum contains the celestial bodies for which the equatorial reference frame can be defined.
@@ -90,6 +102,23 @@ impl CelestialBody {
             CelestialBody::Saturn => (Angle::from_deg(40.589), Angle::from_deg(83.537)),
             CelestialBody::Uranus => (Angle::from_deg(257.311), Angle::from_deg(-15.175)),
             CelestialBody::Neptune => (Angle::from_deg(299.36), Angle::from_deg(43.46)),
+        }
+    }
+}
+
+impl Display for CelestialBody {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CelestialBody::Custom(ra, dec) => write!(f, "Custom body with RA={} and Dec={}", ra, dec),
+            CelestialBody::Sun => write!(f, "the Sun"),
+            CelestialBody::Mercury => write!(f, "Mercury"),
+            CelestialBody::Venus => write!(f, "Venus"),
+            CelestialBody::Earth => write!(f, "Earth"),
+            CelestialBody::Mars => write!(f, "Mars"),
+            CelestialBody::Jupiter => write!(f, "Jupiter"),
+            CelestialBody::Saturn => write!(f, "Saturn"),
+            CelestialBody::Uranus => write!(f, "Uranus"),
+            CelestialBody::Neptune => write!(f, "Neptune"),
         }
     }
 }
