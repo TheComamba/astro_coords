@@ -1,12 +1,7 @@
-use astro_coords::{cartesian::Cartesian, direction::Direction, spherical::Spherical, traits::*};
-use simple_si_units::geometry::Angle;
+use astro_coords::traits::*;
 use utils::{constants::*, examples::*};
 
 mod utils;
-
-fn cartesian_points_along_z(cart: &Cartesian) -> bool {
-    cart.x.m.abs() < ACC && cart.y.m.abs() < ACC
-}
 
 #[test]
 fn cartesian_roundtrips() {
@@ -31,10 +26,6 @@ fn cartesian_roundtrips() {
     }
 }
 
-fn direction_points_along_z(dir: &Direction) -> bool {
-    dir.x().abs() < ACC && dir.y().abs() < ACC
-}
-
 #[test]
 fn direction_roundtrips() {
     for target_frame in reference_frame_examples() {
@@ -56,10 +47,6 @@ fn direction_roundtrips() {
             );
         }
     }
-}
-
-fn spherical_points_along_z(sph: &Spherical) -> bool {
-    (sph.latitude - Angle::from_deg(90.)).rad.abs() < ACC
 }
 
 #[test]

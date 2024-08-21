@@ -254,8 +254,7 @@ mod tests {
         let equatorial = ReferenceFrame::Equatorial;
         let ecliptic = ReferenceFrame::Ecliptic;
 
-        let mut physical = PhysicalCoords::new(Direction::X, equatorial);
-        physical.change_reference_frame(ecliptic);
+        let physical = PhysicalCoords::new(Direction::X, equatorial).in_reference_frame(ecliptic);
 
         assert!(physical
             .mathematical_coordinates
