@@ -39,12 +39,11 @@ pub enum ReferenceFrame {
 impl ReferenceFrame {
     /// Returns the z-axis, or the direction orthogonal to the fundamental plane, of the reference frame.
     ///
-    /// The z-axis is expessed as a direction in the equatorial frame of reference.
+    /// The z-axis is expessed as a spherical direction in the equatorial frame of reference.
     ///
     /// # Example
     /// ```
     /// use astro_coords::reference_frame::ReferenceFrame;
-    /// use astro_coords::direction::Direction;
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::ra_and_dec::RightAscension;
     /// use simple_si_units::angle::Angle;
@@ -55,32 +54,31 @@ impl ReferenceFrame {
     /// // The x-axis in both equatorial and ecliptic coordinates is the direction of the vernal equinox.
     /// // The y-axis on the other hand it rotated around the x-axis by the axial tilt of the Earth.
     /// let earth_axial_tilt = Angle::from_degrees(23.439);
-    /// let ecliptic_north = Direction::Z.rotated_x(earth_axial_tilt);
+    /// let ecliptic_north = Spherical::Z_DIRECTION.rotated_x(earth_axial_tilt);
     /// // After a quarter-year, the sun is high in the sky on the northern hemisphere.
     /// // Because it encircles the earth in mathematically positive direction, this means that the y-component of ecliptic_north is negative.
-    /// assert!(ecliptic_north.y() < 0.);
+    /// assert!(ecliptic_north.to_direction().y() < 0.);
     ///
     /// // RA and Dec of the north pole of the Milky Way galaxy can be found online.
     /// let galactic_north_right_ascension = RightAscension::new(12, 49, 0.).to_angle();
     /// let galactic_north_declination = Angle::from_degrees(27.4);
     /// let galactic_north = Spherical::new(galactic_north_right_ascension, galactic_north_declination);
-    /// let galactic_north = galactic_north.to_direction();
     ///
-    /// assert_eq!(ReferenceFrame::Equatorial.z_axis().eq_within(equatorial_north, 1e-5));
-    /// assert_eq!(ReferenceFrame::Ecliptic.z_axis().eq_within(ecliptic_north, 1e-5));
-    /// assert_eq!(ReferenceFrame::Galactic.z_axis().eq_within(galactic_north, 1e-5));
+    /// let acc = Angle::from_degrees(1e-5);
+    /// assert_eq!(ReferenceFrame::Equatorial.z_axis().eq_within(equatorial_north, acc));
+    /// assert_eq!(ReferenceFrame::Ecliptic.z_axis().eq_within(ecliptic_north, acc));
+    /// assert_eq!(ReferenceFrame::Galactic.z_axis().eq_within(galactic_north, acc));
     /// ```
-    pub fn z_axis(&self) -> Direction {
+    pub fn z_axis(&self) -> Spherical {
         match self {
-            ReferenceFrame::Equatorial => Direction::Z,
+            ReferenceFrame::Equatorial => Spherical::Z_DIRECTION,
             ReferenceFrame::Ecliptic => {
-                Spherical::new(QUARTER_CIRC, QUARTER_CIRC - EARTH_AXIS_TILT).to_direction()
+                Spherical::new(QUARTER_CIRC, QUARTER_CIRC - EARTH_AXIS_TILT)
             }
             ReferenceFrame::Galactic => Spherical::new(
                 RightAscension::new(12, 49, 0.).to_angle(),
                 Angle::from_degrees(27.4),
-            )
-            .to_direction(),
+            ),
         }
     }
 
