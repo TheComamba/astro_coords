@@ -61,8 +61,8 @@ impl ReferenceFrame {
     /// assert!(ecliptic_north.y() < 0.);
     ///
     /// // RA and Dec of the north pole of the Milky Way galaxy can be found online.
-    /// let galactic_north_right_ascension = RightAscension::new(12, 51, 24.).to_angle();
-    /// let galactic_north_declination = Angle::from_degrees(27.13);
+    /// let galactic_north_right_ascension = RightAscension::new(12, 49, 0.).to_angle();
+    /// let galactic_north_declination = Angle::from_degrees(27.4);
     /// let galactic_north = Spherical::new(galactic_north_right_ascension, galactic_north_declination);
     /// let galactic_north = galactic_north.to_direction();
     ///
@@ -77,10 +77,48 @@ impl ReferenceFrame {
                 Spherical::new(QUARTER_CIRC, QUARTER_CIRC - EARTH_AXIS_TILT).to_direction()
             }
             ReferenceFrame::Galactic => Spherical::new(
-                RightAscension::new(12, 51, 24.).to_angle(),
-                Angle::from_degrees(27.13),
+                RightAscension::new(12, 49, 0.).to_angle(),
+                Angle::from_degrees(27.4),
             )
             .to_direction(),
+        }
+    }
+
+    /// Returns the prime meridian offset of the reference frame.
+    ///
+    /// The prime meridian offset is the longitudal angle offset of the x-axis of the reference frame, relative to the point Q that the equatorial x-axis points at after rotating to the new z-axis. It is denoted W in [Fig. 1 of the IAU Report](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf).
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::reference_frame::ReferenceFrame;
+    /// use astro_coords::direction::Direction;
+    /// use astro_coords::spherical::Spherical;
+    /// use astro_coords::ra_and_dec::RightAscension;
+    /// use simple_si_units::angle::Angle;
+    ///
+    /// // The equatorial reference frame has no offset to itself.
+    /// assert_eq!(ReferenceFrame::Equatorial.prime_meridian_offset(), Angle::from_deg(0.));
+    ///
+    /// // The ecliptic x-axis points in the same direction (the vernal equinox) as the equatorial x-axis.
+    /// assert_eq!(ReferenceFrame::Ecliptic.prime_meridian_offset(), Angle::from_deg(0.));
+    ///
+    /// // Galactic north in equatorial coordinates is defined as a=12h49m, d=27.4°.
+    /// let galactic_north_ra = RightAscension(12, 49, 0.).to_angle();
+    /// // The x-axis of the galactic reference frame points towards the galactic center, which for the purpose of the reference frame is fixed at a=17h42m24s, d=-28.92°.
+    /// let galactic_center_ra = RightAscension(17, 42, 24.).to_angle();
+    /// let galactic_center_dec = Angle::from_deg(-28.92);
+    /// let galactic_center = Spherical::new(galactic_center_ra, galactic_center_dec).to_direction();
+    /// // The point Q is found by rotating the x-axis by 90°-12h49m (compare [Fig. 1 of the IAU Report](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf)).
+    /// let Q = Direction::X.rotated_z(Angle::from_deg(90.) - galactic_north_ra);
+    /// // The prime meridian offset is the angle between the galactic center and the point Q.
+    /// let expected_offset = galactic_center.angle_to(Q);
+    /// assert_eq!(ReferenceFrame::Galactic.prime_meridian_offset(), expected_offset);
+    /// ```
+    pub fn prime_meridian_offset(&self) -> Angle<f64> {
+        match self {
+            ReferenceFrame::Equatorial => Angle::from_deg(0.),
+            ReferenceFrame::Ecliptic => Angle::from_deg(0.),
+            ReferenceFrame::Galactic => Angle::from_deg(0.),
         }
     }
 }
