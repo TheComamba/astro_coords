@@ -57,7 +57,7 @@ impl ReferenceFrame {
     /// let ecliptic_north = Spherical::Z_DIRECTION.rotated_x(earth_axial_tilt);
     /// // After a quarter-year, the sun is high in the sky on the northern hemisphere.
     /// // Because it encircles the earth in mathematically positive direction, this means that the y-component of ecliptic_north is negative.
-    /// assert!(ecliptic_north.to_direction().y() < 0.);
+    /// assert!(ecliptic_north.to_direction().y() < 0., "{}", ecliptic_north);
     ///
     /// // RA and Dec of the north pole of the Milky Way galaxy can be found online.
     /// let galactic_north_right_ascension = RightAscension::new(12, 49, 0.).to_angle();
@@ -65,15 +65,15 @@ impl ReferenceFrame {
     /// let galactic_north = Spherical::new(galactic_north_right_ascension, galactic_north_declination);
     ///
     /// let acc = Angle::from_degrees(1e-5);
-    /// assert!(ReferenceFrame::Equatorial.z_axis().eq_within(&equatorial_north, acc));
-    /// assert!(ReferenceFrame::Ecliptic.z_axis().eq_within(&ecliptic_north, acc));
-    /// assert!(ReferenceFrame::Galactic.z_axis().eq_within(&galactic_north, acc));
+    /// assert!(ReferenceFrame::Equatorial.z_axis().eq_within(&equatorial_north, acc), "{}", ReferenceFrame::Equatorial.z_axis());
+    /// assert!(ReferenceFrame::Ecliptic.z_axis().eq_within(&ecliptic_north, acc), "{}", ReferenceFrame::Ecliptic.z_axis());
+    /// assert!(ReferenceFrame::Galactic.z_axis().eq_within(&galactic_north, acc), "{}", ReferenceFrame::Galactic.z_axis());
     /// ```
     pub fn z_axis(&self) -> Spherical {
         match self {
             ReferenceFrame::Equatorial => Spherical::Z_DIRECTION,
             ReferenceFrame::Ecliptic => {
-                Spherical::new(QUARTER_CIRC, QUARTER_CIRC - EARTH_AXIS_TILT)
+                Spherical::new(-QUARTER_CIRC, QUARTER_CIRC - EARTH_AXIS_TILT)
             }
             ReferenceFrame::Galactic => Spherical::new(
                 RightAscension::new(12, 49, 0.).to_angle(),
