@@ -22,7 +22,9 @@ where
     ///
     /// # Example
     /// ```
-    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Direction};
+    /// use astro_coords::physical_coords::PhysicalCoords;
+    /// use astro_coords::reference_frame::ReferenceFrame;
+    /// use astro_coords::direction::Direction;
     ///
     /// let physical = PhysicalCoords::new(Direction::X, ReferenceFrame::Equatorial);
     /// println!("{}", physical);
@@ -43,7 +45,10 @@ where
     ///
     /// # Example
     /// ```
-    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Direction};
+    /// use astro_coords::physical_coords::PhysicalCoords;
+    /// use astro_coords::reference_frame::ReferenceFrame;
+    /// use astro_coords::direction::Direction;
+    /// use astro_coords::traits::*;
     ///
     /// let physical = PhysicalCoords::new(Direction::X, ReferenceFrame::Equatorial);
     /// assert_eq!(physical.reference_frame(), ReferenceFrame::Equatorial);
@@ -58,7 +63,10 @@ where
     ///
     /// # Example
     /// ```
-    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Direction};
+    /// use astro_coords::physical_coords::PhysicalCoords;
+    /// use astro_coords::reference_frame::ReferenceFrame;
+    /// use astro_coords::direction::Direction;
+    /// use astro_coords::traits::*;
     ///
     /// let mut physical = PhysicalCoords::new(Direction::Y, ReferenceFrame::Equatorial);
     /// physical.change_reference_frame(ReferenceFrame::Ecliptic);
@@ -106,14 +114,23 @@ where
     ///
     /// # Example
     /// ```
-    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Spherical};
-    /// use simple_si_units::angle::Angle;
+    /// use astro_coords::physical_coords::PhysicalCoords;
+    /// use astro_coords::reference_frame::ReferenceFrame;
+    /// use astro_coords::spherical::Spherical;
+    /// use astro_coords::traits::*;
+    /// use simple_si_units::geometry::Angle;
     ///
     /// // As an example, the position of the star Sirius is expressed in various reference frames.
     /// // The values are taken from [NASA's HEASARC Object Position Finder Tool](https://heasarc.gsfc.nasa.gov/cgi-bin/Tools/convcoord/convcoord.pl?CoordVal=Sirius&CoordType=J2000&Resolver=GRB%2FSIMBAD%2BSesame%2FNED&NoCache=on&Epoch=)
-    /// let equatorial = PhysicalCoords::new(Spherical::new(101.287155, -16.716116), ReferenceFrame::Equatorial);
-    /// let ecliptic = PhysicalCoords::new(Spherical::new(104.081665, -39.605249), ReferenceFrame::Ecliptic);
-    /// let galactic = PhysicalCoords::new(Spherical::new(227.230283, -8.890284), ReferenceFrame::Galactic);
+    /// let equatorial_lon = Angle::from_deg(101.287155);
+    /// let equatorial_lat = Angle::from_deg(-16.716116);
+    /// let equatorial = PhysicalCoords::new(Spherical::new(equatorial_lon, equatorial_lat), ReferenceFrame::Equatorial);
+    /// let ecliptic_lon = Angle::from_deg(104.081665);
+    /// let ecliptic_lat = Angle::from_deg(-39.605249);
+    /// let ecliptic = PhysicalCoords::new(Spherical::new(ecliptic_lon, ecliptic_lat), ReferenceFrame::Ecliptic);
+    /// let galactic_lon = Angle::from_deg(227.230283);
+    /// let galactic_lat = Angle::from_deg(-8.890284);
+    /// let galactic = PhysicalCoords::new(Spherical::new(galactic_lon, galactic_lat), ReferenceFrame::Galactic);
     ///
     /// let equatorial_from_ecliptic = ecliptic.in_reference_frame(ReferenceFrame::Equatorial);
     /// let equatorial_from_galactic = galactic.in_reference_frame(ReferenceFrame::Equatorial);
@@ -140,7 +157,10 @@ where
     ///
     /// # Example
     /// ```
-    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Direction};
+    /// use astro_coords::physical_coords::PhysicalCoords;
+    /// use astro_coords::reference_frame::ReferenceFrame;
+    /// use astro_coords::direction::Direction;
+    /// use astro_coords::traits::*;
     ///
     /// let mut physical = PhysicalCoords::new(Direction::X, ReferenceFrame::Equatorial);
     /// physical.overwrite_reference_frame(ReferenceFrame::Ecliptic);
@@ -154,7 +174,10 @@ where
     ///
     /// # Example
     /// ```
-    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Direction};
+    /// use astro_coords::physical_coords::PhysicalCoords;
+    /// use astro_coords::reference_frame::ReferenceFrame;
+    /// use astro_coords::direction::Direction;
+    /// use astro_coords::traits::*;
     ///
     /// let physical = PhysicalCoords::new(Direction::X, ReferenceFrame::Equatorial);
     /// assert_eq!(physical.mathematical_coordinates(), &Direction::X);

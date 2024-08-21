@@ -6,7 +6,6 @@ use simple_si_units::geometry::Angle;
 
 use crate::{
     angle_helper::{EARTH_AXIS_TILT, QUARTER_CIRC},
-    direction::Direction,
     ra_and_dec::RightAscension,
     spherical::Spherical,
 };
@@ -46,10 +45,11 @@ impl ReferenceFrame {
     /// use astro_coords::reference_frame::ReferenceFrame;
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::ra_and_dec::RightAscension;
-    /// use simple_si_units::angle::Angle;
+    /// use astro_coords::traits::*;
+    /// use simple_si_units::geometry::Angle;
     ///
     /// // The z-axis of the equatorial frame expressed in equatorial coordinates is, well, the z-direction.
-    /// let equatorial_north = Direction::Z;
+    /// let equatorial_north = Spherical::Z_DIRECTION;
     ///
     /// // The x-axis in both equatorial and ecliptic coordinates is the direction of the vernal equinox.
     /// // The y-axis on the other hand it rotated around the x-axis by the axial tilt of the Earth.
@@ -65,9 +65,9 @@ impl ReferenceFrame {
     /// let galactic_north = Spherical::new(galactic_north_right_ascension, galactic_north_declination);
     ///
     /// let acc = Angle::from_degrees(1e-5);
-    /// assert_eq!(ReferenceFrame::Equatorial.z_axis().eq_within(equatorial_north, acc));
-    /// assert_eq!(ReferenceFrame::Ecliptic.z_axis().eq_within(ecliptic_north, acc));
-    /// assert_eq!(ReferenceFrame::Galactic.z_axis().eq_within(galactic_north, acc));
+    /// assert!(ReferenceFrame::Equatorial.z_axis().eq_within(&equatorial_north, acc));
+    /// assert!(ReferenceFrame::Ecliptic.z_axis().eq_within(&ecliptic_north, acc));
+    /// assert!(ReferenceFrame::Galactic.z_axis().eq_within(&galactic_north, acc));
     /// ```
     pub fn z_axis(&self) -> Spherical {
         match self {
@@ -92,25 +92,26 @@ impl ReferenceFrame {
     /// use astro_coords::direction::Direction;
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::ra_and_dec::RightAscension;
-    /// use simple_si_units::angle::Angle;
+    /// use astro_coords::traits::*;
+    /// use simple_si_units::geometry::Angle;
     ///
     /// // The equatorial reference frame has no offset to itself.
-    /// assert_eq!(ReferenceFrame::Equatorial.prime_meridian_offset(), Angle::from_deg(0.));
+    /// assert!((ReferenceFrame::Equatorial.prime_meridian_offset() - Angle::from_deg(0.)).rad.abs() < 1e-5);
     ///
     /// // The ecliptic x-axis points in the same direction (the vernal equinox) as the equatorial x-axis.
-    /// assert_eq!(ReferenceFrame::Ecliptic.prime_meridian_offset(), Angle::from_deg(0.));
+    /// assert!((ReferenceFrame::Ecliptic.prime_meridian_offset() - Angle::from_deg(0.)).rad.abs() < 1e-5);
     ///
     /// // Galactic north in equatorial coordinates is defined as a=12h49m, d=27.4°.
-    /// let galactic_north_ra = RightAscension(12, 49, 0.).to_angle();
+    /// let galactic_north_ra = RightAscension::new(12, 49, 0.).to_angle();
     /// // The x-axis of the galactic reference frame points towards the galactic center, which for the purpose of the reference frame is fixed at a=17h42m24s, d=-28.92°.
-    /// let galactic_center_ra = RightAscension(17, 42, 24.).to_angle();
+    /// let galactic_center_ra = RightAscension::new(17, 42, 24.).to_angle();
     /// let galactic_center_dec = Angle::from_deg(-28.92);
     /// let galactic_center = Spherical::new(galactic_center_ra, galactic_center_dec).to_direction();
     /// // The point Q is found by rotating the x-axis by 90°-12h49m (compare [Fig. 1 of the IAU Report](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf)).
     /// let Q = Direction::X.rotated_z(Angle::from_deg(90.) - galactic_north_ra);
     /// // The prime meridian offset is the angle between the galactic center and the point Q.
-    /// let expected_offset = galactic_center.angle_to(Q);
-    /// assert_eq!(ReferenceFrame::Galactic.prime_meridian_offset(), expected_offset);
+    /// let expected_offset = galactic_center.angle_to(&Q);
+    /// assert!((ReferenceFrame::Galactic.prime_meridian_offset() - expected_offset).rad.abs() < 1e-5);
     /// ```
     pub fn prime_meridian_offset(&self) -> Angle<f64> {
         match self {
