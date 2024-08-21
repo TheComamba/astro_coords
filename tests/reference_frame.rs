@@ -67,7 +67,7 @@ fn spherical_roundtrips() {
 }
 
 #[test]
-fn changing_reference_frame_of_cartesian_presserves_length() {
+fn changing_reference_frame_of_cartesian_preserves_length() {
     for target_frame in reference_frame_examples() {
         for physical in physical_cartesian_examples() {
             let original_length = physical.mathematical_coordinates().length();

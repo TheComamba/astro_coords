@@ -68,20 +68,24 @@ where
             return;
         }
 
-        let new_z = new_frame.z_axis();
-        let equinox_to_q = QUARTER_CIRC - new_z.longitude;
-        let plane_tilt = QUARTER_CIRC - new_z.latitude;
-        let w = new_frame.prime_meridian_offset();
         if new_frame != ReferenceFrame::Equatorial {
             if self.reference_frame != ReferenceFrame::Equatorial {
                 self.change_reference_frame(ReferenceFrame::Equatorial);
             }
+            let new_z = new_frame.z_axis();
+            let equinox_to_q = QUARTER_CIRC - new_z.longitude;
+            let plane_tilt = QUARTER_CIRC - new_z.latitude;
+            let w = new_frame.prime_meridian_offset();
             self.mathematical_coordinates = self
                 .mathematical_coordinates
                 .rotated_z(equinox_to_q)
                 .rotated_x(plane_tilt)
                 .rotated_z(w);
         } else {
+            let old_z = self.reference_frame.z_axis();
+            let equinox_to_q = QUARTER_CIRC - old_z.longitude;
+            let plane_tilt = QUARTER_CIRC - old_z.latitude;
+            let w = self.reference_frame.prime_meridian_offset();
             self.mathematical_coordinates = self
                 .mathematical_coordinates
                 .rotated_z(-w)
