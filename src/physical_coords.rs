@@ -1,6 +1,8 @@
 //! Defines the PhysicalCartesian struct.
 
-use crate::{reference_frame::ReferenceFrame, traits::*};
+use crate::{
+    angle_helper::QUARTER_CIRC, direction::Direction, reference_frame::ReferenceFrame, traits::*,
+};
 
 /// A wrapper around a Cartesian coordinate that is in a physical reference frame.
 #[derive(Debug, Clone)]
@@ -65,19 +67,38 @@ where
         if self.reference_frame == new_frame {
             return;
         }
-        todo!();
+
+        let new_z = new_frame.z_axis();
+        let equinox_to_q = QUARTER_CIRC - new_z.longitude;
+        let plane_tilt = QUARTER_CIRC - new_z.latitude;
+        let w = new_frame.prime_meridian_offset();
+        if new_frame != ReferenceFrame::Equatorial {
+            if self.reference_frame != ReferenceFrame::Equatorial {
+                self.change_reference_frame(ReferenceFrame::Equatorial);
+            }
+            self.mathematical_coordinates = self
+                .mathematical_coordinates
+                .rotated_z(equinox_to_q)
+                .rotated_x(plane_tilt)
+                .rotated_z(w);
+        } else {
+            self.mathematical_coordinates = self
+                .mathematical_coordinates
+                .rotated_z(-w)
+                .rotated_x(-plane_tilt)
+                .rotated_z(-equinox_to_q);
+        }
         self.reference_frame = new_frame;
     }
 
     /// Returns a new instance with the mathematical coordinates transformed to the new frame of reference.
     ///
-    /// The transformation is defined by a new z-axis, and an angle-parameter W that specifies the orientation of the new x-axis.
+    /// The transformation is defined by a new z-axis given in right ascension and declination, and the prime meridian offset that specifies the orientation of the new x-axis.
     /// Based on Fig. 1 of [the IAU report](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf), the algorithm is as follows:
-    /// - Express the new z-axis in the old reference frame.
-    /// - Convert that new-z-axis to spherical coordinates to determine the longitude (alpha) and latitude (delta) of the new z-axis.
-    /// - Rotate around the old z-axis by 90°-a. The current x-axis now points to the intermediate direction Q.
-    /// - Rotate around Q by 90°-d. The current z-axis now points to the new z-axis.
-    /// - Rotate around the new z-axis by W. The current x-axis now points to the new x-axis.
+    /// - If the coordinates are not currently given in equatorial coordinates, convert them to equatorial coordinates by following the inverse steps of this algorithm.
+    /// - Rotate around the old z-axis by 90°-a, where a is the right ascension of the new z-axis. The current x-axis now points to the intermediate direction Q.
+    /// - Rotate around Q by 90°-d, where d is the declination of the new z-axis. The current z-axis now points to the new z-axis.
+    /// - Rotate around the new z-axis by W, the prime meridian offset. The current x-axis now points to the new x-axis.
     ///
     /// # Example
     /// ```
