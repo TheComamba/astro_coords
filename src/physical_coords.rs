@@ -35,7 +35,7 @@ where
 
 impl<T> Physical<T> for PhysicalCoords<T>
 where
-    T: Mathematical + ActiveRotation<T> + AsRef<T>,
+    T: Mathematical + ActiveRotation<T> + AsRef<T> + Clone,
 {
     /// Returns the frame of reference that the mathematical coordinates are defined in.
     ///
@@ -52,6 +52,25 @@ where
 
     /// Changes the frame of reference, transforming the mathematical coordinates.
     ///
+    /// See the `in_reference_frame` method for a more detailed explanation of the transformation as well as a more detailed example.
+    ///
+    /// # Example
+    /// ```
+    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Direction};
+    ///
+    /// let mut physical = PhysicalCoords::new(Direction::Y, ReferenceFrame::Equatorial);
+    /// physical.change_reference_frame(ReferenceFrame::Ecliptic);
+    /// ```
+    fn change_reference_frame(&mut self, new_frame: ReferenceFrame) {
+        if self.reference_frame == new_frame {
+            return;
+        }
+        todo!();
+        self.reference_frame = new_frame;
+    }
+
+    /// Returns a new instance with the mathematical coordinates transformed to the new frame of reference.
+    ///
     /// The transformation is defined by a new z-axis, and an angle-parameter W that specifies the orientation of the new x-axis.
     /// Based on Fig. 1 of [the IAU report](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf), the algorithm is as follows:
     /// - Express the new z-axis in the old reference frame.
@@ -61,13 +80,35 @@ where
     /// - Rotate around the new z-axis by W. The current x-axis now points to the new x-axis.
     ///
     /// # Example
-    /// TODO
-    fn change_reference_frame(&mut self, new_frame: ReferenceFrame) {
-        if self.reference_frame == new_frame {
-            return;
-        }
-        todo!();
-        self.reference_frame = new_frame;
+    /// ```
+    /// use astro_coords::{PhysicalCoords, ReferenceFrame, Spherical};
+    /// use simple_si_units::angle::Angle;
+    ///
+    /// // As an example, the position of the star Sirius is expressed in various reference frames.
+    /// // The values are taken from [NASA's HEASARC Object Position Finder Tool](https://heasarc.gsfc.nasa.gov/cgi-bin/Tools/convcoord/convcoord.pl?CoordVal=Sirius&CoordType=J2000&Resolver=GRB%2FSIMBAD%2BSesame%2FNED&NoCache=on&Epoch=)
+    /// let equatorial = PhysicalCoords::new(Spherical::new(101.287155, -16.716116), ReferenceFrame::Equatorial);
+    /// let ecliptic = PhysicalCoords::new(Spherical::new(104.081665, -39.605249), ReferenceFrame::Ecliptic);
+    /// let galactic = PhysicalCoords::new(Spherical::new(227.230283, -8.890284), ReferenceFrame::Galactic);
+    ///
+    /// let equatorial_from_ecliptic = ecliptic.in_reference_frame(ReferenceFrame::Equatorial);
+    /// let equatorial_from_galactic = galactic.in_reference_frame(ReferenceFrame::Equatorial);
+    /// let ecliptic_from_equatorial = equatorial.in_reference_frame(ReferenceFrame::Ecliptic);
+    /// let ecliptic_from_galactic = galactic.in_reference_frame(ReferenceFrame::Ecliptic);
+    /// let galactic_from_equatorial = equatorial.in_reference_frame(ReferenceFrame::Galactic);
+    /// let galactic_from_ecliptic = ecliptic.in_reference_frame(ReferenceFrame::Galactic);
+    ///
+    /// let acc = Angle::from_deg(1e-5);
+    /// assert!(equatorial_from_ecliptic.mathematical_coordinates().eq_within(equatorial.mathematical_coordinates(), acc));
+    /// assert!(equatorial_from_galactic.mathematical_coordinates().eq_within(equatorial.mathematical_coordinates(), acc));
+    /// assert!(ecliptic_from_equatorial.mathematical_coordinates().eq_within(ecliptic.mathematical_coordinates(), acc));
+    /// assert!(ecliptic_from_galactic.mathematical_coordinates().eq_within(ecliptic.mathematical_coordinates(), acc));
+    /// assert!(galactic_from_equatorial.mathematical_coordinates().eq_within(galactic.mathematical_coordinates(), acc));
+    /// assert!(galactic_from_ecliptic.mathematical_coordinates().eq_within(galactic.mathematical_coordinates(), acc));
+    /// ```
+    fn in_reference_frame(&self, new_frame: ReferenceFrame) -> PhysicalCoords<T> {
+        let mut new = self.clone();
+        new.change_reference_frame(new_frame);
+        new
     }
 
     /// Overwrites the frame of reference without transforming the mathematical coordinates.

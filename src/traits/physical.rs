@@ -12,6 +12,9 @@ pub trait Physical<T: Mathematical> {
     /// Changes the frame of reference, transforming the mathematical coordinates.
     fn change_reference_frame(&mut self, new_frame: ReferenceFrame);
 
+    /// Returns a new instance with the mathematical coordinates transformed to the new frame of reference.
+    fn in_reference_frame(&self, new_frame: ReferenceFrame) -> Self;
+
     /// Overwrites the frame of reference without transforming the mathematical coordinates.
     fn overwrite_reference_frame(&mut self, new_frame: ReferenceFrame);
 }
