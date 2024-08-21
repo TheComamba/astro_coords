@@ -1,14 +1,14 @@
 //! Defines the PhysicalCartesian struct.
 
-use crate::{
-    angle_helper::QUARTER_CIRC, direction::Direction, reference_frame::ReferenceFrame, traits::*,
-};
+use std::fmt::Display;
+
+use crate::{angle_helper::QUARTER_CIRC, reference_frame::ReferenceFrame, traits::*};
 
 /// A wrapper around a Cartesian coordinate that is in a physical reference frame.
 #[derive(Debug, Clone)]
 pub struct PhysicalCoords<T>
 where
-    T: Mathematical + ActiveRotation<T> + AsRef<T>,
+    T: Mathematical + ActiveRotation<T> + AsRef<T> + Display,
 {
     reference_frame: ReferenceFrame,
     mathematical_coordinates: T,
@@ -16,7 +16,7 @@ where
 
 impl<T> PhysicalCoords<T>
 where
-    T: Mathematical + ActiveRotation<T> + AsRef<T>,
+    T: Mathematical + ActiveRotation<T> + AsRef<T> + Display,
 {
     /// Create a new PhysicalCartesian object.
     ///
@@ -39,7 +39,7 @@ where
 
 impl<T> Physical<T> for PhysicalCoords<T>
 where
-    T: Mathematical + ActiveRotation<T> + AsRef<T> + Clone,
+    T: Mathematical + ActiveRotation<T> + AsRef<T> + Clone + Display,
 {
     /// Returns the frame of reference that the mathematical coordinates are defined in.
     ///
@@ -189,7 +189,7 @@ where
 
 impl<T> ActiveRotation<PhysicalCoords<T>> for PhysicalCoords<T>
 where
-    T: Mathematical + ActiveRotation<T> + AsRef<T>,
+    T: Mathematical + ActiveRotation<T> + AsRef<T> + Display,
 {
     fn rotated(
         &self,
@@ -230,6 +230,16 @@ where
                 .mathematical_coordinates
                 .active_rotation_to_new_z_axis(&new_z.mathematical_coordinates),
         }
+    }
+}
+
+impl Display for PhysicalCoords<crate::direction::Direction> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{} in {} coordinates",
+            self.mathematical_coordinates, self.reference_frame
+        )
     }
 }
 
