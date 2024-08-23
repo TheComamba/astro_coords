@@ -245,7 +245,11 @@ impl Display for PhysicalCoords<crate::direction::Direction> {
 
 #[cfg(test)]
 mod tests {
-    use crate::direction::Direction;
+    use std::f64::consts::PI;
+
+    use simple_si_units::geometry::Angle;
+
+    use crate::{direction::Direction, ra_and_dec::RightAscension, spherical::Spherical};
 
     use super::*;
 
@@ -259,5 +263,39 @@ mod tests {
         assert!(physical
             .mathematical_coordinates
             .eq_within(&Direction::X, 1e-5));
+    }
+
+    #[test]
+    fn the_equations_for_changing_from_equatorial_to_galactic_reference_hold() {
+        // https://en.wikipedia.org/wiki/Galactic_coordinate_system#Conversion_between_equatorial_and_galactic_coordinates
+        let angp = RightAscension::new(12, 51, 24.).to_angle().rad as f64;
+        let dngp = Angle::from_deg(27.13).rad as f64;
+        let lncp = Angle::from_deg(122.93314).rad as f64;
+
+        let angles = vec![0., PI, 0.3, 1.4, -1.4, 3.5, 7.];
+        for ra in angles.clone() {
+            for dec in angles.clone() {
+                let equatorial = PhysicalCoords::new(
+                    Spherical::new(Angle { rad: ra }, Angle { rad: dec }),
+                    ReferenceFrame::Equatorial,
+                );
+                let galactic = equatorial.in_reference_frame(ReferenceFrame::Galactic);
+                let galactic_coords = galactic.mathematical_coordinates();
+                let l = galactic_coords.longitude.rad;
+                let b = galactic_coords.latitude.rad;
+
+                let lefthand = b.sin();
+                let righthand = dngp.sin() * dec.sin() + dngp.cos() * dec.cos() * (ra - angp).cos();
+                assert!((lefthand - righthand).abs() < 1e-5, "ra: {}, dec: {}", ra, dec);
+
+                let lefthand = b.cos() * (lncp - l).sin();
+                let righthand = dec.cos() * (ra - angp).sin();
+                assert!((lefthand - righthand).abs() < 1e-5, "ra: {}, dec: {}", ra, dec);
+
+                let lefthand = b.cos() * (lncp - l).cos();
+                let righthand = dngp.cos() * dec.sin() - dngp.sin() * dec.cos() * (ra - angp).cos();
+                assert!((lefthand - righthand).abs() < 1e-5, "ra: {}, dec: {}", ra, dec);
+            }
+        }
     }
 }
