@@ -249,7 +249,10 @@ mod tests {
 
     use simple_si_units::geometry::Angle;
 
-    use crate::{direction::Direction, ra_and_dec::RightAscension, spherical::Spherical};
+    use crate::{
+        angle_helper::EARTH_AXIS_TILT, direction::Direction, ra_and_dec::RightAscension,
+        spherical::Spherical,
+    };
 
     use super::*;
 
@@ -263,6 +266,54 @@ mod tests {
         assert!(physical
             .mathematical_coordinates
             .eq_within(&Direction::X, 1e-5));
+    }
+
+    #[test]
+    fn the_equations_for_changing_from_equatorial_to_ecliptic_reference_hold() {
+        // https://aas.aanda.org/articles/aas/full/1998/01/ds1449/node3.html
+
+        let e = EARTH_AXIS_TILT.rad;
+
+        let angles = vec![0., PI, 0.3, 1.4, -1.4, 3.5, 7.];
+        for ra in angles.clone() {
+            for dec in angles.clone() {
+                let equatorial = PhysicalCoords::new(
+                    Spherical::new(Angle { rad: ra }, Angle { rad: dec }),
+                    ReferenceFrame::Equatorial,
+                );
+                let ecliptic = equatorial.in_reference_frame(ReferenceFrame::Ecliptic);
+                let ecliptic_coords = ecliptic.mathematical_coordinates();
+                let l = ecliptic_coords.longitude.rad;
+                let b = ecliptic_coords.latitude.rad;
+
+                let lefthand = b.sin();
+                let righthand = dec.sin() * e.cos() - dec.cos() * ra.sin() * e.sin();
+                assert!(
+                    (lefthand - righthand).abs() < 1e-5,
+                    "ra: {}, dec: {}",
+                    ra,
+                    dec
+                );
+
+                let lefthand = ra.cos() * dec.cos();
+                let righthand = l.cos() * b.cos();
+                assert!(
+                    (lefthand - righthand).abs() < 1e-5,
+                    "ra: {}, dec: {}",
+                    ra,
+                    dec
+                );
+
+                let lefthand = ra.sin() * dec.cos();
+                let righthand = -b.sin() * e.cos() + b.cos() * e.cos() * l.sin();
+                assert!(
+                    (lefthand - righthand).abs() < 1e-5,
+                    "ra: {}, dec: {}",
+                    ra,
+                    dec
+                );
+            }
+        }
     }
 
     #[test]
@@ -286,15 +337,30 @@ mod tests {
 
                 let lefthand = b.sin();
                 let righthand = dngp.sin() * dec.sin() + dngp.cos() * dec.cos() * (ra - angp).cos();
-                assert!((lefthand - righthand).abs() < 1e-5, "ra: {}, dec: {}", ra, dec);
+                assert!(
+                    (lefthand - righthand).abs() < 1e-5,
+                    "ra: {}, dec: {}",
+                    ra,
+                    dec
+                );
 
                 let lefthand = b.cos() * (lncp - l).sin();
                 let righthand = dec.cos() * (ra - angp).sin();
-                assert!((lefthand - righthand).abs() < 1e-5, "ra: {}, dec: {}", ra, dec);
+                assert!(
+                    (lefthand - righthand).abs() < 1e-5,
+                    "ra: {}, dec: {}",
+                    ra,
+                    dec
+                );
 
                 let lefthand = b.cos() * (lncp - l).cos();
                 let righthand = dngp.cos() * dec.sin() - dngp.sin() * dec.cos() * (ra - angp).cos();
-                assert!((lefthand - righthand).abs() < 1e-5, "ra: {}, dec: {}", ra, dec);
+                assert!(
+                    (lefthand - righthand).abs() < 1e-5,
+                    "ra: {}, dec: {}",
+                    ra,
+                    dec
+                );
             }
         }
     }
