@@ -5,7 +5,7 @@ use std::fmt::Display;
 use simple_si_units::geometry::Angle;
 
 use crate::{
-    angle_helper::{EARTH_AXIS_TILT, QUARTER_CIRC},
+    angle_helper::{EARTH_AXIS_TILT, HALF_CIRC, QUARTER_CIRC},
     ra_and_dec::RightAscension,
     spherical::Spherical,
 };
@@ -71,7 +71,7 @@ impl ReferenceFrame {
     /// ```
     pub fn z_axis(&self) -> Spherical {
         match self {
-            ReferenceFrame::Equatorial => Spherical::Z_DIRECTION,
+            ReferenceFrame::Equatorial => Spherical::new(HALF_CIRC, QUARTER_CIRC),
             ReferenceFrame::Ecliptic => {
                 Spherical::new(-QUARTER_CIRC, QUARTER_CIRC - EARTH_AXIS_TILT)
             }
@@ -116,7 +116,7 @@ impl ReferenceFrame {
     pub fn prime_meridian_offset(&self) -> Angle<f64> {
         match self {
             ReferenceFrame::Equatorial => Angle::from_deg(0.),
-            ReferenceFrame::Ecliptic => Angle::from_deg(0.),
+            ReferenceFrame::Ecliptic => HALF_CIRC,
             ReferenceFrame::Galactic => Angle::from_deg(0.),
         }
     }

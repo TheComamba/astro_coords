@@ -287,7 +287,7 @@ mod tests {
                 let b = ecliptic_coords.latitude.rad;
 
                 let lefthand = b.sin();
-                let righthand = dec.sin() * e.cos() - dec.cos() * ra.sin() * e.sin();
+                let righthand = dec.sin() * e.cos() - dec.cos() * e.sin() * ra.sin();
                 assert!(
                     (lefthand - righthand).abs() < 1e-5,
                     "ra: {}, dec: {}",
@@ -304,8 +304,8 @@ mod tests {
                     dec
                 );
 
-                let lefthand = ra.sin() * dec.cos();
-                let righthand = -b.sin() * e.cos() + b.cos() * e.cos() * l.sin();
+                let lefthand = l.sin() * b.cos();
+                let righthand = dec.sin() * e.cos() + dec.cos() * e.cos() * ra.sin();
                 assert!(
                     (lefthand - righthand).abs() < 1e-5,
                     "ra: {}, dec: {}",
