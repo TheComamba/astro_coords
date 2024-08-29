@@ -3,7 +3,10 @@
 use std::fmt::Display;
 
 use crate::{
-    angle_helper::{EARTH_AXIS_TILT, QUARTER_CIRC},
+    angle_helper::{
+        DEC_OF_GALACTIC_NORTH, EARTH_AXIS_TILT, GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE,
+        HALF_CIRC, QUARTER_CIRC, RA_OF_GALACTIC_NORTH,
+    },
     reference_frame::ReferenceFrame,
     traits::*,
 };
@@ -44,7 +47,13 @@ where
         self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(EARTH_AXIS_TILT);
     }
 
-    fn change_from_galactic_to_equatorial(&mut self) {}
+    fn change_from_galactic_to_equatorial(&mut self) {
+        self.mathematical_coordinates = self
+            .mathematical_coordinates
+            .rotated_z(GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE - HALF_CIRC)
+            .rotated_y(DEC_OF_GALACTIC_NORTH - QUARTER_CIRC)
+            .rotated_z(-RA_OF_GALACTIC_NORTH);
+    }
 
     fn change_from_cartographic_to_equatorial(&mut self) {
         let old_z = self.reference_frame.z_axis();
@@ -70,7 +79,13 @@ where
         self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(-EARTH_AXIS_TILT);
     }
 
-    fn change_from_equatorial_to_galactic(&mut self) {}
+    fn change_from_equatorial_to_galactic(&mut self) {
+        self.mathematical_coordinates = self
+            .mathematical_coordinates
+            .rotated_z(RA_OF_GALACTIC_NORTH)
+            .rotated_y(QUARTER_CIRC - DEC_OF_GALACTIC_NORTH)
+            .rotated_z(HALF_CIRC - GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE);
+    }
 
     fn change_from_equatorial_to_cartographic(&mut self, new_frame: ReferenceFrame) {
         let new_z = new_frame.z_axis();

@@ -12,6 +12,15 @@ pub(crate) const DEGREE: Angle<f64> = Angle {
 pub(crate) const EARTH_AXIS_TILT: Angle<f64> = Angle {
     rad: 23.439_281 * DEGREE.rad,
 };
+pub(crate) const GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE: Angle<f64> = Angle {
+    rad: 122.93314 * DEGREE.rad,
+};
+pub(crate) const RA_OF_GALACTIC_NORTH: Angle<f64> = Angle {
+    rad: 3.3658674624710652,
+};
+pub(crate) const DEC_OF_GALACTIC_NORTH: Angle<f64> = Angle {
+    rad: 27.13 * DEGREE.rad,
+};
 
 pub(crate) fn angle_eq_within(
     actual: Angle<f64>,
