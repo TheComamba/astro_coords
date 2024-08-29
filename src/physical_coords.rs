@@ -345,7 +345,7 @@ mod tests {
                 );
 
                 let lefthand = l.sin() * b.cos();
-                let righthand = dec.sin() * e.cos() + dec.cos() * e.cos() * ra.sin();
+                let righthand = dec.sin() * e.sin() + dec.cos() * e.cos() * ra.sin();
                 assert!(
                     (lefthand - righthand).abs() < 1e-5,
                     "ra: {}, dec: {}",
