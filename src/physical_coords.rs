@@ -2,7 +2,11 @@
 
 use std::fmt::Display;
 
-use crate::{angle_helper::QUARTER_CIRC, reference_frame::ReferenceFrame, traits::*};
+use crate::{
+    angle_helper::{EARTH_AXIS_TILT, QUARTER_CIRC},
+    reference_frame::ReferenceFrame,
+    traits::*,
+};
 
 /// A wrapper around a Cartesian coordinate that is in a physical reference frame.
 #[derive(Debug, Clone)]
@@ -36,7 +40,13 @@ where
         }
     }
 
-    fn change_to_equatorial(&mut self) {
+    fn change_from_ecliptic_to_equatorial(&mut self) {
+        self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(EARTH_AXIS_TILT);
+    }
+
+    fn change_from_galactic_to_equatorial(&mut self) {}
+
+    fn change_from_cartographic_to_equatorial(&mut self) {
         let old_z = self.reference_frame.z_axis();
         let equinox_to_q = QUARTER_CIRC - old_z.longitude;
         let plane_tilt = QUARTER_CIRC - old_z.latitude;
@@ -48,7 +58,21 @@ where
             .rotated_z(-equinox_to_q);
     }
 
-    fn change_from_equatorial(&mut self, new_frame: ReferenceFrame) {
+    fn change_to_equatorial(&mut self) {
+        match self.reference_frame {
+            ReferenceFrame::Equatorial => {}
+            ReferenceFrame::Ecliptic => self.change_from_ecliptic_to_equatorial(),
+            ReferenceFrame::Galactic => self.change_from_galactic_to_equatorial(),
+        }
+    }
+
+    fn change_from_equatorial_to_ecliptic(&mut self) {
+        self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(-EARTH_AXIS_TILT);
+    }
+
+    fn change_from_equatorial_to_galactic(&mut self) {}
+
+    fn change_from_equatorial_to_cartographic(&mut self, new_frame: ReferenceFrame) {
         let new_z = new_frame.z_axis();
         let equinox_to_q = QUARTER_CIRC - new_z.longitude;
         let plane_tilt = QUARTER_CIRC - new_z.latitude;
@@ -58,6 +82,14 @@ where
             .rotated_z(equinox_to_q)
             .rotated_x(plane_tilt)
             .rotated_z(w);
+    }
+
+    fn change_from_equatorial(&mut self, new_frame: ReferenceFrame) {
+        match new_frame {
+            ReferenceFrame::Equatorial => {}
+            ReferenceFrame::Ecliptic => self.change_from_equatorial_to_ecliptic(),
+            ReferenceFrame::Galactic => self.change_from_equatorial_to_galactic(),
+        }
     }
 }
 
