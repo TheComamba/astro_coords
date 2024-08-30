@@ -3,10 +3,7 @@
 use std::fmt::Display;
 
 use crate::{
-    angle_helper::{
-        DEC_OF_GALACTIC_NORTH, EARTH_AXIS_TILT, GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE,
-        HALF_CIRC, QUARTER_CIRC, RA_OF_GALACTIC_NORTH,
-    },
+    angle_helper::*,
     reference_frame::{CelestialBody, ReferenceFrame},
     traits::*,
 };
@@ -55,8 +52,7 @@ where
             .rotated_z(RA_OF_GALACTIC_NORTH);
     }
 
-    fn change_from_cartographic_to_equatorial(&mut self) {
-        let celestial_body: CelestialBody = todo!();
+    fn change_from_cartographic_to_equatorial(&mut self, celestial_body: CelestialBody) {
         let old_z = celestial_body.z_axis();
         let equinox_to_q = QUARTER_CIRC - old_z.longitude;
         let plane_tilt = QUARTER_CIRC - old_z.latitude;
@@ -73,6 +69,7 @@ where
             ReferenceFrame::Equatorial => {}
             ReferenceFrame::Ecliptic => self.change_from_ecliptic_to_equatorial(),
             ReferenceFrame::Galactic => self.change_from_galactic_to_equatorial(),
+            ReferenceFrame::Cartographic(body) => self.change_from_cartographic_to_equatorial(body),
         }
     }
 
@@ -105,6 +102,7 @@ where
             ReferenceFrame::Equatorial => {}
             ReferenceFrame::Ecliptic => self.change_from_equatorial_to_ecliptic(),
             ReferenceFrame::Galactic => self.change_from_equatorial_to_galactic(),
+            ReferenceFrame::Cartographic(body) => self.change_from_equatorial_to_cartographic(body),
         }
     }
 }

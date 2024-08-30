@@ -99,7 +99,7 @@ impl Display for CelestialBody {
             CelestialBody::Custom(ra, dec) => {
                 write!(f, "Custom body with RA={} and Dec={}", ra, dec)
             }
-            CelestialBody::Sun => write!(f, "the Sun"),
+            CelestialBody::Sun => write!(f, "Sun"),
             CelestialBody::Mercury => write!(f, "Mercury"),
             CelestialBody::Venus => write!(f, "Venus"),
             CelestialBody::Earth => write!(f, "Earth"),

@@ -2,13 +2,7 @@
 
 use std::fmt::Display;
 
-use simple_si_units::geometry::Angle;
-
-use crate::{
-    angle_helper::{EARTH_AXIS_TILT, HALF_CIRC, QUARTER_CIRC},
-    ra_and_dec::RightAscension,
-    spherical::Spherical,
-};
+use super::CelestialBody;
 
 /// A reference frame provides the connection between mathematical coordinates (say, (0,0,1) or the z-direction) and physical positions or directions (say, the direction of the North Pole of earth).
 ///
@@ -33,6 +27,11 @@ pub enum ReferenceFrame {
     ///
     /// Galactic coordinates are oriented such that the z-axis points along the normal of the plane of the Milky Way galaxy. The x-axis points towards the galactic center, and the y-axis completes the right-handed coordinate system.
     Galactic,
+    /// The co-rotating reference frame for a specific celestial body.
+    ///
+    /// The z-axis points along the north pole of the celestial body, which is not necessarily to axis of positive rotation, but rather the axis of rotation that points towards the positive half-dome of the ecliptic.
+    /// The x-axis points along a direction usually specified by tome distinguishable feature of the body, which is recommended by the IAU working group.
+    Cartographic(CelestialBody),
 }
 
 impl Display for ReferenceFrame {
@@ -41,6 +40,7 @@ impl Display for ReferenceFrame {
             ReferenceFrame::Equatorial => write!(f, "Equatorial"),
             ReferenceFrame::Ecliptic => write!(f, "Ecliptic"),
             ReferenceFrame::Galactic => write!(f, "Galactic"),
+            ReferenceFrame::Cartographic(body) => write!(f, "{} Cartographic", body),
         }
     }
 }

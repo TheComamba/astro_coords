@@ -19,7 +19,10 @@ pub mod constants {
 
 #[cfg(test)]
 pub mod examples {
-    use astro_coords::{physical_coords::PhysicalCoords, reference_frame::ReferenceFrame};
+    use astro_coords::{
+        physical_coords::PhysicalCoords,
+        reference_frame::{CelestialBody, ReferenceFrame},
+    };
 
     use super::*;
 
@@ -114,12 +117,30 @@ pub mod examples {
         examples
     }
 
-    pub fn reference_frame_examples() -> Vec<ReferenceFrame> {
+    pub fn celestial_body_examples() -> Vec<CelestialBody> {
         vec![
+            CelestialBody::Sun,
+            CelestialBody::Mercury,
+            CelestialBody::Venus,
+            CelestialBody::Earth,
+            CelestialBody::Mars,
+            CelestialBody::Jupiter,
+            CelestialBody::Saturn,
+            CelestialBody::Uranus,
+            CelestialBody::Neptune,
+        ]
+    }
+
+    pub fn reference_frame_examples() -> Vec<ReferenceFrame> {
+        let mut vec = vec![
             ReferenceFrame::Equatorial,
             ReferenceFrame::Ecliptic,
             ReferenceFrame::Galactic,
-        ]
+        ];
+        for body in celestial_body_examples() {
+            vec.push(ReferenceFrame::Cartographic(body));
+        }
+        vec
     }
 
     pub fn physical_cartesian_examples() -> Vec<PhysicalCoords<Cartesian>> {
