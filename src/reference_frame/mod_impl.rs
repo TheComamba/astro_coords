@@ -33,7 +33,7 @@ pub enum ReferenceFrame {
     ///
     /// The z-axis points along the north pole of the celestial body, which is not necessarily to axis of positive rotation, but rather the axis of rotation that points towards the positive half-dome of the ecliptic.
     /// The x-axis points along a direction usually specified by tome distinguishable feature of the body, which is recommended by the IAU working group.
-    Cartographic((CelestialBody, Time<f64>)),
+    Cartographic(CelestialBody, Time<f64>),
 }
 
 impl Display for ReferenceFrame {
@@ -42,7 +42,7 @@ impl Display for ReferenceFrame {
             ReferenceFrame::Equatorial => write!(f, "Equatorial"),
             ReferenceFrame::Ecliptic => write!(f, "Ecliptic"),
             ReferenceFrame::Galactic => write!(f, "Galactic"),
-            ReferenceFrame::Cartographic((body, _)) => write!(f, "{} Cartographic", body),
+            ReferenceFrame::Cartographic(body, _) => write!(f, "{} Cartographic", body),
         }
     }
 }
@@ -50,7 +50,9 @@ impl Display for ReferenceFrame {
 impl PartialEq for ReferenceFrame {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (ReferenceFrame::Cartographic(_), _) | (_, ReferenceFrame::Cartographic(_)) => false,
+            (ReferenceFrame::Cartographic(_, _), _) | (_, ReferenceFrame::Cartographic(_, _)) => {
+                false
+            }
             _ => std::mem::discriminant(self) == std::mem::discriminant(other),
         }
     }
@@ -66,7 +68,7 @@ mod tests {
     fn cartographic_reference_frames_are_never_equal() {
         let body = CelestialBody::Sun;
         let time = Time::from_s(0.0);
-        let cartographic_ref = ReferenceFrame::Cartographic((body, time));
+        let cartographic_ref = ReferenceFrame::Cartographic(body, time);
 
         assert_ne!(cartographic_ref, ReferenceFrame::Equatorial);
         assert_ne!(cartographic_ref, cartographic_ref);

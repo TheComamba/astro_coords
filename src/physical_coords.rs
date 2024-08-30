@@ -75,7 +75,7 @@ where
             ReferenceFrame::Equatorial => {}
             ReferenceFrame::Ecliptic => self.change_from_ecliptic_to_equatorial(),
             ReferenceFrame::Galactic => self.change_from_galactic_to_equatorial(),
-            ReferenceFrame::Cartographic((body, time)) => {
+            ReferenceFrame::Cartographic(body, time) => {
                 self.change_from_cartographic_to_equatorial(body, time)
             }
         }
@@ -114,7 +114,7 @@ where
             ReferenceFrame::Equatorial => {}
             ReferenceFrame::Ecliptic => self.change_from_equatorial_to_ecliptic(),
             ReferenceFrame::Galactic => self.change_from_equatorial_to_galactic(),
-            ReferenceFrame::Cartographic((body, time)) => {
+            ReferenceFrame::Cartographic(body, time) => {
                 self.change_from_equatorial_to_cartographic(body, time)
             }
         }

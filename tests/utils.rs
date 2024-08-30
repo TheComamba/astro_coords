@@ -150,7 +150,7 @@ pub mod examples {
         ];
         for body in celestial_body_examples() {
             for time in long_time_examples() {
-                vec.push(ReferenceFrame::Cartographic((body, time)));
+                vec.push(ReferenceFrame::Cartographic(body, time));
             }
         }
         vec
