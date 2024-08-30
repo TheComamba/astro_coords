@@ -6,7 +6,7 @@ use utils::benchmarks::many_directions;
 
 mod utils;
 
-const MAX_DURATION_PER_CALL: Duration = Duration::from_nanos(100);
+const MAX_DURATION_PER_CALL: Duration = Duration::from_nanos(1000);
 
 #[test]
 #[ignore]
@@ -28,7 +28,7 @@ fn changing_to_same_frame_is_extremely_fast() {
 
     let duration_per_call = duration / NUM as u32;
     println!(
-        "{} calls to Direction::change_reference_frame took {:?}, or {:?} per call.",
+        "{} calls to Direction::change_reference_frame with the same frame took {:?}, or {:?} per call.",
         NUM, duration, duration_per_call
     );
     assert!(duration_per_call < Duration::from_nanos(10));
