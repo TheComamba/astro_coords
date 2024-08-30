@@ -50,9 +50,9 @@ where
     fn change_from_galactic_to_equatorial(&mut self) {
         self.mathematical_coordinates = self
             .mathematical_coordinates
-            .rotated_z(GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE - HALF_CIRC)
+            .rotated_z(HALF_CIRC - GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE)
             .rotated_y(QUARTER_CIRC - DEC_OF_GALACTIC_NORTH)
-            .rotated_z(-RA_OF_GALACTIC_NORTH);
+            .rotated_z(RA_OF_GALACTIC_NORTH);
     }
 
     fn change_from_cartographic_to_equatorial(&mut self) {
@@ -82,9 +82,9 @@ where
     fn change_from_equatorial_to_galactic(&mut self) {
         self.mathematical_coordinates = self
             .mathematical_coordinates
-            .rotated_z(RA_OF_GALACTIC_NORTH)
+            .rotated_z(-RA_OF_GALACTIC_NORTH)
             .rotated_y(DEC_OF_GALACTIC_NORTH - QUARTER_CIRC)
-            .rotated_z(HALF_CIRC - GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE);
+            .rotated_z(GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE - HALF_CIRC);
     }
 
     fn change_from_equatorial_to_cartographic(&mut self, new_frame: ReferenceFrame) {
