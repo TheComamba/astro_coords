@@ -51,7 +51,7 @@ where
         self.mathematical_coordinates = self
             .mathematical_coordinates
             .rotated_z(GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE - HALF_CIRC)
-            .rotated_y(DEC_OF_GALACTIC_NORTH - QUARTER_CIRC)
+            .rotated_y(QUARTER_CIRC - DEC_OF_GALACTIC_NORTH)
             .rotated_z(-RA_OF_GALACTIC_NORTH);
     }
 
@@ -83,7 +83,7 @@ where
         self.mathematical_coordinates = self
             .mathematical_coordinates
             .rotated_z(RA_OF_GALACTIC_NORTH)
-            .rotated_y(QUARTER_CIRC - DEC_OF_GALACTIC_NORTH)
+            .rotated_y(DEC_OF_GALACTIC_NORTH - QUARTER_CIRC)
             .rotated_z(HALF_CIRC - GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE);
     }
 
