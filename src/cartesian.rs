@@ -67,6 +67,14 @@ pub struct Cartesian {
     pub z: Distance<f64>,
 }
 
+impl Mathematical for Cartesian {}
+
+impl AsRef<Cartesian> for Cartesian {
+    fn as_ref(&self) -> &Cartesian {
+        self
+    }
+}
+
 impl Cartesian {
     /// The origin of the coordinate system, given by (x,y,z)=(0,0,0).
     pub const ORIGIN: Cartesian = Cartesian {

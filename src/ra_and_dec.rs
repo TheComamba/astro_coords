@@ -7,6 +7,8 @@ use std::fmt::Display;
 ///
 /// It is measured in hours, minutes, and seconds, with 24 hours corresponding to a full circle.
 ///
+/// The main functionality of this struct is to convert from hours, minutes, and seconds to an angle.
+///
 /// # Examples
 /// ```
 /// use astro_coords::ra_and_dec::RightAscension;
@@ -39,6 +41,8 @@ pub struct RightAscension {
 /// It is measured in degrees, arcminutes, and arcseconds.
 /// 90 degrees correspond to the north celestial pole and -90 degrees to the south celestial pole.
 /// One arcminute is 1/60 of a degree, and one arcsecond is 1/60 of an arcminute.
+///
+/// The main functionality of this struct is to convert from degrees, arcminutes, and arcseconds to an angle.
 ///
 /// # Examples
 /// ```

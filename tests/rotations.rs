@@ -1,44 +1,12 @@
 use astro_coords::{direction::Direction, traits::*};
-use simple_si_units::geometry::Angle;
+use utils::{constants::*, examples::*};
 
-const ACC: f64 = 1e-5;
-const ANGLE_ACC: Angle<f64> = Angle { rad: ACC };
-
-fn example_angles() -> Vec<Angle<f64>> {
-    vec![
-        Angle::from_deg(0.0),
-        Angle::from_deg(45.0),
-        Angle::from_deg(90.0),
-        Angle::from_deg(135.0),
-        Angle::from_deg(180.0),
-        Angle::from_deg(225.0),
-        Angle::from_deg(270.0),
-        Angle::from_deg(315.0),
-        Angle::from_deg(360.0),
-        Angle::from_deg(123.4),
-    ]
-}
-
-fn example_directions() -> Vec<Direction> {
-    let ordinates = vec![0.0, 0.5, -0.1, 12.0];
-    let mut directions = Vec::new();
-    for x in ordinates.iter() {
-        for y in ordinates.iter() {
-            for z in ordinates.iter() {
-                let direction = Direction::new(*x, *y, *z);
-                if let Ok(dir) = direction {
-                    directions.push(dir);
-                }
-            }
-        }
-    }
-    directions
-}
+mod utils;
 
 #[test]
 fn rotated_x_is_the_same_as_rotation_around_x() {
-    for vec in example_directions() {
-        for angle in example_angles() {
+    for vec in direction_examples() {
+        for angle in angle_examples() {
             let rotated_1 = vec.rotated_x(angle);
             let rotated_2 = vec.rotated(angle, &Direction::X);
             assert!(rotated_1.eq_within(&rotated_2, ACC));
@@ -48,8 +16,8 @@ fn rotated_x_is_the_same_as_rotation_around_x() {
 
 #[test]
 fn rotated_y_is_the_same_as_rotation_around_y() {
-    for vec in example_directions() {
-        for angle in example_angles() {
+    for vec in direction_examples() {
+        for angle in angle_examples() {
             let rotated_1 = vec.rotated_y(angle);
             let rotated_2 = vec.rotated(angle, &Direction::Y);
             assert!(rotated_1.eq_within(&rotated_2, ACC));
@@ -59,8 +27,8 @@ fn rotated_y_is_the_same_as_rotation_around_y() {
 
 #[test]
 fn rotated_z_is_the_same_as_rotation_around_z() {
-    for vec in example_directions() {
-        for angle in example_angles() {
+    for vec in direction_examples() {
+        for angle in angle_examples() {
             let rotated_1 = vec.rotated_z(angle);
             let rotated_2 = vec.rotated(angle, &Direction::Z);
             assert!(rotated_1.eq_within(&rotated_2, ACC));
@@ -70,9 +38,9 @@ fn rotated_z_is_the_same_as_rotation_around_z() {
 
 #[test]
 fn rotated_is_the_same_for_direction_and_spherical() {
-    for vec in example_directions() {
-        for angle in example_angles() {
-            for axis in example_directions() {
+    for vec in direction_examples() {
+        for angle in angle_examples() {
+            for axis in direction_examples() {
                 let rotated_dir = vec.rotated(angle, &axis);
 
                 let spherical_dir = vec.to_spherical();
@@ -92,8 +60,8 @@ fn rotated_is_the_same_for_direction_and_spherical() {
 
 #[test]
 fn rotated_x_is_the_same_for_direction_and_spherical() {
-    for vec in example_directions() {
-        for angle in example_angles() {
+    for vec in direction_examples() {
+        for angle in angle_examples() {
             let rotated_dir = vec.rotated_x(angle);
 
             let spherical_dir = vec.to_spherical();
@@ -112,8 +80,8 @@ fn rotated_x_is_the_same_for_direction_and_spherical() {
 
 #[test]
 fn rotated_y_is_the_same_for_direction_and_spherical() {
-    for vec in example_directions() {
-        for angle in example_angles() {
+    for vec in direction_examples() {
+        for angle in angle_examples() {
             let rotated_dir = vec.rotated_y(angle);
 
             let spherical_dir = vec.to_spherical();
@@ -132,8 +100,8 @@ fn rotated_y_is_the_same_for_direction_and_spherical() {
 
 #[test]
 fn rotated_z_is_the_same_for_direction_and_spherical() {
-    for vec in example_directions() {
-        for angle in example_angles() {
+    for vec in direction_examples() {
+        for angle in angle_examples() {
             let rotated_dir = vec.rotated_z(angle);
 
             let spherical_dir = vec.to_spherical();
@@ -154,8 +122,8 @@ fn rotated_z_is_the_same_for_direction_and_spherical() {
 
 #[test]
 fn active_rotation_is_the_same_for_direction_and_spherical() {
-    for new_z in example_directions() {
-        for vec in example_directions() {
+    for new_z in direction_examples() {
+        for vec in direction_examples() {
             let rotated_dir = vec.active_rotation_to_new_z_axis(&new_z);
 
             let spherical_new_z = new_z.to_spherical();
@@ -178,8 +146,8 @@ fn active_rotation_is_the_same_for_direction_and_spherical() {
 
 #[test]
 fn passive_rotation_is_the_same_for_direction_and_spherical() {
-    for new_z in example_directions() {
-        for vec in example_directions() {
+    for new_z in direction_examples() {
+        for vec in direction_examples() {
             let rotated_dir = vec.passive_rotation_to_new_z_axis(&new_z);
 
             let spherical_new_z = new_z.to_spherical();

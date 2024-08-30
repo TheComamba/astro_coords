@@ -26,6 +26,14 @@ pub struct Direction {
     pub(super) z: f64,
 }
 
+impl AsRef<Direction> for Direction {
+    fn as_ref(&self) -> &Direction {
+        self
+    }
+}
+
+impl Mathematical for Direction {}
+
 impl Direction {
     /// A normalised vector pointing in x-Direction.
     pub const X: Direction = Direction {
