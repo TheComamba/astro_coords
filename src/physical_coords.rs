@@ -195,7 +195,7 @@ where
     /// let galactic_from_equatorial = equatorial.in_reference_frame(ReferenceFrame::Galactic);
     /// let galactic_from_ecliptic = ecliptic.in_reference_frame(ReferenceFrame::Galactic);
     ///
-    /// let acc = Angle::from_deg(1e-5);
+    /// let acc = Angle::from_deg(1e-1); // Rotations can include some significant loss of accuracy.
     /// assert!(equatorial_from_ecliptic.mathematical_coordinates().eq_within(equatorial.mathematical_coordinates(), acc));
     /// assert!(equatorial_from_galactic.mathematical_coordinates().eq_within(equatorial.mathematical_coordinates(), acc));
     /// assert!(ecliptic_from_equatorial.mathematical_coordinates().eq_within(ecliptic.mathematical_coordinates(), acc));
