@@ -2,6 +2,8 @@
 
 use std::fmt::Display;
 
+use simple_si_units::base::Time;
+
 use crate::{
     angle_helper::*,
     reference_frame::{CelestialBody, ReferenceFrame},
@@ -52,11 +54,15 @@ where
             .rotated_z(RA_OF_GALACTIC_NORTH);
     }
 
-    fn change_from_cartographic_to_equatorial(&mut self, celestial_body: CelestialBody) {
+    fn change_from_cartographic_to_equatorial(
+        &mut self,
+        celestial_body: CelestialBody,
+        time_since_epoch: Time<f64>,
+    ) {
         let old_z = celestial_body.z_axis();
         let equinox_to_q = QUARTER_CIRC - old_z.longitude;
         let plane_tilt = QUARTER_CIRC - old_z.latitude;
-        let w = celestial_body.prime_meridian_offset();
+        let w = celestial_body.prime_meridian_offset(time_since_epoch);
         self.mathematical_coordinates = self
             .mathematical_coordinates
             .rotated_z(-w)
@@ -69,7 +75,9 @@ where
             ReferenceFrame::Equatorial => {}
             ReferenceFrame::Ecliptic => self.change_from_ecliptic_to_equatorial(),
             ReferenceFrame::Galactic => self.change_from_galactic_to_equatorial(),
-            ReferenceFrame::Cartographic(body) => self.change_from_cartographic_to_equatorial(body),
+            ReferenceFrame::Cartographic((body, time)) => {
+                self.change_from_cartographic_to_equatorial(body, time)
+            }
         }
     }
 
@@ -85,11 +93,15 @@ where
             .rotated_z(GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE - HALF_CIRC);
     }
 
-    fn change_from_equatorial_to_cartographic(&mut self, celestial_body: CelestialBody) {
+    fn change_from_equatorial_to_cartographic(
+        &mut self,
+        celestial_body: CelestialBody,
+        time_since_epoch: Time<f64>,
+    ) {
         let new_z = celestial_body.z_axis();
         let equinox_to_q = QUARTER_CIRC - new_z.longitude;
         let plane_tilt = QUARTER_CIRC - new_z.latitude;
-        let w = celestial_body.prime_meridian_offset();
+        let w = celestial_body.prime_meridian_offset(time_since_epoch);
         self.mathematical_coordinates = self
             .mathematical_coordinates
             .rotated_z(equinox_to_q)
@@ -102,7 +114,9 @@ where
             ReferenceFrame::Equatorial => {}
             ReferenceFrame::Ecliptic => self.change_from_equatorial_to_ecliptic(),
             ReferenceFrame::Galactic => self.change_from_equatorial_to_galactic(),
-            ReferenceFrame::Cartographic(body) => self.change_from_equatorial_to_cartographic(body),
+            ReferenceFrame::Cartographic((body, time)) => {
+                self.change_from_equatorial_to_cartographic(body, time)
+            }
         }
     }
 }

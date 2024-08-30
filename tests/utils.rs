@@ -23,6 +23,7 @@ pub mod examples {
         physical_coords::PhysicalCoords,
         reference_frame::{CelestialBody, ReferenceFrame},
     };
+    use simple_si_units::base::Time;
 
     use super::*;
 
@@ -51,6 +52,16 @@ pub mod examples {
             Angle::from_degrees(180.0),
             Angle::from_degrees(270.0),
             Angle::from_degrees(360.0),
+        ]
+    }
+
+    pub fn long_time_examples() -> Vec<Time<f64>> {
+        vec![
+            Time::from_yr(0.0),
+            Time::from_yr(1.0),
+            Time::from_yr(100.0),
+            Time::from_yr(1000.0),
+            Time::from_yr(10000.0),
         ]
     }
 
@@ -138,7 +149,9 @@ pub mod examples {
             ReferenceFrame::Galactic,
         ];
         for body in celestial_body_examples() {
-            vec.push(ReferenceFrame::Cartographic(body));
+            for time in long_time_examples() {
+                vec.push(ReferenceFrame::Cartographic((body, time)));
+            }
         }
         vec
     }

@@ -1,4 +1,4 @@
-use simple_si_units::geometry::Angle;
+use simple_si_units::{base::Time, geometry::Angle};
 use std::fmt::Display;
 
 use crate::spherical::Spherical;
@@ -86,7 +86,7 @@ impl CelestialBody {
     /// Returns the prime meridian offset of the reference frame.
     ///
     /// The prime meridian offset is the longitudal angle offset of the x-axis of the reference frame, relative to the point Q that the equatorial x-axis points at after rotating to the new z-axis. It is denoted W in [Fig. 1 of the IAU Report](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf).
-    pub fn prime_meridian_offset(&self) -> Angle<f64> {
+    pub fn prime_meridian_offset(&self, time_since_epoch: Time<f64>) -> Angle<f64> {
         match self {
             _ => todo!(),
         }
@@ -109,38 +109,5 @@ impl Display for CelestialBody {
             CelestialBody::Uranus => write!(f, "Uranus"),
             CelestialBody::Neptune => write!(f, "Neptune"),
         }
-    }
-}
-
-impl PartialEq for CelestialBody {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (CelestialBody::Custom(_, _), _) | (_, CelestialBody::Custom(_, _)) => false,
-            _ => std::mem::discriminant(self) == std::mem::discriminant(other),
-        }
-    }
-}
-
-impl Eq for CelestialBody {}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn custom_celestial_bodies_are_never_equal() {
-        let custom_ra = Angle::from_degrees(27.5);
-        let custom_dec = Angle::from_degrees(119.24);
-        let custom_body = CelestialBody::Custom(custom_ra, custom_dec);
-
-        assert_ne!(custom_body, CelestialBody::Sun);
-        assert_ne!(custom_body, CelestialBody::Custom(custom_ra, custom_dec));
-    }
-
-    #[test]
-    fn non_custom_celestial_bodies_are_comparable() {
-        assert_eq!(CelestialBody::Sun, CelestialBody::Sun);
-        assert_eq!(CelestialBody::Earth, CelestialBody::Earth);
-        assert_ne!(CelestialBody::Sun, CelestialBody::Earth);
     }
 }
