@@ -305,7 +305,9 @@ mod tests {
     use simple_si_units::geometry::Angle;
 
     use crate::{
-        angle_helper::EARTH_AXIS_TILT, direction::Direction, ra_and_dec::RightAscension,
+        angle_helper::{normalized_angle, EARTH_AXIS_TILT},
+        direction::Direction,
+        ra_and_dec::{Declination, RightAscension, Sgn},
         spherical::Spherical,
     };
 
@@ -418,5 +420,32 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn specific_test_case() {
+        // https://ned.ipac.caltech.edu/coordinate_calculator?in_csys=Equatorial&in_equinox=J2000.0&obs_epoch=2000.0&ra=11&dec=22%2033&pa=0.0&out_csys=Equatorial&out_equinox=J2000.0
+        let ra = RightAscension::new(11, 0, 0.).to_angle();
+        let dec = Declination::new(Sgn::Pos, 22, 33, 0.).to_angle();
+        let equatorial = PhysicalCoords::new(Spherical::new(ra, dec), ReferenceFrame::Equatorial);
+
+        let ecliptic = equatorial.in_reference_frame(ReferenceFrame::Ecliptic);
+        let ecliptic_coords = ecliptic.mathematical_coordinates();
+        let l = ecliptic_coords.longitude;
+        let b = ecliptic_coords.latitude;
+        let expected_l = Angle::from_deg(157.371833);
+        let expected_b = Angle::from_deg(14.878115);
+        assert!((l - expected_l).rad.abs() < 1e-5);
+        assert!((b - expected_b).rad.abs() < 1e-5);
+
+        let galactic = equatorial.in_reference_frame(ReferenceFrame::Galactic);
+        let galactic_coords = galactic.mathematical_coordinates();
+        let l = galactic_coords.longitude;
+        let b = galactic_coords.latitude;
+        let expected_l = normalized_angle(Angle::from_deg(217.042106));
+        let expected_b = Angle::from_deg(64.361644);
+        // Galactic coordinates seem to not be defined as accurately as ecliptic coordinates
+        assert!((l - expected_l).rad.abs() < 2e-4);
+        assert!((b - expected_b).rad.abs() < 2e-4);
     }
 }
