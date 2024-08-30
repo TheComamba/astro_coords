@@ -1,6 +1,8 @@
 use simple_si_units::geometry::Angle;
 use std::fmt::Display;
 
+use crate::spherical::Spherical;
+
 /// This enum contains the celestial bodies for which the equatorial reference frame can be defined.
 ///
 /// The elements can be converted to the right ascension and declination of the north pole of the celestial body.
@@ -13,14 +15,16 @@ use std::fmt::Display;
 /// use astro_coords::reference_frame::CelestialBody;
 ///
 /// let earth = CelestialBody::Earth;
-/// let (ra, dec) = earth.get_ra_and_dec();
+/// let z = earth.z_axis();
+/// let (ra, dec) = (z.longitude, z.latitude);
 /// assert!(ra.to_degrees() < 1e-5);
 /// assert!(dec.to_degrees() - 90.0 < 1e-5);
 ///
 /// let custom_ra = Angle::from_degrees(27.5);
 /// let custom_dec = Angle::from_degrees(119.24);
 /// let custom_body = CelestialBody::Custom(custom_ra, custom_dec);
-/// let (ra, dec) = custom_body.get_ra_and_dec();
+/// let z = custom_body.z_axis();
+/// let (ra, dec) = (z.longitude, z.latitude);
 /// assert!((ra-custom_ra).to_degrees() < 1e-5);
 /// assert!((dec-custom_dec).to_degrees() < 1e-5);
 /// ```
@@ -52,18 +56,39 @@ impl CelestialBody {
     /// Returns the right ascension and declination (in earth-equatorial coordinates) of the north pole of the celestial body.
     ///
     /// The data is taken from the [Report of the IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf). Any time dependency is ignored.
-    pub fn get_ra_and_dec(&self) -> (Angle<f64>, Angle<f64>) {
+    pub fn z_axis(&self) -> Spherical {
         match self {
-            CelestialBody::Custom(ra, dec) => (*ra, *dec),
-            CelestialBody::Sun => (Angle::from_deg(286.13), Angle::from_deg(63.87)),
-            CelestialBody::Mercury => (Angle::from_deg(281.0103), Angle::from_deg(61.4155)),
-            CelestialBody::Venus => (Angle::from_deg(272.76), Angle::from_deg(67.16)),
-            CelestialBody::Earth => (Angle::from_deg(0.0), Angle::from_deg(90.0)),
-            CelestialBody::Mars => (Angle::from_deg(317.269202), Angle::from_deg(54.432516)),
-            CelestialBody::Jupiter => (Angle::from_deg(268.056595), Angle::from_deg(64.495303)),
-            CelestialBody::Saturn => (Angle::from_deg(40.589), Angle::from_deg(83.537)),
-            CelestialBody::Uranus => (Angle::from_deg(257.311), Angle::from_deg(-15.175)),
-            CelestialBody::Neptune => (Angle::from_deg(299.36), Angle::from_deg(43.46)),
+            CelestialBody::Custom(ra, dec) => Spherical::new(*ra, *dec),
+            CelestialBody::Sun => Spherical::new(Angle::from_deg(286.13), Angle::from_deg(63.87)),
+            CelestialBody::Mercury => {
+                Spherical::new(Angle::from_deg(281.0103), Angle::from_deg(61.4155))
+            }
+            CelestialBody::Venus => Spherical::new(Angle::from_deg(272.76), Angle::from_deg(67.16)),
+            CelestialBody::Earth => Spherical::new(Angle::from_deg(0.0), Angle::from_deg(90.0)),
+            CelestialBody::Mars => {
+                Spherical::new(Angle::from_deg(317.269202), Angle::from_deg(54.432516))
+            }
+            CelestialBody::Jupiter => {
+                Spherical::new(Angle::from_deg(268.056595), Angle::from_deg(64.495303))
+            }
+            CelestialBody::Saturn => {
+                Spherical::new(Angle::from_deg(40.589), Angle::from_deg(83.537))
+            }
+            CelestialBody::Uranus => {
+                Spherical::new(Angle::from_deg(257.311), Angle::from_deg(-15.175))
+            }
+            CelestialBody::Neptune => {
+                Spherical::new(Angle::from_deg(299.36), Angle::from_deg(43.46))
+            }
+        }
+    }
+
+    /// Returns the prime meridian offset of the reference frame.
+    ///
+    /// The prime meridian offset is the longitudal angle offset of the x-axis of the reference frame, relative to the point Q that the equatorial x-axis points at after rotating to the new z-axis. It is denoted W in [Fig. 1 of the IAU Report](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf).
+    pub fn prime_meridian_offset(&self) -> Angle<f64> {
+        match self {
+            _ => todo!(),
         }
     }
 }

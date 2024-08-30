@@ -7,7 +7,7 @@ use crate::{
         DEC_OF_GALACTIC_NORTH, EARTH_AXIS_TILT, GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE,
         HALF_CIRC, QUARTER_CIRC, RA_OF_GALACTIC_NORTH,
     },
-    reference_frame::ReferenceFrame,
+    reference_frame::{CelestialBody, ReferenceFrame},
     traits::*,
 };
 
@@ -56,10 +56,11 @@ where
     }
 
     fn change_from_cartographic_to_equatorial(&mut self) {
-        let old_z = self.reference_frame.z_axis();
+        let celestial_body: CelestialBody = todo!();
+        let old_z = celestial_body.z_axis();
         let equinox_to_q = QUARTER_CIRC - old_z.longitude;
         let plane_tilt = QUARTER_CIRC - old_z.latitude;
-        let w = self.reference_frame.prime_meridian_offset();
+        let w = celestial_body.prime_meridian_offset();
         self.mathematical_coordinates = self
             .mathematical_coordinates
             .rotated_z(-w)
@@ -87,11 +88,11 @@ where
             .rotated_z(GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE - HALF_CIRC);
     }
 
-    fn change_from_equatorial_to_cartographic(&mut self, new_frame: ReferenceFrame) {
-        let new_z = new_frame.z_axis();
+    fn change_from_equatorial_to_cartographic(&mut self, celestial_body: CelestialBody) {
+        let new_z = celestial_body.z_axis();
         let equinox_to_q = QUARTER_CIRC - new_z.longitude;
         let plane_tilt = QUARTER_CIRC - new_z.latitude;
-        let w = new_frame.prime_meridian_offset();
+        let w = celestial_body.prime_meridian_offset();
         self.mathematical_coordinates = self
             .mathematical_coordinates
             .rotated_z(equinox_to_q)
