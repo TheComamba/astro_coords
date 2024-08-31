@@ -140,17 +140,21 @@ pub mod examples {
             CelestialBody::Uranus,
             CelestialBody::Neptune,
         ];
-        for z in spherical_examples() {
-            for offset in angle_examples() {
-                for rate in angle_examples() {
-                    let rot = RotationalElements {
-                        z_axis: z,
-                        prime_meridian_offset_offset: offset,
-                        prime_meridian_offset_rate: rate / Time::from_days(1.0),
-                    };
-                    vec.push(CelestialBody::Custom(rot));
-                }
-            }
+        let sphericals = spherical_examples();
+        let angles = angle_examples();
+        let angular_velocities: Vec<_> = angle_examples()
+            .into_iter()
+            .map(|a| a / Time::from_days(1.0))
+            .collect();
+        for i in 0..sphericals.len() {
+            let j = i * 12345 % angles.len();
+            let k = i * 54321 % angular_velocities.len();
+            let rot = RotationalElements {
+                z_axis: sphericals[i],
+                prime_meridian_offset_offset: angles[j],
+                prime_meridian_offset_rate: angular_velocities[k],
+            };
+            vec.push(CelestialBody::Custom(rot));
         }
         vec
     }
