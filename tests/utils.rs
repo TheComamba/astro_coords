@@ -21,7 +21,7 @@ pub mod constants {
 pub mod examples {
     use astro_coords::{
         physical_coords::PhysicalCoords,
-        reference_frame::{CelestialBody, ReferenceFrame},
+        reference_frame::{CelestialBody, ReferenceFrame, RotationalElements},
     };
     use simple_si_units::base::Time;
 
@@ -129,7 +129,7 @@ pub mod examples {
     }
 
     pub fn celestial_body_examples() -> Vec<CelestialBody> {
-        vec![
+        let mut vec = vec![
             CelestialBody::Sun,
             CelestialBody::Mercury,
             CelestialBody::Venus,
@@ -139,7 +139,20 @@ pub mod examples {
             CelestialBody::Saturn,
             CelestialBody::Uranus,
             CelestialBody::Neptune,
-        ]
+        ];
+        for z in spherical_examples() {
+            for offset in angle_examples() {
+                for rate in angle_examples() {
+                    let rot = RotationalElements {
+                        z_axis: z,
+                        prime_meridian_offset_offset: offset,
+                        prime_meridian_offset_rate: rate / Time::from_days(1.0),
+                    };
+                    vec.push(CelestialBody::Custom(rot));
+                }
+            }
+        }
+        vec
     }
 
     pub fn reference_frame_examples() -> Vec<ReferenceFrame> {
@@ -189,6 +202,8 @@ pub mod examples {
 
 #[cfg(test)]
 pub mod benchmarks {
+    use simple_si_units::base::Time;
+
     use super::*;
 
     pub fn many_angles(num: usize) -> Vec<Angle<f64>> {
@@ -218,6 +233,18 @@ pub mod benchmarks {
             }
         }
         directions
+    }
+
+    pub fn many_times(num: usize) -> Vec<Time<f64>> {
+        let seed = [42; 32];
+        let mut rng = StdRng::from_seed(seed);
+
+        let mut times = Vec::new();
+        for _ in 0..num {
+            let yr = rng.gen_range(0.0..1000.0);
+            times.push(Time::from_yr(yr));
+        }
+        times
     }
 
     pub fn many_cartesians(num: usize) -> Vec<Cartesian> {
