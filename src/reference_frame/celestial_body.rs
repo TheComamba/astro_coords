@@ -1,4 +1,4 @@
-use simple_si_units::{base::Time, geometry::Angle};
+use simple_si_units::{base::Time, geometry::Angle, mechanical::AngularVelocity};
 use std::fmt::Display;
 
 use crate::{
@@ -10,12 +10,14 @@ use crate::{
 ///
 /// The elements can be converted to the right ascension and declination of the north pole of the celestial body.
 ///
-/// It is possible to define a custom celestial body by providing the right ascension and declination of its north pole.
+/// It is possible to define a custom celestial body by providing the right ascension and declination of its north pole, as well as its prime meridian offset at the epoch and its siderial angular velocity.
 ///
 /// # Examples
 /// ```
 /// use simple_si_units::geometry::Angle;
-/// use astro_coords::reference_frame::CelestialBody;
+/// use simple_si_units::base::Time;
+/// use astro_coords::reference_frame::{CelestialBody, RotationalElements};
+/// use astro_coords::spherical::Spherical;
 ///
 /// let earth = CelestialBody::Earth;
 /// let z = earth.z_axis();
@@ -25,16 +27,28 @@ use crate::{
 ///
 /// let custom_ra = Angle::from_degrees(27.5);
 /// let custom_dec = Angle::from_degrees(119.24);
-/// let custom_body = CelestialBody::Custom(custom_ra, custom_dec);
+/// let custom_z = Spherical::new(custom_ra, custom_dec);
+/// let custom_prime_meridian_offset = Angle::from_degrees(23.0);
+/// let custom_prime_meridian_rate = Angle::from_degrees(40.0) / Time::from_days(1.0);
+/// let custom_rotational_elements = RotationalElements {
+///     z_axis: custom_z,
+///     prime_meridian_offset_offset: custom_prime_meridian_offset,
+///     prime_meridian_offset_rate: custom_prime_meridian_rate,
+/// };
+/// let custom_body = CelestialBody::Custom(custom_rotational_elements);
 /// let z = custom_body.z_axis();
 /// let (ra, dec) = (z.longitude, z.latitude);
 /// assert!((ra-custom_ra).to_degrees() < 1e-5);
 /// assert!((dec-custom_dec).to_degrees() < 1e-5);
+/// let time = Time::from_days(1.0);
+/// let offset = custom_body.prime_meridian_offset(time);
+/// let expected_offset = Angle::from_degrees(23.0) + Angle::from_degrees(40.0);
+/// assert!((offset-expected_offset).to_degrees().abs() < 1e-5);
 /// ```
 #[derive(Clone, Copy, Debug)]
 pub enum CelestialBody {
     /// A celestial body with an arbitrary north-pole, provided as Right Ascension and Declination in Earth-Equatorial coordinates.
-    Custom(Angle<f64>, Angle<f64>),
+    Custom(RotationalElements),
     /// The central body in our solar system.
     Sun,
     /// The innermost and smallest planet in our solar system.
@@ -55,13 +69,23 @@ pub enum CelestialBody {
     Neptune,
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct RotationalElements {
+    /// The rotational axis, provided as Right Ascension and Declination in Earth-Equatorial coordinates.
+    pub z_axis: Spherical,
+    /// The prime meridian offset at the J2000 epoch.
+    pub prime_meridian_offset_offset: Angle<f64>,
+    /// The rate of change of the prime meridian offset.
+    pub prime_meridian_offset_rate: AngularVelocity<f64>,
+}
+
 impl CelestialBody {
     /// Returns the right ascension and declination (in earth-equatorial coordinates) of the north pole of the celestial body.
     ///
     /// The data is taken from the [Report of the IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf). Any time dependency is ignored.
     pub fn z_axis(&self) -> Spherical {
         match self {
-            CelestialBody::Custom(ra, dec) => Spherical::new(*ra, *dec),
+            CelestialBody::Custom(rotational_elements) => rotational_elements.z_axis,
             CelestialBody::Sun => Spherical::new(Angle::from_deg(286.13), Angle::from_deg(63.87)),
             CelestialBody::Mercury => {
                 Spherical::new(Angle::from_deg(281.0103), Angle::from_deg(61.4155))
@@ -108,6 +132,10 @@ impl CelestialBody {
     /// ```
     pub fn prime_meridian_offset(&self, time_since_epoch: Time<f64>) -> Angle<f64> {
         let offset = match self {
+            CelestialBody::Custom(rotational_elements) => {
+                rotational_elements.prime_meridian_offset_offset
+                    + rotational_elements.prime_meridian_offset_rate * time_since_epoch
+            }
             CelestialBody::Sun => {
                 Angle::from_deg(84.176) + Angle::from_deg(14.1844000) * time_since_epoch.to_days()
             }
@@ -136,7 +164,6 @@ impl CelestialBody {
             CelestialBody::Neptune => {
                 Angle::from_deg(249.978) + Angle::from_deg(541.1397757) * time_since_epoch.to_days()
             }
-            _ => todo!(),
         };
         normalized_angle(offset)
     }
@@ -145,8 +172,11 @@ impl CelestialBody {
 impl Display for CelestialBody {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CelestialBody::Custom(ra, dec) => {
-                write!(f, "Custom body with RA={} and Dec={}", ra, dec)
+            CelestialBody::Custom(rot) => {
+                write!(f, "Custom body rotating around the {} axis, with a prime meridian offset of {}+{}*t",
+                rot.z_axis,
+                rot.prime_meridian_offset_offset,
+                rot.prime_meridian_offset_rate)
             }
             CelestialBody::Sun => write!(f, "Sun"),
             CelestialBody::Mercury => write!(f, "Mercury"),
