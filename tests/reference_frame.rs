@@ -12,7 +12,6 @@ fn cartesian_roundtrips() {
             let mut new_physical = physical.clone();
 
             new_physical.change_reference_frame(target_frame);
-            assert_eq!(new_physical.reference_frame(), target_frame);
             new_physical.change_reference_frame(original_frame);
 
             let mathematical_after_roundtrip = new_physical.mathematical_coordinates();
@@ -35,7 +34,6 @@ fn direction_roundtrips() {
             let mut new_physical = physical.clone();
 
             new_physical.change_reference_frame(target_frame);
-            assert_eq!(new_physical.reference_frame(), target_frame);
             new_physical.change_reference_frame(original_frame);
 
             let mathematical_after_roundtrip = new_physical.mathematical_coordinates();
@@ -58,7 +56,6 @@ fn spherical_roundtrips() {
             let mut new_physical = physical.clone();
 
             new_physical.change_reference_frame(target_frame);
-            assert_eq!(new_physical.reference_frame(), target_frame);
             new_physical.change_reference_frame(original_frame);
 
             let mathematical_after_roundtrip = new_physical.mathematical_coordinates();

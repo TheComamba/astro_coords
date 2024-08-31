@@ -19,7 +19,11 @@ pub mod constants {
 
 #[cfg(test)]
 pub mod examples {
-    use astro_coords::{physical_coords::PhysicalCoords, reference_frame::ReferenceFrame};
+    use astro_coords::{
+        physical_coords::PhysicalCoords,
+        reference_frame::{CelestialBody, ReferenceFrame, RotationalElements},
+    };
+    use simple_si_units::base::Time;
 
     use super::*;
 
@@ -48,6 +52,16 @@ pub mod examples {
             Angle::from_degrees(180.0),
             Angle::from_degrees(270.0),
             Angle::from_degrees(360.0),
+        ]
+    }
+
+    pub fn long_time_examples() -> Vec<Time<f64>> {
+        vec![
+            Time::from_yr(0.0),
+            Time::from_yr(1.0),
+            Time::from_yr(100.0),
+            Time::from_yr(1000.0),
+            Time::from_yr(10000.0),
         ]
     }
 
@@ -114,12 +128,49 @@ pub mod examples {
         examples
     }
 
+    pub fn celestial_body_examples() -> Vec<CelestialBody> {
+        let mut vec = vec![
+            CelestialBody::Sun,
+            CelestialBody::Mercury,
+            CelestialBody::Venus,
+            CelestialBody::Earth,
+            CelestialBody::Mars,
+            CelestialBody::Jupiter,
+            CelestialBody::Saturn,
+            CelestialBody::Uranus,
+            CelestialBody::Neptune,
+        ];
+        let sphericals = spherical_examples();
+        let angles = angle_examples();
+        let angular_velocities: Vec<_> = angle_examples()
+            .into_iter()
+            .map(|a| a / Time::from_days(1.0))
+            .collect();
+        for i in 0..sphericals.len() {
+            let j = i * 12345 % angles.len();
+            let k = i * 54321 % angular_velocities.len();
+            let rot = RotationalElements {
+                z_axis: sphericals[i],
+                prime_meridian_offset_offset: angles[j],
+                prime_meridian_offset_rate: angular_velocities[k],
+            };
+            vec.push(CelestialBody::Custom(rot));
+        }
+        vec
+    }
+
     pub fn reference_frame_examples() -> Vec<ReferenceFrame> {
-        vec![
+        let mut vec = vec![
             ReferenceFrame::Equatorial,
             ReferenceFrame::Ecliptic,
             ReferenceFrame::Galactic,
-        ]
+        ];
+        for body in celestial_body_examples() {
+            for time in long_time_examples() {
+                vec.push(ReferenceFrame::Cartographic(body, time));
+            }
+        }
+        vec
     }
 
     pub fn physical_cartesian_examples() -> Vec<PhysicalCoords<Cartesian>> {
@@ -155,6 +206,8 @@ pub mod examples {
 
 #[cfg(test)]
 pub mod benchmarks {
+    use simple_si_units::base::Time;
+
     use super::*;
 
     pub fn many_angles(num: usize) -> Vec<Angle<f64>> {
@@ -184,6 +237,18 @@ pub mod benchmarks {
             }
         }
         directions
+    }
+
+    pub fn many_times(num: usize) -> Vec<Time<f64>> {
+        let seed = [42; 32];
+        let mut rng = StdRng::from_seed(seed);
+
+        let mut times = Vec::new();
+        for _ in 0..num {
+            let yr = rng.gen_range(0.0..1000.0);
+            times.push(Time::from_yr(yr));
+        }
+        times
     }
 
     pub fn many_cartesians(num: usize) -> Vec<Cartesian> {
