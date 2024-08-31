@@ -1,7 +1,10 @@
 use simple_si_units::{base::Time, geometry::Angle};
 use std::fmt::Display;
 
-use crate::{angle_helper::FULL_CIRC, spherical::Spherical};
+use crate::{
+    angle_helper::{normalized_angle, FULL_CIRC},
+    spherical::Spherical,
+};
 
 /// This enum contains the celestial bodies for which the equatorial reference frame can be defined.
 ///
@@ -83,12 +86,28 @@ impl CelestialBody {
         }
     }
 
-    /// Returns the prime meridian offset of the reference frame.
+    /// Returns the prime meridian offset of the reference frame at a given time since epoch.
     ///
     /// The prime meridian offset is the longitudal angle offset of the x-axis of the reference frame, relative to the point Q that the equatorial x-axis points at after rotating to the new z-axis. It is the current longitudial offset from the direction of earth's vernal equinox, or the x-direction in equatorial coordinates. It is denoted W in [Fig. 1 of the IAU Report](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf).
     /// The data here is taken from the [Report of the IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015](https://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2015reprint.pdf), except for that of earth, which is taken from Eq. 5.14 of [chapter 5 of technical note 36 of the international earth rotation and reference systems service](https://www.iers.org/SharedDocs/Publikationen/EN/IERS/Publications/tn/TechnNote36/tn36_043.pdf?__blob=publicationFile&v=1).
+    /// Only the constant and linear part of the time dependency is considered.
+    /// The J2000 epoch for celestial bodies is defined as the 1st of January 2000, 12:00:00 TT.
+    ///
+    /// # Example
+    /// ```
+    /// use simple_si_units::base::Time;
+    /// use astro_coords::reference_frame::CelestialBody;
+    ///
+    /// // Vernal equinox was on the 20th of March 2000, which is 79 days after the J2000 epoch.
+    /// let time_between_j2000_and_vernal_equinox = Time::from_days(79.);
+    /// // At the vernal equinox, the prime meridian offset of the earth is roughly 0.
+    /// let prime_meridian_offset = CelestialBody::Earth.prime_meridian_offset(time_between_j2000_and_vernal_equinox);
+    /// // It is not exactly 0, because it is not guaranteed that the moment of vernal equinox is exactly at 12:00:00 TT.
+    /// let acceptable_error_in_degrees = 2.;
+    /// assert!(prime_meridian_offset.to_degrees().abs() < acceptable_error_in_degrees);
+    /// ```
     pub fn prime_meridian_offset(&self, time_since_epoch: Time<f64>) -> Angle<f64> {
-        match self {
+        let offset = match self {
             CelestialBody::Sun => {
                 Angle::from_deg(84.176) + Angle::from_deg(14.1844000) * time_since_epoch.to_days()
             }
@@ -118,7 +137,8 @@ impl CelestialBody {
                 Angle::from_deg(249.978) + Angle::from_deg(541.1397757) * time_since_epoch.to_days()
             }
             _ => todo!(),
-        }
+        };
+        normalized_angle(offset)
     }
 }
 
