@@ -1,4 +1,4 @@
-name: Check for TODOs
+name: Check Licenses
 
 on: [pull_request]
 
