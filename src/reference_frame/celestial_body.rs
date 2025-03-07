@@ -1,4 +1,3 @@
-use simple_si_units::{base::Time, geometry::Angle, mechanical::AngularVelocity};
 use std::fmt::Display;
 
 use crate::{
@@ -65,7 +64,7 @@ pub enum CelestialBody {
     Saturn,
     /// The sevenths planet in our solar system, a gaseous ice-giant.
     Uranus,
-    /// The eightths and outermost known planet in our solar system.
+    /// The eighths and outermost known planet in our solar system.
     Neptune,
 }
 
