@@ -28,7 +28,7 @@ pub fn direction_relative_to_normal(
 
 #[cfg(test)]
 mod tests {
-    use simple_si_units::geometry::Angle;
+    use uom::si::{angle::radian, f64::Angle};
 
     use crate::angle_helper::*;
 
@@ -61,9 +61,9 @@ mod tests {
         let ordinates = vec![0., 1., -1., 12.];
         let angles = vec![
             ANGLE_ZERO,
-            Angle::from_radians(1.),
-            Angle::from_radians(-1.),
-            Angle::from_radians(12.),
+            Angle::new::<radian>(1.),
+            Angle::new::<radian>(-1.),
+            Angle::new::<radian>(12.),
         ];
         for x1 in ordinates.clone().iter() {
             for y1 in ordinates.clone().iter() {

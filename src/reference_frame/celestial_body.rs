@@ -1,5 +1,11 @@
 use std::fmt::Display;
 
+use uom::si::{
+    angle::degree,
+    f64::{Angle, AngularVelocity, Time},
+    time::day,
+};
+
 use crate::{
     angle_helper::{normalized_angle, FULL_CIRC},
     spherical::Spherical,
@@ -13,7 +19,7 @@ use crate::{
 ///
 /// # Examples
 /// ```
-/// use simple_si_units::geometry::Angle;
+/// use uom::si::f64::Angle;
 /// use simple_si_units::base::Time;
 /// use astro_coords::reference_frame::{CelestialBody, RotationalElements};
 /// use astro_coords::spherical::Spherical;
@@ -21,14 +27,14 @@ use crate::{
 /// let earth = CelestialBody::Earth;
 /// let z = earth.z_axis();
 /// let (ra, dec) = (z.longitude, z.latitude);
-/// assert!(ra.to_degrees() < 1e-5);
-/// assert!(dec.to_degrees() - 90.0 < 1e-5);
+/// assert!(ra.get::<degree>() < 1e-5);
+/// assert!(dec.get::<degree>() - 90.0 < 1e-5);
 ///
-/// let custom_ra = Angle::from_degrees(27.5);
-/// let custom_dec = Angle::from_degrees(119.24);
+/// let custom_ra = Angle::new::<degree>(27.5);
+/// let custom_dec = Angle::new::<degree>(119.24);
 /// let custom_z = Spherical::new(custom_ra, custom_dec);
-/// let custom_prime_meridian_offset = Angle::from_degrees(23.0);
-/// let custom_prime_meridian_rate = Angle::from_degrees(40.0) / Time::from_days(1.0);
+/// let custom_prime_meridian_offset = Angle::new::<degree>(23.0);
+/// let custom_prime_meridian_rate = Angle::new::<degree>(40.0) / Time::from_days(1.0);
 /// let custom_rotational_elements = RotationalElements {
 ///     z_axis: custom_z,
 ///     prime_meridian_offset_offset: custom_prime_meridian_offset,
@@ -37,12 +43,12 @@ use crate::{
 /// let custom_body = CelestialBody::Custom(custom_rotational_elements);
 /// let z = custom_body.z_axis();
 /// let (ra, dec) = (z.longitude, z.latitude);
-/// assert!((ra-custom_ra).to_degrees() < 1e-5);
-/// assert!((dec-custom_dec).to_degrees() < 1e-5);
+/// assert!((ra-custom_ra).get::<degree>() < 1e-5);
+/// assert!((dec-custom_dec).get::<degree>() < 1e-5);
 /// let time = Time::from_days(1.0);
 /// let offset = custom_body.prime_meridian_offset(time);
-/// let expected_offset = Angle::from_degrees(23.0) + Angle::from_degrees(40.0);
-/// assert!((offset-expected_offset).to_degrees().abs() < 1e-5);
+/// let expected_offset = Angle::new::<degree>(23.0) + Angle::new::<degree>(40.0);
+/// assert!((offset-expected_offset).get::<degree>().abs() < 1e-5);
 /// ```
 #[derive(Clone, Copy, Debug)]
 pub enum CelestialBody {
@@ -73,9 +79,9 @@ pub struct RotationalElements {
     /// The rotational axis, provided as Right Ascension and Declination in Earth-Equatorial coordinates.
     pub z_axis: Spherical,
     /// The prime meridian offset at the J2000 epoch.
-    pub prime_meridian_offset_offset: Angle<f64>,
+    pub prime_meridian_offset_offset: Angle,
     /// The rate of change of the prime meridian offset.
-    pub prime_meridian_offset_rate: AngularVelocity<f64>,
+    pub prime_meridian_offset_rate: AngularVelocity,
 }
 
 impl CelestialBody {
@@ -85,26 +91,35 @@ impl CelestialBody {
     pub fn z_axis(&self) -> Spherical {
         match self {
             CelestialBody::Custom(rotational_elements) => rotational_elements.z_axis,
-            CelestialBody::Sun => Spherical::new(Angle::from_deg(286.13), Angle::from_deg(63.87)),
-            CelestialBody::Mercury => {
-                Spherical::new(Angle::from_deg(281.0103), Angle::from_deg(61.4155))
+            CelestialBody::Sun => {
+                Spherical::new(Angle::new::<degree>(286.13), Angle::new::<degree>(63.87))
             }
-            CelestialBody::Venus => Spherical::new(Angle::from_deg(272.76), Angle::from_deg(67.16)),
-            CelestialBody::Earth => Spherical::new(Angle::from_deg(0.0), Angle::from_deg(90.0)),
-            CelestialBody::Mars => {
-                Spherical::new(Angle::from_deg(317.269202), Angle::from_deg(54.432516))
+            CelestialBody::Mercury => Spherical::new(
+                Angle::new::<degree>(281.0103),
+                Angle::new::<degree>(61.4155),
+            ),
+            CelestialBody::Venus => {
+                Spherical::new(Angle::new::<degree>(272.76), Angle::new::<degree>(67.16))
             }
-            CelestialBody::Jupiter => {
-                Spherical::new(Angle::from_deg(268.056595), Angle::from_deg(64.495303))
+            CelestialBody::Earth => {
+                Spherical::new(Angle::new::<degree>(0.0), Angle::new::<degree>(90.0))
             }
+            CelestialBody::Mars => Spherical::new(
+                Angle::new::<degree>(317.269202),
+                Angle::new::<degree>(54.432516),
+            ),
+            CelestialBody::Jupiter => Spherical::new(
+                Angle::new::<degree>(268.056595),
+                Angle::new::<degree>(64.495303),
+            ),
             CelestialBody::Saturn => {
-                Spherical::new(Angle::from_deg(40.589), Angle::from_deg(83.537))
+                Spherical::new(Angle::new::<degree>(40.589), Angle::new::<degree>(83.537))
             }
             CelestialBody::Uranus => {
-                Spherical::new(Angle::from_deg(257.311), Angle::from_deg(-15.175))
+                Spherical::new(Angle::new::<degree>(257.311), Angle::new::<degree>(-15.175))
             }
             CelestialBody::Neptune => {
-                Spherical::new(Angle::from_deg(299.36), Angle::from_deg(43.46))
+                Spherical::new(Angle::new::<degree>(299.36), Angle::new::<degree>(43.46))
             }
         }
     }
@@ -127,41 +142,48 @@ impl CelestialBody {
     /// let prime_meridian_offset = CelestialBody::Earth.prime_meridian_offset(time_between_j2000_and_vernal_equinox);
     /// // It is not exactly 0, because it is not guaranteed that the moment of vernal equinox is exactly at 12:00:00 TT.
     /// let acceptable_error_in_degrees = 2.;
-    /// assert!(prime_meridian_offset.to_degrees().abs() < acceptable_error_in_degrees);
+    /// assert!(prime_meridian_offset.get::<degree>().abs() < acceptable_error_in_degrees);
     /// ```
-    pub fn prime_meridian_offset(&self, time_since_epoch: Time<f64>) -> Angle<f64> {
+    pub fn prime_meridian_offset(&self, time_since_epoch: Time) -> Angle {
         let offset = match self {
             CelestialBody::Custom(rotational_elements) => {
                 rotational_elements.prime_meridian_offset_offset
                     + rotational_elements.prime_meridian_offset_rate * time_since_epoch
             }
             CelestialBody::Sun => {
-                Angle::from_deg(84.176) + Angle::from_deg(14.1844000) * time_since_epoch.to_days()
+                Angle::new::<degree>(84.176)
+                    + Angle::new::<degree>(14.1844000) * time_since_epoch.get::<day>()
             }
             CelestialBody::Mercury => {
-                Angle::from_deg(329.5988) + Angle::from_deg(6.1385108) * time_since_epoch.to_days()
+                Angle::new::<degree>(329.5988)
+                    + Angle::new::<degree>(6.1385108) * time_since_epoch.get::<day>()
             }
             CelestialBody::Venus => {
-                Angle::from_deg(160.20) - Angle::from_deg(1.4813688) * time_since_epoch.to_days()
+                Angle::new::<degree>(160.20)
+                    - Angle::new::<degree>(1.4813688) * time_since_epoch.get::<day>()
             }
             CelestialBody::Earth => {
-                FULL_CIRC * (0.7790572732640 + 1.00273781191135448 * time_since_epoch.to_days())
+                FULL_CIRC * (0.7790572732640 + 1.00273781191135448 * time_since_epoch.get::<day>())
             }
             CelestialBody::Mars => {
-                Angle::from_deg(176.049863)
-                    + Angle::from_deg(350.891982443297) * time_since_epoch.to_days()
+                Angle::new::<degree>(176.049863)
+                    + Angle::new::<degree>(350.891982443297) * time_since_epoch.get::<day>()
             }
             CelestialBody::Jupiter => {
-                Angle::from_deg(284.95) + Angle::from_deg(870.5360000) * time_since_epoch.to_days()
+                Angle::new::<degree>(284.95)
+                    + Angle::new::<degree>(870.5360000) * time_since_epoch.get::<day>()
             }
             CelestialBody::Saturn => {
-                Angle::from_deg(38.90) + Angle::from_deg(810.7939024) * time_since_epoch.to_days()
+                Angle::new::<degree>(38.90)
+                    + Angle::new::<degree>(810.7939024) * time_since_epoch.get::<day>()
             }
             CelestialBody::Uranus => {
-                Angle::from_deg(203.81) - Angle::from_deg(501.1600928) * time_since_epoch.to_days()
+                Angle::new::<degree>(203.81)
+                    - Angle::new::<degree>(501.1600928) * time_since_epoch.get::<day>()
             }
             CelestialBody::Neptune => {
-                Angle::from_deg(249.978) + Angle::from_deg(541.1397757) * time_since_epoch.to_days()
+                Angle::new::<degree>(249.978)
+                    + Angle::new::<degree>(541.1397757) * time_since_epoch.get::<day>()
             }
         };
         normalized_angle(offset)

@@ -1,8 +1,11 @@
 //! This module contains the Spherical struct and its implementation.
 
 use serde::{Deserialize, Serialize};
-use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
+use uom::si::{
+    angle::{degree, radian},
+    f64::Angle,
+};
 
 use crate::{
     angle_helper::*, cartesian::Cartesian, earth_equatorial::EarthEquatorial,
@@ -21,9 +24,9 @@ use super::{
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Spherical {
     /// The longitude of the Spherical struct measures the angle between the x-axis and the vector projected on the x-y plane.
-    pub longitude: Angle<f64>,
+    pub longitude: Angle,
     /// The latitude of the Spherical struct measures the angle between the vector and the x-y plane.
-    pub latitude: Angle<f64>,
+    pub latitude: Angle,
 }
 
 impl Mathematical for Spherical {}
@@ -56,7 +59,7 @@ impl Spherical {
     /// Creates a new Spherical struct from longitude and latitude input.
     ///
     /// Contrary to the mathematical definition of spherical coordinates, the longitude is measured from the x-axis, and the latitude is measured from the xy-plane.
-    pub const fn new(longitude: Angle<f64>, latitude: Angle<f64>) -> Self {
+    pub const fn new(longitude: Angle, latitude: Angle) -> Self {
         Self {
             longitude,
             latitude,
@@ -70,16 +73,16 @@ impl Spherical {
     /// # Examples
     /// ```
     /// use astro_coords::spherical::Spherical;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     ///
-    /// let mut coords = Spherical::new(Angle::from_degrees(190.), Angle::from_degrees(0.));
+    /// let mut coords = Spherical::new(Angle::new::<degree>(190.), Angle::new::<degree>(0.));
     /// coords.normalize();
-    /// assert!((coords.longitude.to_degrees() + 170.).abs() < 1e-5);
+    /// assert!((coords.longitude.get::<degree>() + 170.).abs() < 1e-5);
     ///
-    /// let mut coords = Spherical::new(Angle::from_degrees(10.), Angle::from_degrees(100.));
+    /// let mut coords = Spherical::new(Angle::new::<degree>(10.), Angle::new::<degree>(100.));
     /// coords.normalize();
-    /// assert!((coords.longitude.to_degrees() + 170.).abs() < 1e-5);
-    /// assert!((coords.latitude.to_degrees() - 80.).abs() < 1e-5);
+    /// assert!((coords.longitude.get::<degree>() + 170.).abs() < 1e-5);
+    /// assert!((coords.latitude.get::<degree>() - 80.).abs() < 1e-5);
     /// ```
     pub fn normalize(&mut self) {
         self.longitude = normalized_angle(self.longitude);
@@ -100,13 +103,13 @@ impl Spherical {
     /// # Examples
     /// ```
     /// use astro_coords::spherical::Spherical;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     ///
-    /// let mut c1 = Spherical::new(Angle::from_degrees(10.), Angle::from_degrees(100.));
-    /// let mut c2 = Spherical::new(Angle::from_degrees(-170.), Angle::from_degrees(80.));
-    /// assert!(c1.eq_within(&c2, Angle::from_degrees(1.)));
+    /// let mut c1 = Spherical::new(Angle::new::<degree>(10.), Angle::new::<degree>(100.));
+    /// let mut c2 = Spherical::new(Angle::new::<degree>(-170.), Angle::new::<degree>(80.));
+    /// assert!(c1.eq_within(&c2, Angle::new::<degree>(1.)));
     /// ```
-    pub fn eq_within(&self, other: &Self, accuracy: Angle<f64>) -> bool {
+    pub fn eq_within(&self, other: &Self, accuracy: Angle) -> bool {
         let northpole_latitude = QUARTER_CIRC;
         let southpole_latitude = -QUARTER_CIRC;
         let mut copy = *self;
@@ -132,14 +135,14 @@ impl Spherical {
     /// # Example
     /// ```
     /// use astro_coords::spherical::Spherical;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     ///
-    /// let a = Spherical::new(Angle::from_degrees(0.), Angle::from_degrees(0.));
-    /// let b = Spherical::new(Angle::from_degrees(90.), Angle::from_degrees(0.));
+    /// let a = Spherical::new(Angle::new::<degree>(0.), Angle::new::<degree>(0.));
+    /// let b = Spherical::new(Angle::new::<degree>(90.), Angle::new::<degree>(0.));
     /// let angle = a.angle_to(&b);
-    /// assert!((angle - Angle::from_degrees(90.)).rad.abs() < 1e-5);
+    /// assert!((angle - Angle::new::<degree>(90.)).get::<radian>().abs() < 1e-5);
     /// ```
-    pub fn angle_to(&self, other: &Self) -> Angle<f64> {
+    pub fn angle_to(&self, other: &Self) -> Angle {
         let lat_diff = other.latitude - self.latitude;
         let lat_sum = other.latitude + self.latitude;
         let long_diff = other.longitude - self.longitude;
@@ -156,8 +159,8 @@ impl Spherical {
             return Err(AstroCoordsError::NormalizingZeroVector);
         }
 
-        let longitude = Angle::from_radians(y.atan2(x));
-        let latitude = Angle::from_radians(z.atan2((x * x + y * y).sqrt()));
+        let longitude = Angle::new::<radian>(y.atan2(x));
+        let latitude = Angle::new::<radian>(z.atan2((x * x + y * y).sqrt()));
         Ok(Self {
             longitude,
             latitude,
@@ -165,7 +168,7 @@ impl Spherical {
     }
 
     /// Constructs Cartesian with the provided length pointing in the direction specified by the Spherical struct.
-    pub fn to_cartesian(&self, length: Distance<f64>) -> Cartesian {
+    pub fn to_cartesian(&self, length: Length) -> Cartesian {
         self.to_direction().to_cartesian(length)
     }
 
@@ -184,9 +187,9 @@ impl Spherical {
     /// assert!(z.eq_within(&Direction::Z, 1e-5));
     /// ```
     pub fn to_direction(&self) -> Direction {
-        let x = self.longitude.rad.cos() * self.latitude.rad.cos();
-        let y = self.longitude.rad.sin() * self.latitude.rad.cos();
-        let z = self.latitude.rad.sin();
+        let x = self.longitude.get::<radian>().cos() * self.latitude.get::<radian>().cos();
+        let y = self.longitude.get::<radian>().sin() * self.latitude.get::<radian>().cos();
+        let z = self.latitude.get::<radian>().sin();
         Direction { x, y, z }
     }
 
@@ -203,7 +206,7 @@ impl Spherical {
     }
 
     pub fn to_ra_and_dec(&self) -> (RightAscension, Declination) {
-        let mut ra_remainder = normalized_angle(self.longitude).to_degrees();
+        let mut ra_remainder = normalized_angle(self.longitude).get::<degree>();
         if ra_remainder < 0. {
             ra_remainder += 360.;
         }
@@ -214,7 +217,7 @@ impl Spherical {
         let ra_seconds = (ra_remainder / 15. * 3600.).floor();
         let ra = RightAscension::new(ra_hours, ra_minutes, ra_seconds);
 
-        let mut dec_remainder = self.latitude.to_degrees();
+        let mut dec_remainder = self.latitude.get::<degree>();
         let sign = if dec_remainder < 0. {
             dec_remainder = dec_remainder.abs();
             Sgn::Neg
@@ -240,13 +243,13 @@ impl ActiveRotation<Spherical> for Spherical {
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::direction::Direction;
     /// use astro_coords::traits::*;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     ///
     /// let mut coords = Spherical::X_DIRECTION;
-    /// let rotated = coords.rotated(Angle::from_degrees(90.), &Direction::Z);
-    /// assert!(rotated.eq_within(&Spherical::Y_DIRECTION, Angle::from_degrees(1e-5)));
+    /// let rotated = coords.rotated(Angle::new::<degree>(90.), &Direction::Z);
+    /// assert!(rotated.eq_within(&Spherical::Y_DIRECTION, Angle::new::<degree>(1e-5)));
     /// ```
-    fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Spherical {
+    fn rotated(&self, angle: Angle, axis: &Direction) -> Spherical {
         self.to_direction().rotated(angle, axis).to_spherical()
     }
 
@@ -258,13 +261,13 @@ impl ActiveRotation<Spherical> for Spherical {
     /// ```
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::traits::*;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     ///
     /// let mut coords = Spherical::Y_DIRECTION;
-    /// let rotated = coords.rotated_x(Angle::from_degrees(90.));
-    /// assert!((rotated.eq_within(&Spherical::Z_DIRECTION, Angle::from_degrees(1e-5))));
+    /// let rotated = coords.rotated_x(Angle::new::<degree>(90.));
+    /// assert!((rotated.eq_within(&Spherical::Z_DIRECTION, Angle::new::<degree>(1e-5))));
     /// ```
-    fn rotated_x(&self, angle: Angle<f64>) -> Spherical {
+    fn rotated_x(&self, angle: Angle) -> Spherical {
         self.to_direction().rotated_x(angle).to_spherical()
     }
 
@@ -276,13 +279,13 @@ impl ActiveRotation<Spherical> for Spherical {
     /// ```
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::traits::*;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     ///
     /// let mut coords = Spherical::Z_DIRECTION;
-    /// let rotated = coords.rotated_y(Angle::from_degrees(90.));
-    /// assert!((rotated.eq_within(&Spherical::X_DIRECTION, Angle::from_degrees(1e-5))));
+    /// let rotated = coords.rotated_y(Angle::new::<degree>(90.));
+    /// assert!((rotated.eq_within(&Spherical::X_DIRECTION, Angle::new::<degree>(1e-5))));
     /// ```
-    fn rotated_y(&self, angle: Angle<f64>) -> Spherical {
+    fn rotated_y(&self, angle: Angle) -> Spherical {
         self.to_direction().rotated_y(angle).to_spherical()
     }
 
@@ -294,13 +297,13 @@ impl ActiveRotation<Spherical> for Spherical {
     /// ```
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::traits::*;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     ///
     /// let mut coords = Spherical::X_DIRECTION;
-    /// let rotated = coords.rotated_z(Angle::from_degrees(90.));
-    /// assert!((rotated.eq_within(&Spherical::Y_DIRECTION, Angle::from_degrees(1e-5))));
+    /// let rotated = coords.rotated_z(Angle::new::<degree>(90.));
+    /// assert!((rotated.eq_within(&Spherical::Y_DIRECTION, Angle::new::<degree>(1e-5))));
     /// ```
-    fn rotated_z(&self, angle: Angle<f64>) -> Spherical {
+    fn rotated_z(&self, angle: Angle) -> Spherical {
         let mut rotated = self.clone();
         rotated.longitude += angle;
         rotated
@@ -336,14 +339,14 @@ impl PassiveRotation<Spherical> for Spherical {
     /// ```
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::traits::*;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     ///
     /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
     /// let dir_of_sun_in_ecliptic = Spherical::Y_DIRECTION;
     ///
     /// // Now we want to express the sun's direction in earth equatorial coordinates.
     /// // The rotation axis of the earth expressed in ecliptic coordinates is given by:
-    /// let earth_axis_tilt = Angle::from_degrees(23.44);
+    /// let earth_axis_tilt = Angle::new::<degree>(23.44);
     /// let earth_rotation_axis_in_ecliptic = Spherical::Z_DIRECTION.rotated_x(-earth_axis_tilt);
     ///
     /// // The sun's direction in earth equatorial coordinates is then:
@@ -351,8 +354,8 @@ impl PassiveRotation<Spherical> for Spherical {
     ///
     /// // At summer solstice, the sun is highest in the sky in the northern hemisphere, so its longitude is a quarter turn, and its latitude is positive.
     /// println!("{}", dir_of_sun_in_equatorial);
-    /// assert!((dir_of_sun_in_equatorial.longitude.to_degrees() - 90.).abs() < 1e-5);
-    /// assert!(dir_of_sun_in_equatorial.latitude.to_degrees() > 0.);
+    /// assert!((dir_of_sun_in_equatorial.longitude.get::<degree>() - 90.).abs() < 1e-5);
+    /// assert!(dir_of_sun_in_equatorial.latitude.get::<degree>() > 0.);
     /// ```
     fn passive_rotation_to_new_z_axis(&self, new_z: &Self) -> Self {
         let (angle_to_old_z, polar_rotation_angle) =
@@ -362,10 +365,10 @@ impl PassiveRotation<Spherical> for Spherical {
     }
 }
 
-fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Spherical) -> (Angle<f64>, Angle<f64>) {
+fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Spherical) -> (Angle, Angle) {
     let angle_to_old_z = QUARTER_CIRC - new_z.latitude;
-    let is_polar =
-        angle_to_old_z.rad.abs() < 1e-20 || (angle_to_old_z - HALF_CIRC).rad.abs() < 1e-20;
+    let is_polar = angle_to_old_z.get::<radian>().abs() < 1e-20
+        || (angle_to_old_z - HALF_CIRC).get::<radian>().abs() < 1e-20;
     let polar_rotation_angle = if is_polar {
         Angle { rad: 0. }
     } else {
@@ -404,117 +407,117 @@ impl Display for Spherical {
 
 #[cfg(test)]
 mod tests {
-    use simple_si_units::base::Distance;
     use std::f64::consts::PI;
+    use uom::si::{f64::Length, length::meter};
 
     use crate::cartesian::Cartesian;
 
     use super::*;
 
     const TEST_ACCURACY: f64 = 1e-5;
-    const ANGLE_TEST_ACCURACY: Angle<f64> = Angle { rad: TEST_ACCURACY };
+    const ANGLE_TEST_ACCURACY: Angle = Angle { rad: TEST_ACCURACY };
 
     #[test]
     fn test_from_cartesian() {
         let cartesian = Cartesian::new(
-            Distance::from_meters(1.),
-            Distance::from_meters(1.),
-            Distance::from_meters(1.),
+            Length::new::<meter>(1.),
+            Length::new::<meter>(1.),
+            Length::new::<meter>(1.),
         );
         let expected: Spherical = Spherical {
-            longitude: Angle::from_degrees(45.),
-            latitude: Angle::from_degrees(90. - 54.7356),
+            longitude: Angle::new::<degree>(45.),
+            latitude: Angle::new::<degree>(90. - 54.7356),
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
         assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
 
         let cartesian = Cartesian::new(
-            Distance::from_meters(1.),
-            Distance::from_meters(1.),
-            Distance::from_meters(-1.),
+            Length::new::<meter>(1.),
+            Length::new::<meter>(1.),
+            Length::new::<meter>(-1.),
         );
         let expected = Spherical {
-            longitude: Angle::from_degrees(45.),
-            latitude: Angle::from_degrees(-90. + 54.7356),
+            longitude: Angle::new::<degree>(45.),
+            latitude: Angle::new::<degree>(-90. + 54.7356),
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
         assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
 
         let cartesian = Cartesian::new(
-            Distance::from_meters(1.),
-            Distance::from_meters(-1.),
-            Distance::from_meters(1.),
+            Length::new::<meter>(1.),
+            Length::new::<meter>(-1.),
+            Length::new::<meter>(1.),
         );
         let expected = Spherical {
-            longitude: Angle::from_degrees(-45.),
-            latitude: Angle::from_degrees(90. - 54.7356),
+            longitude: Angle::new::<degree>(-45.),
+            latitude: Angle::new::<degree>(90. - 54.7356),
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
         assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
 
         let cartesian = Cartesian::new(
-            Distance::from_meters(1.),
-            Distance::from_meters(-1.),
-            Distance::from_meters(-1.),
+            Length::new::<meter>(1.),
+            Length::new::<meter>(-1.),
+            Length::new::<meter>(-1.),
         );
         let expected = Spherical {
-            longitude: Angle::from_degrees(-45.),
-            latitude: Angle::from_degrees(-90. + 54.7356),
+            longitude: Angle::new::<degree>(-45.),
+            latitude: Angle::new::<degree>(-90. + 54.7356),
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
         assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
 
         let cartesian = Cartesian::new(
-            Distance::from_meters(-1.),
-            Distance::from_meters(1.),
-            Distance::from_meters(1.),
+            Length::new::<meter>(-1.),
+            Length::new::<meter>(1.),
+            Length::new::<meter>(1.),
         );
         let expected = Spherical {
-            longitude: Angle::from_degrees(135.),
-            latitude: Angle::from_degrees(90. - 54.7356),
+            longitude: Angle::new::<degree>(135.),
+            latitude: Angle::new::<degree>(90. - 54.7356),
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
         assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
 
         let cartesian = Cartesian::new(
-            Distance::from_meters(-1.),
-            Distance::from_meters(1.),
-            Distance::from_meters(-1.),
+            Length::new::<meter>(-1.),
+            Length::new::<meter>(1.),
+            Length::new::<meter>(-1.),
         );
         let expected = Spherical {
-            longitude: Angle::from_degrees(135.),
-            latitude: Angle::from_degrees(-90. + 54.7356),
+            longitude: Angle::new::<degree>(135.),
+            latitude: Angle::new::<degree>(-90. + 54.7356),
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
         assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
 
         let cartesian = Cartesian::new(
-            Distance::from_meters(-1.),
-            Distance::from_meters(-1.),
-            Distance::from_meters(1.),
+            Length::new::<meter>(-1.),
+            Length::new::<meter>(-1.),
+            Length::new::<meter>(1.),
         );
         let expected = Spherical {
-            longitude: Angle::from_degrees(-135.),
-            latitude: Angle::from_degrees(90. - 54.7356),
+            longitude: Angle::new::<degree>(-135.),
+            latitude: Angle::new::<degree>(90. - 54.7356),
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
         assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
 
         let cartesian = Cartesian::new(
-            Distance::from_meters(-1.),
-            Distance::from_meters(-1.),
-            Distance::from_meters(-1.),
+            Length::new::<meter>(-1.),
+            Length::new::<meter>(-1.),
+            Length::new::<meter>(-1.),
         );
         let expected = Spherical {
-            longitude: Angle::from_degrees(-135.),
-            latitude: Angle::from_degrees(-90. + 54.7356),
+            longitude: Angle::new::<degree>(-135.),
+            latitude: Angle::new::<degree>(-90. + 54.7356),
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
@@ -527,8 +530,8 @@ mod tests {
         let y = Spherical::Y_DIRECTION;
         let z = Spherical::Z_DIRECTION;
         let xyz = Spherical {
-            longitude: Angle::from_radians(PI / 4.),
-            latitude: Angle::from_radians(PI / 4.),
+            longitude: Angle::new::<radian>(PI / 4.),
+            latitude: Angle::new::<radian>(PI / 4.),
         };
         let expected_minus_x = Spherical {
             longitude: HALF_CIRC,
@@ -543,8 +546,8 @@ mod tests {
             latitude: -QUARTER_CIRC,
         };
         let expected_minus_xyz = Spherical {
-            longitude: Angle::from_radians(-PI * 3. / 4.),
-            latitude: Angle::from_radians(-PI / 4.),
+            longitude: Angle::new::<radian>(-PI * 3. / 4.),
+            latitude: Angle::new::<radian>(-PI / 4.),
         };
 
         let minus_x = -x;
@@ -569,7 +572,7 @@ mod tests {
 
     #[test]
     fn test_eq_within() {
-        const LOCAL_TEST_ANGLE_ACCURACY: Angle<f64> = Angle {
+        const LOCAL_TEST_ANGLE_ACCURACY: Angle = Angle {
             rad: 10. * TEST_ACCURACY,
         };
 
@@ -619,7 +622,7 @@ mod tests {
 
     #[test]
     fn test_normalization_two_pi_offsets() {
-        const LOCAL_TEST_ANGLE_ACCURACY: Angle<f64> = Angle {
+        const LOCAL_TEST_ANGLE_ACCURACY: Angle = Angle {
             rad: 10. * TEST_ACCURACY,
         };
 
@@ -642,8 +645,8 @@ mod tests {
         for longitude in longitudes.clone() {
             for latitude in latitudes.clone() {
                 for offset in offsets.clone() {
-                    let longitude1 = Angle::from_radians(longitude);
-                    let latitude1 = Angle::from_radians(latitude);
+                    let longitude1 = Angle::new::<radian>(longitude);
+                    let latitude1 = Angle::new::<radian>(latitude);
                     let longitude2 = longitude1 + offset;
                     let latitude2 = latitude1 + offset;
                     let mut coords1 = Spherical {
@@ -678,11 +681,11 @@ mod tests {
     fn test_normalization_crossing_poles() {
         let mut coord = Spherical {
             longitude: ANGLE_ZERO,
-            latitude: Angle::from_radians(3. / 4. * PI),
+            latitude: Angle::new::<radian>(3. / 4. * PI),
         };
         let expected = Spherical {
             longitude: HALF_CIRC,
-            latitude: Angle::from_radians(PI / 4.),
+            latitude: Angle::new::<radian>(PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
@@ -690,11 +693,11 @@ mod tests {
 
         let mut coord = Spherical {
             longitude: ANGLE_ZERO,
-            latitude: Angle::from_radians(-3. / 4. * PI),
+            latitude: Angle::new::<radian>(-3. / 4. * PI),
         };
         let expected = Spherical {
             longitude: HALF_CIRC,
-            latitude: Angle::from_radians(-PI / 4.),
+            latitude: Angle::new::<radian>(-PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
@@ -702,11 +705,11 @@ mod tests {
 
         let mut coord = Spherical {
             longitude: HALF_CIRC,
-            latitude: Angle::from_radians(3. / 4. * PI),
+            latitude: Angle::new::<radian>(3. / 4. * PI),
         };
         let expected = Spherical {
             longitude: ANGLE_ZERO,
-            latitude: Angle::from_radians(PI / 4.),
+            latitude: Angle::new::<radian>(PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
@@ -714,11 +717,11 @@ mod tests {
 
         let mut coord = Spherical {
             longitude: HALF_CIRC,
-            latitude: Angle::from_radians(-3. / 4. * PI),
+            latitude: Angle::new::<radian>(-3. / 4. * PI),
         };
         let expected = Spherical {
             longitude: ANGLE_ZERO,
-            latitude: Angle::from_radians(-PI / 4.),
+            latitude: Angle::new::<radian>(-PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
@@ -726,11 +729,11 @@ mod tests {
 
         let mut coord = Spherical {
             longitude: QUARTER_CIRC,
-            latitude: Angle::from_radians(3. / 4. * PI),
+            latitude: Angle::new::<radian>(3. / 4. * PI),
         };
         let expected = Spherical {
-            longitude: Angle::from_radians(3. / 2. * PI),
-            latitude: Angle::from_radians(PI / 4.),
+            longitude: Angle::new::<radian>(3. / 2. * PI),
+            latitude: Angle::new::<radian>(PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
@@ -738,23 +741,23 @@ mod tests {
 
         let mut coord = Spherical {
             longitude: QUARTER_CIRC,
-            latitude: Angle::from_radians(-3. / 4. * PI),
+            latitude: Angle::new::<radian>(-3. / 4. * PI),
         };
         let expected = Spherical {
-            longitude: Angle::from_radians(3. / 2. * PI),
-            latitude: Angle::from_radians(-PI / 4.),
+            longitude: Angle::new::<radian>(3. / 2. * PI),
+            latitude: Angle::new::<radian>(-PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
         assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY));
 
         let mut coord = Spherical {
-            longitude: Angle::from_radians(3. / 2. * PI),
-            latitude: Angle::from_radians(3. / 4. * PI),
+            longitude: Angle::new::<radian>(3. / 2. * PI),
+            latitude: Angle::new::<radian>(3. / 4. * PI),
         };
         let expected = Spherical {
             longitude: QUARTER_CIRC,
-            latitude: Angle::from_radians(PI / 4.),
+            latitude: Angle::new::<radian>(PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
@@ -767,8 +770,8 @@ mod tests {
         const STEP: usize = 100;
         for i in 0..STEP {
             for j in 0..STEP {
-                let ra_angle = Angle::from_radians(2. * PI * i as f64 / STEP as f64);
-                let dec_angle = Angle::from_radians(PI * j as f64 / STEP as f64 - PI / 2.);
+                let ra_angle = Angle::new::<radian>(2. * PI * i as f64 / STEP as f64);
+                let dec_angle = Angle::new::<radian>(PI * j as f64 / STEP as f64 - PI / 2.);
                 let spherical = Spherical {
                     longitude: ra_angle,
                     latitude: dec_angle,

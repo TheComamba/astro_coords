@@ -13,8 +13,8 @@ pub mod constants {
     use super::*;
 
     pub const ACC: f64 = 1e-5;
-    pub const DISTANCE_ACC: Distance<f64> = Distance { m: ACC };
-    pub const ANGLE_ACC: Angle<f64> = Angle { rad: ACC };
+    pub const DISTANCE_ACC: Length = Distance { m: ACC };
+    pub const ANGLE_ACC: Angle = Angle { rad: ACC };
 }
 
 #[cfg(test)]
@@ -27,7 +27,7 @@ pub mod examples {
 
     use super::*;
 
-    pub fn distance_examples() -> Vec<Distance<f64>> {
+    pub fn distance_examples() -> Vec<Length> {
         vec![
             Distance::from_m(0.1),
             Distance::from_m(2.0),
@@ -35,7 +35,7 @@ pub mod examples {
         ]
     }
 
-    pub fn positive_distance_examples() -> Vec<Distance<f64>> {
+    pub fn positive_distance_examples() -> Vec<Length> {
         vec![
             Distance::from_m(0.1),
             Distance::from_m(2.0),
@@ -43,19 +43,19 @@ pub mod examples {
         ]
     }
 
-    pub fn angle_examples() -> Vec<Angle<f64>> {
+    pub fn angle_examples() -> Vec<Angle> {
         vec![
-            Angle::from_degrees(0.0),
-            Angle::from_degrees(0.1),
-            Angle::from_degrees(45.0),
-            Angle::from_degrees(90.0),
-            Angle::from_degrees(180.0),
-            Angle::from_degrees(270.0),
-            Angle::from_degrees(360.0),
+            Angle::new::<degree>(0.0),
+            Angle::new::<degree>(0.1),
+            Angle::new::<degree>(45.0),
+            Angle::new::<degree>(90.0),
+            Angle::new::<degree>(180.0),
+            Angle::new::<degree>(270.0),
+            Angle::new::<degree>(360.0),
         ]
     }
 
-    pub fn long_time_examples() -> Vec<Time<f64>> {
+    pub fn long_time_examples() -> Vec<Time> {
         vec![
             Time::from_yr(0.0),
             Time::from_yr(1.0),
@@ -210,7 +210,7 @@ pub mod benchmarks {
 
     use super::*;
 
-    pub fn many_angles(num: usize) -> Vec<Angle<f64>> {
+    pub fn many_angles(num: usize) -> Vec<Angle> {
         let seed = [42; 32];
         let mut rng = StdRng::from_seed(seed);
 
@@ -239,7 +239,7 @@ pub mod benchmarks {
         directions
     }
 
-    pub fn many_times(num: usize) -> Vec<Time<f64>> {
+    pub fn many_times(num: usize) -> Vec<Time> {
         let seed = [42; 32];
         let mut rng = StdRng::from_seed(seed);
 

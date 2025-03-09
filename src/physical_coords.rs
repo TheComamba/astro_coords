@@ -2,7 +2,7 @@
 
 use std::fmt::Display;
 
-use simple_si_units::base::Time;
+use uom::si::f64::{Angle, Time};
 
 use crate::{
     angle_helper::*,
@@ -57,7 +57,7 @@ where
     fn change_from_cartographic_to_equatorial(
         &mut self,
         celestial_body: CelestialBody,
-        time_since_epoch: Time<f64>,
+        time_since_epoch: Time,
     ) {
         let old_z = celestial_body.z_axis();
         let equinox_to_q = QUARTER_CIRC - old_z.longitude;
@@ -96,7 +96,7 @@ where
     fn change_from_equatorial_to_cartographic(
         &mut self,
         celestial_body: CelestialBody,
-        time_since_epoch: Time<f64>,
+        time_since_epoch: Time,
     ) {
         let new_z = celestial_body.z_axis();
         let equinox_to_q = QUARTER_CIRC - new_z.longitude;
@@ -186,18 +186,18 @@ where
     /// use astro_coords::reference_frame::ReferenceFrame;
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::traits::*;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     ///
     /// // As an example, the position of the star Sirius is expressed in various reference frames.
     /// // The values are taken from [NASA's HEASARC Object Position Finder Tool](https://heasarc.gsfc.nasa.gov/cgi-bin/Tools/convcoord/convcoord.pl?CoordVal=Sirius&CoordType=J2000&Resolver=GRB%2FSIMBAD%2BSesame%2FNED&NoCache=on&Epoch=)
-    /// let equatorial_lon = Angle::from_deg(101.287155);
-    /// let equatorial_lat = Angle::from_deg(-16.716116);
+    /// let equatorial_lon = Angle::new::<degree>(101.287155);
+    /// let equatorial_lat = Angle::new::<degree>(-16.716116);
     /// let equatorial = PhysicalCoords::new(Spherical::new(equatorial_lon, equatorial_lat), ReferenceFrame::Equatorial);
-    /// let ecliptic_lon = Angle::from_deg(104.081665);
-    /// let ecliptic_lat = Angle::from_deg(-39.605249);
+    /// let ecliptic_lon = Angle::new::<degree>(104.081665);
+    /// let ecliptic_lat = Angle::new::<degree>(-39.605249);
     /// let ecliptic = PhysicalCoords::new(Spherical::new(ecliptic_lon, ecliptic_lat), ReferenceFrame::Ecliptic);
-    /// let galactic_lon = Angle::from_deg(227.230283);
-    /// let galactic_lat = Angle::from_deg(-8.890284);
+    /// let galactic_lon = Angle::new::<degree>(227.230283);
+    /// let galactic_lat = Angle::new::<degree>(-8.890284);
     /// let galactic = PhysicalCoords::new(Spherical::new(galactic_lon, galactic_lat), ReferenceFrame::Galactic);
     ///
     /// let equatorial_from_ecliptic = ecliptic.in_reference_frame(ReferenceFrame::Equatorial);
@@ -207,7 +207,7 @@ where
     /// let galactic_from_equatorial = equatorial.in_reference_frame(ReferenceFrame::Galactic);
     /// let galactic_from_ecliptic = ecliptic.in_reference_frame(ReferenceFrame::Galactic);
     ///
-    /// let acc = Angle::from_deg(1e-1); // Rotations can include some significant loss of accuracy.
+    /// let acc = Angle::new::<degree>(1e-1); // Rotations can include some significant loss of accuracy.
     /// assert!(equatorial_from_ecliptic.mathematical_coordinates().eq_within(equatorial.mathematical_coordinates(), acc));
     /// assert!(equatorial_from_galactic.mathematical_coordinates().eq_within(equatorial.mathematical_coordinates(), acc));
     /// assert!(ecliptic_from_equatorial.mathematical_coordinates().eq_within(ecliptic.mathematical_coordinates(), acc));
@@ -259,32 +259,28 @@ impl<T> ActiveRotation<PhysicalCoords<T>> for PhysicalCoords<T>
 where
     T: Mathematical + ActiveRotation<T> + AsRef<T> + Display,
 {
-    fn rotated(
-        &self,
-        angle: simple_si_units::geometry::Angle<f64>,
-        axis: &crate::direction::Direction,
-    ) -> PhysicalCoords<T> {
+    fn rotated(&self, angle: Angle, axis: &crate::direction::Direction) -> PhysicalCoords<T> {
         Self {
             reference_frame: self.reference_frame,
             mathematical_coordinates: self.mathematical_coordinates.rotated(angle, axis),
         }
     }
 
-    fn rotated_x(&self, angle: simple_si_units::geometry::Angle<f64>) -> PhysicalCoords<T> {
+    fn rotated_x(&self, angle: Angle) -> PhysicalCoords<T> {
         Self {
             reference_frame: self.reference_frame,
             mathematical_coordinates: self.mathematical_coordinates.rotated_x(angle),
         }
     }
 
-    fn rotated_y(&self, angle: simple_si_units::geometry::Angle<f64>) -> PhysicalCoords<T> {
+    fn rotated_y(&self, angle: Angle) -> PhysicalCoords<T> {
         Self {
             reference_frame: self.reference_frame,
             mathematical_coordinates: self.mathematical_coordinates.rotated_y(angle),
         }
     }
 
-    fn rotated_z(&self, angle: simple_si_units::geometry::Angle<f64>) -> PhysicalCoords<T> {
+    fn rotated_z(&self, angle: Angle) -> PhysicalCoords<T> {
         Self {
             reference_frame: self.reference_frame,
             mathematical_coordinates: self.mathematical_coordinates.rotated_z(angle),
@@ -315,7 +311,7 @@ impl Display for PhysicalCoords<crate::direction::Direction> {
 mod tests {
     use std::f64::consts::PI;
 
-    use simple_si_units::geometry::Angle;
+    use uom::si::angle::{degree, radian};
 
     use crate::{
         angle_helper::{normalized_angle, EARTH_AXIS_TILT},
@@ -342,7 +338,7 @@ mod tests {
     fn the_equations_for_changing_from_equatorial_to_ecliptic_reference_hold() {
         // https://aas.aanda.org/articles/aas/full/1998/01/ds1449/node3.html
 
-        let e = EARTH_AXIS_TILT.rad;
+        let e = EARTH_AXIS_TILT.get::<radian>();
 
         let angles = vec![0., PI, 0.3, 1.4, -1.4, 3.5, 7.];
         for ra in angles.clone() {
@@ -353,8 +349,8 @@ mod tests {
                 );
                 let ecliptic = equatorial.in_reference_frame(ReferenceFrame::Ecliptic);
                 let ecliptic_coords = ecliptic.mathematical_coordinates();
-                let l = ecliptic_coords.longitude.rad;
-                let b = ecliptic_coords.latitude.rad;
+                let l = ecliptic_coords.longitude.get::<radian>();
+                let b = ecliptic_coords.latitude.get::<radian>();
 
                 let lefthand = b.sin();
                 let righthand = dec.sin() * e.cos() - dec.cos() * e.sin() * ra.sin();
@@ -389,9 +385,9 @@ mod tests {
     #[test]
     fn the_equations_for_changing_from_equatorial_to_galactic_reference_hold() {
         // https://en.wikipedia.org/wiki/Galactic_coordinate_system#Conversion_between_equatorial_and_galactic_coordinates
-        let angp = RightAscension::new(12, 51, 24.).to_angle().rad as f64;
-        let dngp = Angle::from_deg(27.13).rad as f64;
-        let lncp = Angle::from_deg(122.93314).rad as f64;
+        let angp = RightAscension::new(12, 51, 24.).to_angle().get::<radian>() as f64;
+        let dngp = Angle::new::<degree>(27.13).get::<radian>() as f64;
+        let lncp = Angle::new::<degree>(122.93314).get::<radian>() as f64;
 
         let angles = vec![0., PI, 0.3, 1.4, -1.4, 3.5, 7.];
         for ra in angles.clone() {
@@ -402,8 +398,8 @@ mod tests {
                 );
                 let galactic = equatorial.in_reference_frame(ReferenceFrame::Galactic);
                 let galactic_coords = galactic.mathematical_coordinates();
-                let l = galactic_coords.longitude.rad;
-                let b = galactic_coords.latitude.rad;
+                let l = galactic_coords.longitude.get::<radian>();
+                let b = galactic_coords.latitude.get::<radian>();
 
                 let lefthand = b.sin();
                 let righthand = dngp.sin() * dec.sin() + dngp.cos() * dec.cos() * (ra - angp).cos();
@@ -446,19 +442,19 @@ mod tests {
         let ecliptic_coords = ecliptic.mathematical_coordinates();
         let l = ecliptic_coords.longitude;
         let b = ecliptic_coords.latitude;
-        let expected_l = Angle::from_deg(157.371833);
-        let expected_b = Angle::from_deg(14.878115);
-        assert!((l - expected_l).rad.abs() < 1e-5);
-        assert!((b - expected_b).rad.abs() < 1e-5);
+        let expected_l = Angle::new::<degree>(157.371833);
+        let expected_b = Angle::new::<degree>(14.878115);
+        assert!((l - expected_l).get::<radian>().abs() < 1e-5);
+        assert!((b - expected_b).get::<radian>().abs() < 1e-5);
 
         let galactic = equatorial.in_reference_frame(ReferenceFrame::Galactic);
         let galactic_coords = galactic.mathematical_coordinates();
         let l = galactic_coords.longitude;
         let b = galactic_coords.latitude;
-        let expected_l = normalized_angle(Angle::from_deg(217.042106));
-        let expected_b = Angle::from_deg(64.361644);
+        let expected_l = normalized_angle(Angle::new::<degree>(217.042106));
+        let expected_b = Angle::new::<degree>(64.361644);
         // Galactic coordinates seem to not be defined as accurately as ecliptic coordinates
-        assert!((l - expected_l).rad.abs() < 2e-4);
-        assert!((b - expected_b).rad.abs() < 2e-4);
+        assert!((l - expected_l).get::<radian>().abs() < 2e-4);
+        assert!((b - expected_b).get::<radian>().abs() < 2e-4);
     }
 }

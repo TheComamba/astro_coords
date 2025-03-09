@@ -1,14 +1,12 @@
 //! Cartesian coordinates in 3D space.
 
-use serde::{Deserialize, Serialize};
-use simple_si_units::{
-    base::Distance,
-    geometry::{Angle, Area},
-};
 use std::{
     fmt::Display,
     ops::{Add, Div, Mul, Neg, Sub},
 };
+
+use serde::{Deserialize, Serialize};
+use uom::si::f64::Length;
 
 use crate::{
     angle_helper::{safe_acos, ANGLE_ZERO, HALF_CIRC},
@@ -25,46 +23,46 @@ use super::{
 
 /// Cartesian coordinates in 3D space.
 ///
-/// The members x, y and z are typed as `Distance<f64>`.
+/// The members x, y and z are typed as `Length`.
 ///
 /// The struct implments basic arithmetic operations, such as addition, subtraction, multiplication and division.
 ///
 /// # Examples
 /// ```
-/// use simple_si_units::base::Distance;
+/// use uom::si::f64::Length;
 /// use astro_coords::cartesian::Cartesian;
 ///
-/// let c1 = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
-/// let c2 = Cartesian::new(Distance::from_meters(4.), Distance::from_meters(5.), Distance::from_meters(6.));
+/// let c1 = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(2.), Length::new::<meter>(3.));
+/// let c2 = Cartesian::new(Length::new::<meter>(4.), Length::new::<meter>(5.), Length::new::<meter>(6.));
 ///
 /// let add = &c1 + &c2;
-/// let expected = Cartesian::new(Distance::from_meters(5.), Distance::from_meters(7.), Distance::from_meters(9.));
-/// assert!(add.eq_within(&expected, Distance::from_meters(1e-5)));
+/// let expected = Cartesian::new(Length::new::<meter>(5.), Length::new::<meter>(7.), Length::new::<meter>(9.));
+/// assert!(add.eq_within(&expected, Length::new::<meter>(1e-5)));
 ///
 /// let sub = &c1 - &c2;
-/// let expected = Cartesian::new(Distance::from_meters(-3.), Distance::from_meters(-3.), Distance::from_meters(-3.));
-/// assert!(sub.eq_within(&expected, Distance::from_meters(1e-5)));
+/// let expected = Cartesian::new(Length::new::<meter>(-3.), Length::new::<meter>(-3.), Length::new::<meter>(-3.));
+/// assert!(sub.eq_within(&expected, Length::new::<meter>(1e-5)));
 ///
 /// let mul = &c1 * 2.;
-/// let expected = Cartesian::new(Distance::from_meters(2.), Distance::from_meters(4.), Distance::from_meters(6.));
-/// assert!(mul.eq_within(&expected, Distance::from_meters(1e-5)));
+/// let expected = Cartesian::new(Length::new::<meter>(2.), Length::new::<meter>(4.), Length::new::<meter>(6.));
+/// assert!(mul.eq_within(&expected, Length::new::<meter>(1e-5)));
 ///
 /// let div = &c1 / 2.;
-/// let expected = Cartesian::new(Distance::from_meters(0.5), Distance::from_meters(1.), Distance::from_meters(1.5));
-/// assert!(div.eq_within(&expected, Distance::from_meters(1e-5)));
+/// let expected = Cartesian::new(Length::new::<meter>(0.5), Length::new::<meter>(1.), Length::new::<meter>(1.5));
+/// assert!(div.eq_within(&expected, Length::new::<meter>(1e-5)));
 ///
 /// let neg = -c1;
-/// let expected = Cartesian::new(Distance::from_meters(-1.), Distance::from_meters(-2.), Distance::from_meters(-3.));
-/// assert!(neg.eq_within(&expected, Distance::from_meters(1e-5)));
+/// let expected = Cartesian::new(Length::new::<meter>(-1.), Length::new::<meter>(-2.), Length::new::<meter>(-3.));
+/// assert!(neg.eq_within(&expected, Length::new::<meter>(1e-5)));
 /// ```
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Cartesian {
     /// The x-ordinate.
-    pub x: Distance<f64>,
+    pub x: Length,
     /// The y-ordinate.
-    pub y: Distance<f64>,
+    pub y: Length,
     /// The z-ordinate.
-    pub z: Distance<f64>,
+    pub z: Length,
 }
 
 impl Mathematical for Cartesian {}
@@ -102,7 +100,7 @@ impl Cartesian {
     };
 
     /// Creates a new Cartesian object.
-    pub const fn new(x: Distance<f64>, y: Distance<f64>, z: Distance<f64>) -> Cartesian {
+    pub const fn new(x: Length, y: Length, z: Length) -> Cartesian {
         Cartesian { x, y, z }
     }
 
@@ -110,14 +108,14 @@ impl Cartesian {
     ///
     /// # Examples
     /// ```
-    /// use simple_si_units::base::Distance;
+    /// use uom::si::f64::Length;
     /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let c1 = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
-    /// let c2 = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
-    /// assert!(c1.eq_within(&c2, Distance::from_meters(0.1)));
+    /// let c1 = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(2.), Length::new::<meter>(3.));
+    /// let c2 = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(2.), Length::new::<meter>(3.));
+    /// assert!(c1.eq_within(&c2, Length::new::<meter>(0.1)));
     /// ```
-    pub fn eq_within(&self, other: &Cartesian, accuracy: Distance<f64>) -> bool {
+    pub fn eq_within(&self, other: &Cartesian, accuracy: Length) -> bool {
         (self.x.m - other.x.m).abs() < accuracy.m
             && (self.y.m - other.y.m).abs() < accuracy.m
             && (self.z.m - other.z.m).abs() < accuracy.m
@@ -130,13 +128,13 @@ impl Cartesian {
     ///
     /// # Examples
     /// ```
-    /// use simple_si_units::base::Distance;
+    /// use uom::si::f64::Length;
     /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(3.), Distance::from_meters(4.), Distance::from_meters(5.));
+    /// let coordinates = Cartesian::new(Length::new::<meter>(3.), Length::new::<meter>(4.), Length::new::<meter>(5.));
     /// assert!((coordinates.length().to_m() - 7.0710678118654755).abs() < 1e-5);
     /// ```
-    pub fn length(&self) -> Distance<f64> {
+    pub fn length(&self) -> Length {
         let x = self.x.m;
         let y = self.y.m;
         let z = self.z.m;
@@ -149,10 +147,10 @@ impl Cartesian {
     ///
     /// # Examples
     /// ```
-    /// use simple_si_units::base::Distance;
+    /// use uom::si::f64::Length;
     /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(3.), Distance::from_meters(4.), Distance::from_meters(5.));
+    /// let coordinates = Cartesian::new(Length::new::<meter>(3.), Length::new::<meter>(4.), Length::new::<meter>(5.));
     /// assert!((coordinates.length_squared().to_m2() - 50.).abs() < 1e-5);
     /// ```
     pub fn length_squared(&self) -> Area<f64> {
@@ -168,14 +166,14 @@ impl Cartesian {
     ///
     /// # Examples
     /// ```
-    /// use simple_si_units::base::Distance;
+    /// use uom::si::f64::Length;
     /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let c1 = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(2.), Distance::from_meters(3.));
-    /// let c2 = Cartesian::new(Distance::from_meters(4.), Distance::from_meters(5.), Distance::from_meters(6.));
+    /// let c1 = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(2.), Length::new::<meter>(3.));
+    /// let c2 = Cartesian::new(Length::new::<meter>(4.), Length::new::<meter>(5.), Length::new::<meter>(6.));
     /// assert!((c1.distance(&c2).to_m() - 5.196152422706632).abs() < 1e-5);
     /// ```
-    pub fn distance(&self, other: &Cartesian) -> Distance<f64> {
+    pub fn distance(&self, other: &Cartesian) -> Length {
         let diff = self - other;
         diff.length()
     }
@@ -184,16 +182,16 @@ impl Cartesian {
     ///
     /// # Examples
     /// ```
-    /// use simple_si_units::base::Distance;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Length;
+    /// use uom::si::f64::Angle;
     /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let c1 = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
-    /// let c2 = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// let c1 = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(0.), Length::new::<meter>(0.));
+    /// let c2 = Cartesian::new(Length::new::<meter>(0.), Length::new::<meter>(1.), Length::new::<meter>(0.));
     /// let angle = c1.angle_to(&c2).unwrap();
-    /// assert!((angle.to_degrees() - 90.).abs() < 1e-5);
+    /// assert!((angle.get::<degree>() - 90.).abs() < 1e-5);
     /// ```
-    pub fn angle_to(&self, other: &Cartesian) -> Result<Angle<f64>, AstroCoordsError> {
+    pub fn angle_to(&self, other: &Cartesian) -> Result<Angle, AstroCoordsError> {
         // Use that
         // cos²(θ) = (a · b)² / (|a|² |b|²) = 1/2 + cos(2 θ) / 2
         // => cos(2 θ) = 2 (a · b)² / (|a|² |b|²) - 1
@@ -220,10 +218,10 @@ impl Cartesian {
     ///
     /// # Examples
     /// ```
-    /// use simple_si_units::base::Distance;
+    /// use uom::si::f64::Length;
     /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// let coordinates = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(1.), Length::new::<meter>(0.));
     /// let direction = coordinates.to_direction().unwrap();
     /// assert!((direction.x() - 0.7071067811865476).abs() < 1e-5);
     /// assert!((direction.y() - 0.7071067811865476).abs() < 1e-5);
@@ -257,13 +255,13 @@ impl Cartesian {
     ///
     /// # Examples
     /// ```
-    /// use simple_si_units::base::Distance;
+    /// use uom::si::f64::Length;
     /// use astro_coords::cartesian::Cartesian;
     ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(1.), Distance::from_meters(0.));
+    /// let coordinates = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(1.), Length::new::<meter>(0.));
     /// let spherical = coordinates.to_spherical().unwrap();
-    /// assert!((spherical.longitude.to_degrees() - 45.).abs() < 1e-5);
-    /// assert!((spherical.latitude.to_degrees() - 0.).abs() < 1e-5);
+    /// assert!((spherical.longitude.get::<degree>() - 45.).abs() < 1e-5);
+    /// assert!((spherical.latitude.get::<degree>() - 0.).abs() < 1e-5);
     /// ```
     pub fn to_spherical(&self) -> Result<Spherical, AstroCoordsError> {
         Spherical::cartesian_to_spherical((self.x.m, self.y.m, self.z.m))
@@ -275,18 +273,18 @@ impl ActiveRotation<Cartesian> for Cartesian {
     ///
     /// # Examples
     /// ```
-    /// use simple_si_units::base::Distance;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Length;
+    /// use uom::si::f64::Angle;
     /// use astro_coords::{cartesian::Cartesian, direction::Direction, traits::*};
     ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
-    /// let angle = Angle::from_degrees(90.);
+    /// let coordinates = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(0.), Length::new::<meter>(0.));
+    /// let angle = Angle::new::<degree>(90.);
     /// let axis = Direction::new(0., 0., 1.).unwrap();
     /// let rotated = coordinates.rotated(angle, &axis);
-    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
-    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// let expected = Cartesian::new(Length::new::<meter>(0.), Length::new::<meter>(1.), Length::new::<meter>(0.));
+    /// assert!(rotated.eq_within(&expected, Length::new::<meter>(1e-5)));
     /// ```
-    fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Cartesian {
+    fn rotated(&self, angle: Angle, axis: &Direction) -> Cartesian {
         let (x, y, z) = rotated_tuple((self.x, self.y, self.z), angle, axis);
         Cartesian { x, y, z }
     }
@@ -297,17 +295,17 @@ impl ActiveRotation<Cartesian> for Cartesian {
     ///
     /// # Examples
     /// ```
-    /// use simple_si_units::base::Distance;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Length;
+    /// use uom::si::f64::Angle;
     /// use astro_coords::{cartesian::Cartesian, traits::*};
     ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
-    /// let angle = Angle::from_degrees(90.);
+    /// let coordinates = Cartesian::new(Length::new::<meter>(0.), Length::new::<meter>(1.), Length::new::<meter>(0.));
+    /// let angle = Angle::new::<degree>(90.);
     /// let rotated = coordinates.rotated_x(angle);
-    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(0.), Distance::from_meters(1.));
-    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// let expected = Cartesian::new(Length::new::<meter>(0.), Length::new::<meter>(0.), Length::new::<meter>(1.));
+    /// assert!(rotated.eq_within(&expected, Length::new::<meter>(1e-5)));
     /// ```
-    fn rotated_x(&self, angle: Angle<f64>) -> Cartesian {
+    fn rotated_x(&self, angle: Angle) -> Cartesian {
         let (x, y, z) = rotated_x_tuple((self.x, self.y, self.z), angle);
         Cartesian { x, y, z }
     }
@@ -318,17 +316,17 @@ impl ActiveRotation<Cartesian> for Cartesian {
     ///
     /// # Examples
     /// ```
-    /// use simple_si_units::base::Distance;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Length;
+    /// use uom::si::f64::Angle;
     /// use astro_coords::{cartesian::Cartesian, traits::*};
     ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
-    /// let angle = Angle::from_degrees(90.);
+    /// let coordinates = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(0.), Length::new::<meter>(0.));
+    /// let angle = Angle::new::<degree>(90.);
     /// let rotated = coordinates.rotated_y(angle);
-    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(0.), Distance::from_meters(-1.));
-    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// let expected = Cartesian::new(Length::new::<meter>(0.), Length::new::<meter>(0.), Length::new::<meter>(-1.));
+    /// assert!(rotated.eq_within(&expected, Length::new::<meter>(1e-5)));
     /// ```
-    fn rotated_y(&self, angle: Angle<f64>) -> Cartesian {
+    fn rotated_y(&self, angle: Angle) -> Cartesian {
         let (x, y, z) = rotated_y_tuple((self.x, self.y, self.z), angle);
         Cartesian { x, y, z }
     }
@@ -339,17 +337,17 @@ impl ActiveRotation<Cartesian> for Cartesian {
     ///
     /// # Examples
     /// ```
-    /// use simple_si_units::base::Distance;
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Length;
+    /// use uom::si::f64::Angle;
     /// use astro_coords::{cartesian::Cartesian, traits::*};
     ///
-    /// let coordinates = Cartesian::new(Distance::from_meters(1.), Distance::from_meters(0.), Distance::from_meters(0.));
-    /// let angle = Angle::from_degrees(90.);
+    /// let coordinates = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(0.), Length::new::<meter>(0.));
+    /// let angle = Angle::new::<degree>(90.);
     /// let rotated = coordinates.rotated_z(angle);
-    /// let expected = Cartesian::new(Distance::from_meters(0.), Distance::from_meters(1.), Distance::from_meters(0.));
-    /// assert!(rotated.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// let expected = Cartesian::new(Length::new::<meter>(0.), Length::new::<meter>(1.), Length::new::<meter>(0.));
+    /// assert!(rotated.eq_within(&expected, Length::new::<meter>(1e-5)));
     /// ```
-    fn rotated_z(&self, angle: Angle<f64>) -> Cartesian {
+    fn rotated_z(&self, angle: Angle) -> Cartesian {
         let (x, y, z) = rotated_z_tuple((self.x, self.y, self.z), angle);
         Cartesian { x, y, z }
     }
@@ -383,14 +381,14 @@ impl PassiveRotation<Cartesian> for Cartesian {
     /// # Example
     /// ```
     /// use astro_coords::{cartesian::Cartesian, traits::*};
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     ///
     /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
     /// let dir_of_sun_in_ecliptic = Cartesian::Y_DIRECTION;
     ///
     /// // Now we want to express the sun's direction in earth equatorial coordinates.
     /// // The rotation axis of the earth expressed in ecliptic coordinates is given by:
-    /// let earth_axis_tilt = Angle::from_degrees(23.44);
+    /// let earth_axis_tilt = Angle::new::<degree>(23.44);
     /// let earth_rotation_axis_in_ecliptic = Cartesian::Z_DIRECTION.rotated_x(-earth_axis_tilt);
     ///
     /// // The sun's direction in earth equatorial coordinates is then:
@@ -410,7 +408,7 @@ impl PassiveRotation<Cartesian> for Cartesian {
     }
 }
 
-fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Cartesian) -> (Angle<f64>, Angle<f64>) {
+fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Cartesian) -> (Angle, Angle) {
     let angle_to_old_z = match new_z.angle_to(&Cartesian::Z_DIRECTION) {
         Ok(angle) => angle,
         Err(_) => return (ANGLE_ZERO, ANGLE_ZERO),
@@ -588,9 +586,9 @@ mod tests {
     #[test]
     fn test_length() {
         let coordinates = Cartesian {
-            x: Distance::from_meters(3.),
-            y: Distance::from_meters(4.),
-            z: Distance::from_meters(5.),
+            x: Length::new::<meter>(3.),
+            y: Length::new::<meter>(4.),
+            z: Length::new::<meter>(5.),
         };
 
         assert!((coordinates.length().to_m() - 7.0710678118654755).abs() < TEST_ACCURACY);
@@ -606,14 +604,14 @@ mod tests {
                         for y2 in ordinates.iter() {
                             for z2 in ordinates.iter() {
                                 let c1 = Cartesian::new(
-                                    Distance::from_meters(*x1),
-                                    Distance::from_meters(*y1),
-                                    Distance::from_meters(*z1),
+                                    Length::new::<meter>(*x1),
+                                    Length::new::<meter>(*y1),
+                                    Length::new::<meter>(*z1),
                                 );
                                 let c2 = Cartesian::new(
-                                    Distance::from_meters(*x2),
-                                    Distance::from_meters(*y2),
-                                    Distance::from_meters(*z2),
+                                    Length::new::<meter>(*x2),
+                                    Length::new::<meter>(*y2),
+                                    Length::new::<meter>(*z2),
                                 );
                                 let c3 = &c1 - &c2;
                                 let c4 = c1.clone() - c2.clone();

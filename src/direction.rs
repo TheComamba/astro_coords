@@ -3,9 +3,9 @@
 use serde::ser::SerializeTuple;
 use serde::Serializer;
 use serde::{Deserialize, Serialize};
-use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
 use std::ops::Neg;
+use uom::si::f64::{Angle, Length};
 
 use crate::equatorial::Equatorial;
 use crate::error::AstroCoordsError;
@@ -88,17 +88,17 @@ impl Direction {
     ///
     /// # Example
     /// ```
-    /// use simple_si_units::base::Distance;
+    /// use uom::si::f64::Length;
     /// use astro_coords::{direction::Direction, cartesian::Cartesian};
     ///
     /// let direction = Direction::new(1., 1., 1.).unwrap();
-    /// let length = Distance::from_meters(10.);
+    /// let length = Length::new::<meter>(10.);
     /// let ordinate_length = length / 3f64.sqrt();
     /// let cartesian = direction.to_cartesian(length);
     /// let expected = Cartesian::new(ordinate_length, ordinate_length, ordinate_length);
-    /// assert!(cartesian.eq_within(&expected, Distance::from_meters(1e-5)));
+    /// assert!(cartesian.eq_within(&expected, Length::new::<meter>(1e-5)));
     /// ```
-    pub fn to_cartesian(&self, length: Distance<f64>) -> Cartesian {
+    pub fn to_cartesian(&self, length: Length) -> Cartesian {
         Cartesian::new(self.x * length, self.y * length, self.z * length)
     }
 
@@ -110,18 +110,18 @@ impl Direction {
     ///
     /// let direction = Direction::X;
     /// let spherical = direction.to_spherical();
-    /// assert!((spherical.latitude.to_degrees() - 0.).abs() < 1e-5);
-    /// assert!((spherical.longitude.to_degrees() - 0.).abs() < 1e-5);
+    /// assert!((spherical.latitude.get::<degree>() - 0.).abs() < 1e-5);
+    /// assert!((spherical.longitude.get::<degree>() - 0.).abs() < 1e-5);
     ///
     /// let direction = Direction::Y;
     /// let spherical = direction.to_spherical();
-    /// assert!((spherical.latitude.to_degrees() - 0.).abs() < 1e-5);
-    /// assert!((spherical.longitude.to_degrees() - 90.).abs() < 1e-5);
+    /// assert!((spherical.latitude.get::<degree>() - 0.).abs() < 1e-5);
+    /// assert!((spherical.longitude.get::<degree>() - 90.).abs() < 1e-5);
     ///
     /// let direction = Direction::Z;
     /// let spherical = direction.to_spherical();
-    /// assert!((spherical.latitude.to_degrees() - 90.).abs() < 1e-5);
-    /// assert!((spherical.longitude.to_degrees() - 0.).abs() < 1e-5);
+    /// assert!((spherical.latitude.get::<degree>() - 90.).abs() < 1e-5);
+    /// assert!((spherical.longitude.get::<degree>() - 0.).abs() < 1e-5);
     /// ```
     pub fn to_spherical(&self) -> Spherical {
         // Direction is normalised and thus guaranteed to produce valid spherical coordinates.
@@ -169,9 +169,9 @@ impl Direction {
     /// let direction = Direction::X;
     /// let other = Direction::Y;
     /// let angle = direction.angle_to(&other);
-    /// assert!((angle.to_degrees() - 90.).abs() < 1e-5);
+    /// assert!((angle.get::<degree>() - 90.).abs() < 1e-5);
     /// ```
-    pub fn angle_to(&self, other: &Direction) -> Angle<f64> {
+    pub fn angle_to(&self, other: &Direction) -> Angle {
         let (ax, ay, az) = (self.x(), self.y(), self.z());
         let (bx, by, bz) = (other.x(), other.y(), other.z());
 
@@ -187,7 +187,7 @@ impl Direction {
     ///
     /// let direction = Direction::new(1., 2., 3.).unwrap();
     /// let orthogonal = direction.some_orthogonal_vector();
-    /// assert!(orthogonal.angle_to(&direction).to_degrees() - 90. < 1e-5);
+    /// assert!(orthogonal.angle_to(&direction).get::<degree>() - 90. < 1e-5);
     /// ```
     pub fn some_orthogonal_vector(&self) -> Direction {
         let ortho = if self.x().abs() > NORMALIZATION_THRESHOLD {
@@ -259,16 +259,16 @@ impl ActiveRotation<Direction> for Direction {
     ///
     /// # Example
     /// ```
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::X;
-    /// let angle = Angle::from_degrees(90.);
+    /// let angle = Angle::new::<degree>(90.);
     /// let axis = Direction::Z;
     /// let rotated = direction.rotated(angle, &axis);
     /// assert!(rotated.eq_within(&Direction::Y, 1e-5));
     /// ```
-    fn rotated(&self, angle: Angle<f64>, axis: &Direction) -> Direction {
+    fn rotated(&self, angle: Angle, axis: &Direction) -> Direction {
         let (x, y, z) = rotated_tuple((self.x, self.y, self.z), angle, axis);
         Direction { x, y, z }
     }
@@ -279,15 +279,15 @@ impl ActiveRotation<Direction> for Direction {
     ///
     /// # Example
     /// ```
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::Y;
-    /// let angle = Angle::from_degrees(90.);
+    /// let angle = Angle::new::<degree>(90.);
     /// let rotated = direction.rotated_x(angle);
     /// assert!(rotated.eq_within(&Direction::Z, 1e-5));
     /// ```
-    fn rotated_x(&self, angle: Angle<f64>) -> Direction {
+    fn rotated_x(&self, angle: Angle) -> Direction {
         let (x, y, z) = rotated_x_tuple((self.x, self.y, self.z), angle);
         Direction { x, y, z }
     }
@@ -298,15 +298,15 @@ impl ActiveRotation<Direction> for Direction {
     ///
     /// # Example
     /// ```
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::Z;
-    /// let angle = Angle::from_degrees(90.);
+    /// let angle = Angle::new::<degree>(90.);
     /// let rotated = direction.rotated_y(angle);
     /// assert!(rotated.eq_within(&Direction::X, 1e-5));
     /// ```
-    fn rotated_y(&self, angle: Angle<f64>) -> Direction {
+    fn rotated_y(&self, angle: Angle) -> Direction {
         let (x, y, z) = rotated_y_tuple((self.x, self.y, self.z), angle);
         Direction { x, y, z }
     }
@@ -317,15 +317,15 @@ impl ActiveRotation<Direction> for Direction {
     ///
     /// # Example
     /// ```
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::X;
-    /// let angle = Angle::from_degrees(90.);
+    /// let angle = Angle::new::<degree>(90.);
     /// let rotated = direction.rotated_z(angle);
     /// assert!(rotated.eq_within(&Direction::Y, 1e-5));
     /// ```
-    fn rotated_z(&self, angle: Angle<f64>) -> Direction {
+    fn rotated_z(&self, angle: Angle) -> Direction {
         let (x, y, z) = rotated_z_tuple((self.x, self.y, self.z), angle);
         Direction { x, y, z }
     }
@@ -358,7 +358,7 @@ impl PassiveRotation<Direction> for Direction {
     ///
     /// # Example
     /// ```
-    /// use simple_si_units::geometry::Angle;
+    /// use uom::si::f64::Angle;
     /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
@@ -366,7 +366,7 @@ impl PassiveRotation<Direction> for Direction {
     ///
     /// // Now we want to express the sun's direction in earth equatorial coordinates.
     /// // The rotation axis of the earth expressed in ecliptic coordinates is given by:
-    /// let earth_axis_tilt = Angle::from_degrees(23.44);
+    /// let earth_axis_tilt = Angle::new::<degree>(23.44);
     /// let earth_rotation_axis_in_ecliptic = Direction::Z.rotated_x(-earth_axis_tilt);
     ///
     /// // The sun's direction in earth equatorial coordinates is then:
@@ -386,7 +386,7 @@ impl PassiveRotation<Direction> for Direction {
     }
 }
 
-fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Direction) -> (Angle<f64>, Angle<f64>) {
+fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Direction) -> (Angle, Angle) {
     let angle_to_old_z = new_z.angle_to(&Direction::Z);
 
     let axis_projected_onto_xy_plane = Direction::new(new_z.x(), new_z.y(), 0.);
@@ -443,7 +443,7 @@ mod tests {
     use super::*;
 
     const TEST_ACCURACY: f64 = 1e-5;
-    const ROTATION_ACCURACY: Angle<f64> = Angle { rad: 1e-3 }; //Accos is a bit unstable
+    const ROTATION_ACCURACY: Angle = Angle { rad: 1e-3 }; //Accos is a bit unstable
 
     #[test]
     fn from_spherical() {
@@ -451,9 +451,9 @@ mod tests {
         for x in values.iter() {
             for y in values.iter() {
                 for z in values.iter() {
-                    let x = Distance::from_meters(*x);
-                    let y = Distance::from_meters(*y);
-                    let z = Distance::from_meters(*z);
+                    let x = Length::new::<meter>(*x);
+                    let y = Length::new::<meter>(*y);
+                    let z = Length::new::<meter>(*z);
                     let cartesian = Cartesian::new(x, y, z);
                     let length = cartesian.length();
                     let expected_x = x / length;
@@ -471,7 +471,7 @@ mod tests {
 
     #[test]
     fn angle_between_is_half_turn() {
-        let expected: Angle<f64> = HALF_CIRC;
+        let expected: Angle = HALF_CIRC;
 
         let angle = Direction::X.angle_to(&(-&Direction::X));
         println!("angle: {}", angle);
@@ -535,7 +535,7 @@ mod tests {
 
     #[test]
     fn angle_between_is_zero() {
-        let expected: Angle<f64> = Angle::from_rad(0.);
+        let expected: Angle = Angle::from_rad(0.);
 
         let angle = Direction::X.angle_to(&Direction::X);
         println!("expected: {}, actual: {}", expected, angle);

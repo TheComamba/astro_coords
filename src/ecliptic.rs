@@ -1,8 +1,9 @@
 //! This module contains the Ecliptic struct and its implementation.
 
-use serde::{Deserialize, Serialize};
-use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
+
+use serde::{Deserialize, Serialize};
+use uom::si::f64::{Angle, Length};
 
 use crate::{cartesian::Cartesian, equatorial::Equatorial};
 
@@ -40,11 +41,11 @@ impl Ecliptic {
         self.spherical.normalize();
     }
 
-    pub fn eq_within(&self, other: &Ecliptic, accuracy: Angle<f64>) -> bool {
+    pub fn eq_within(&self, other: &Ecliptic, accuracy: Angle) -> bool {
         self.spherical.eq_within(&other.spherical, accuracy)
     }
 
-    pub fn to_cartesian(&self, length: Distance<f64>) -> Cartesian {
+    pub fn to_cartesian(&self, length: Length) -> Cartesian {
         self.to_direction().to_cartesian(length)
     }
 
@@ -64,7 +65,7 @@ impl Ecliptic {
         self.spherical
     }
 
-    pub fn angle_to(&self, other: &Self) -> Angle<f64> {
+    pub fn angle_to(&self, other: &Self) -> Angle {
         self.to_direction().angle_to(&other.to_direction())
     }
 }
@@ -98,13 +99,15 @@ pub(super) const EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES: Ecliptic =
     Ecliptic::new(Spherical::new(
         crate::angle_helper::QUARTER_CIRC,
         Angle {
-            rad: crate::angle_helper::QUARTER_CIRC.rad - crate::angle_helper::EARTH_AXIS_TILT.rad,
+            rad: crate::angle_helper::QUARTER_CIRC.get::<radian>()
+                - crate::angle_helper::EARTH_AXIS_TILT.get::<radian>(),
         },
     ));
 
 #[cfg(test)]
 mod tests {
-    use simple_si_units::geometry::Angle;
+
+    use uom::si::{angle::radian, f64::Angle};
 
     use crate::{angle_helper::angle_eq_within, direction::Direction, traits::*};
 
@@ -119,7 +122,7 @@ mod tests {
                         if dir1.is_err() {
                             continue;
                         }
-                        let angle = Angle::from_radians((*angle).abs());
+                        let angle = Angle::new::<radian>((*angle).abs());
                         let dir1 = dir1.unwrap();
                         let axis = dir1.some_orthogonal_vector();
                         let dir2 = dir1.rotated(angle, &axis);

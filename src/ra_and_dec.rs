@@ -1,7 +1,7 @@
 //! Right Ascension and Declination types and conversions.
 
-use simple_si_units::geometry::Angle;
 use std::fmt::Display;
+use uom::si::{angle::degree, f64::Angle};
 
 /// Right ascension is the angular distance of a point eastward along the celestial equator from the vernal equinox to the point in question.
 ///
@@ -17,15 +17,15 @@ use std::fmt::Display;
 /// assert_eq!(format!("{}", ra), "01h02m03.456s");
 ///
 /// let ra = RightAscension::new(6, 0, 0.);
-/// assert!((ra.to_angle().to_degrees() - 90.).abs() < 1e-5);
+/// assert!((ra.to_angle().get::<degree>() - 90.).abs() < 1e-5);
 ///
 /// let one_hour = RightAscension::new(1, 0, 0.);
 /// let sixty_minutes = RightAscension::new(0, 60, 0.);
-/// assert!((one_hour.to_angle() - sixty_minutes.to_angle()).to_degrees().abs() < 1e-5);
+/// assert!((one_hour.to_angle() - sixty_minutes.to_angle()).get::<degree>().abs() < 1e-5);
 ///
 /// let one_minute = RightAscension::new(0, 1, 0.);
 /// let sixty_seconds = RightAscension::new(0, 0, 60.);
-/// assert!((one_minute.to_angle() - sixty_seconds.to_angle()).to_degrees().abs() < 1e-5);
+/// assert!((one_minute.to_angle() - sixty_seconds.to_angle()).get::<degree>().abs() < 1e-5);
 /// ```
 pub struct RightAscension {
     /// Subdivision of the equatorial plane into 24 hours.
@@ -52,15 +52,15 @@ pub struct RightAscension {
 /// assert_eq!(format!("{}", dec), "+01°02'03.456\"");
 ///
 /// let dec = Declination::new(Sgn::Neg, 45, 0, 0.);
-/// assert!((dec.to_angle().to_degrees() + 45.).abs() < 1e-5);
+/// assert!((dec.to_angle().get::<degree>() + 45.).abs() < 1e-5);
 ///
 /// let one_degree = Declination::new(Sgn::Pos, 1, 0, 0.);
 /// let sixty_arcminutes = Declination::new(Sgn::Pos, 0, 60, 0.);
-/// assert!((one_degree.to_angle() - sixty_arcminutes.to_angle()).to_degrees().abs() < 1e-5);
+/// assert!((one_degree.to_angle() - sixty_arcminutes.to_angle()).get::<degree>().abs() < 1e-5);
 ///
 /// let one_arcminute = Declination::new(Sgn::Pos, 0, 1, 0.);
 /// let sixty_arcseconds = Declination::new(Sgn::Pos, 0, 0, 60.);
-/// assert!((one_arcminute.to_angle() - sixty_arcseconds.to_angle()).to_degrees().abs() < 1e-5);
+/// assert!((one_arcminute.to_angle() - sixty_arcseconds.to_angle()).get::<degree>().abs() < 1e-5);
 /// ```
 pub struct Declination {
     /// Sign of the declination, denoting northern or southern hemisphere.
@@ -95,12 +95,12 @@ impl RightAscension {
     }
 
     /// Convert the right ascension to an angle.
-    pub fn to_angle(&self) -> Angle<f64> {
+    pub fn to_angle(&self) -> Angle {
         let hours = self.hours as f64;
         let minutes = self.minutes as f64;
         let seconds = self.seconds as f64;
 
-        Angle::from_degrees((hours + minutes / 60. + seconds / 3600.) * 15.)
+        Angle::new::<degree>((hours + minutes / 60. + seconds / 3600.) * 15.)
     }
 }
 
@@ -126,7 +126,7 @@ impl Declination {
     }
 
     /// Convert the declination to an angle.
-    pub fn to_angle(&self) -> Angle<f64> {
+    pub fn to_angle(&self) -> Angle {
         let sign = match self.sign {
             Sgn::Pos => 1.,
             Sgn::Neg => -1.,
@@ -135,7 +135,7 @@ impl Declination {
         let minutes = self.arcminutes as f64;
         let seconds = self.arcseconds as f64;
 
-        sign * Angle::from_degrees(degrees + minutes / 60. + seconds / 3600.)
+        sign * Angle::new::<degree>(degrees + minutes / 60. + seconds / 3600.)
     }
 }
 

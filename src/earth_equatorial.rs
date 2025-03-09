@@ -1,7 +1,8 @@
 //! This module contains the EarthEquatorial struct and its implementation.
 
-use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
+
+use uom::si::f64::{Angle, Length};
 
 use crate::{
     angle_helper::EARTH_AXIS_TILT, cartesian::Cartesian, equatorial::Equatorial, traits::*,
@@ -25,19 +26,19 @@ use super::{direction::Direction, ecliptic::Ecliptic, spherical::Spherical};
 ///
 /// The EarthEquatorial struct provides methods to convert to and from other coordinate systems.
 pub struct EarthEquatorial {
-    right_ascension: Angle<f64>,
-    declination: Angle<f64>,
+    right_ascension: Angle,
+    declination: Angle,
 }
 
 impl EarthEquatorial {
-    pub const fn new(right_ascension: Angle<f64>, declination: Angle<f64>) -> EarthEquatorial {
+    pub const fn new(right_ascension: Angle, declination: Angle) -> EarthEquatorial {
         EarthEquatorial {
             right_ascension,
             declination,
         }
     }
 
-    pub fn to_cartesian(&self, length: Distance<f64>) -> Cartesian {
+    pub fn to_cartesian(&self, length: Length) -> Cartesian {
         self.to_direction().to_cartesian(length)
     }
 
@@ -59,7 +60,7 @@ impl EarthEquatorial {
         self.to_direction().to_spherical()
     }
 
-    pub fn eq_within(&self, other: &EarthEquatorial, accuracy: Angle<f64>) -> bool {
+    pub fn eq_within(&self, other: &EarthEquatorial, accuracy: Angle) -> bool {
         let mut self_spherical = Spherical::new(self.right_ascension, self.declination);
         self_spherical.normalize();
         let mut other_spherical = Spherical::new(other.right_ascension, other.declination);
@@ -76,20 +77,20 @@ impl Display for EarthEquatorial {
 
 #[cfg(test)]
 pub(super) mod tests {
-    use simple_si_units::geometry::Angle;
+    use uom::si::f64::Angle;
 
     use crate::{angle_helper::*, direction::Direction, ecliptic::Ecliptic, spherical::Spherical};
 
     use super::EarthEquatorial;
 
     const TEST_ACCURACY: f64 = 1e-5;
-    const ANGLE_TEST_ACCURACY: Angle<f64> = Angle { rad: TEST_ACCURACY };
+    const ANGLE_TEST_ACCURACY: Angle = Angle { rad: TEST_ACCURACY };
 
     pub(super) const EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES: Ecliptic =
         Ecliptic::new(Spherical::new(
             QUARTER_CIRC,
             Angle {
-                rad: QUARTER_CIRC.rad - EARTH_AXIS_TILT.rad,
+                rad: QUARTER_CIRC.get::<radian>() - EARTH_AXIS_TILT.get::<radian>(),
             },
         ));
 
@@ -97,7 +98,7 @@ pub(super) mod tests {
     fn the_sun_is_high_in_northern_hemisphere_during_summer_solstice() {
         let direction = Direction::Y;
         let equatorial = direction.to_earth_equatorial();
-        assert!(equatorial.declination.rad > 0.);
+        assert!(equatorial.declination.get::<radian>() > 0.);
     }
 
     /*
@@ -105,7 +106,7 @@ pub(super) mod tests {
      */
     #[test]
     fn ra_zero_dec_ninty_is_north_pole() {
-        let equatorial = EarthEquatorial::new(Angle::from_degrees(0.), Angle::from_degrees(90.));
+        let equatorial = EarthEquatorial::new(Angle::new::<degree>(0.), Angle::new::<degree>(90.));
         let expected = EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES;
         let actual = equatorial.to_ecliptic();
         println!("expected: {},\n  actual: {}", expected, actual);
@@ -132,8 +133,8 @@ pub(super) mod tests {
      */
     #[test]
     fn ra_ninty_dec_zero_is_equator_zenith() {
-        let equatorial = EarthEquatorial::new(Angle::from_degrees(90.), ANGLE_ZERO);
-        let expected = Ecliptic::new(Spherical::new(Angle::from_degrees(90.), -EARTH_AXIS_TILT));
+        let equatorial = EarthEquatorial::new(Angle::new::<degree>(90.), ANGLE_ZERO);
+        let expected = Ecliptic::new(Spherical::new(Angle::new::<degree>(90.), -EARTH_AXIS_TILT));
         let actual = equatorial.to_ecliptic();
         println!("expected: {},\n  actual: {}", expected, actual);
         assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
@@ -144,7 +145,7 @@ pub(super) mod tests {
      */
     #[test]
     fn ra_oneeighty_dec_zero_is_minus_x_axis() {
-        let equatorial = EarthEquatorial::new(Angle::from_degrees(180.), ANGLE_ZERO);
+        let equatorial = EarthEquatorial::new(Angle::new::<degree>(180.), ANGLE_ZERO);
         let expected = -Ecliptic::X_DIRECTION;
         let actual = equatorial.to_ecliptic();
         println!("expected: {},\n  actual: {}", expected, actual);
@@ -156,8 +157,8 @@ pub(super) mod tests {
      */
     #[test]
     fn ra_twoseventy_dec_zero_is_equator_midnight() {
-        let equatorial = EarthEquatorial::new(Angle::from_degrees(270.), ANGLE_ZERO);
-        let expected = Ecliptic::new(Spherical::new(Angle::from_degrees(270.), EARTH_AXIS_TILT));
+        let equatorial = EarthEquatorial::new(Angle::new::<degree>(270.), ANGLE_ZERO);
+        let expected = Ecliptic::new(Spherical::new(Angle::new::<degree>(270.), EARTH_AXIS_TILT));
         let actual = equatorial.to_ecliptic();
         println!("expected: {},\n  actual: {}", expected, actual);
         assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
@@ -168,7 +169,7 @@ pub(super) mod tests {
      */
     #[test]
     fn ra_ninty_dec_tilt_is_y_axis() {
-        let equatorial = EarthEquatorial::new(Angle::from_degrees(90.), EARTH_AXIS_TILT);
+        let equatorial = EarthEquatorial::new(Angle::new::<degree>(90.), EARTH_AXIS_TILT);
         let expected = Ecliptic::Y_DIRECTION;
         let actual = equatorial.to_ecliptic();
         println!("expected: {},\n  actual: {}", expected, actual);
@@ -181,8 +182,8 @@ pub(super) mod tests {
     #[test]
     fn ra_twoseventy_dec_ninty_minus_tilt_is_z_axis() {
         let equatorial = EarthEquatorial::new(
-            Angle::from_degrees(270.),
-            Angle::from_degrees(90.) - EARTH_AXIS_TILT,
+            Angle::new::<degree>(270.),
+            Angle::new::<degree>(90.) - EARTH_AXIS_TILT,
         );
         let expected = Ecliptic::Z_DIRECTION;
         let actual = equatorial.to_ecliptic();
@@ -195,10 +196,11 @@ pub(super) mod tests {
      */
     #[test]
     fn specific_testcase() {
-        let equatorial = EarthEquatorial::new(Angle::from_degrees(234.), Angle::from_degrees(56.));
+        let equatorial =
+            EarthEquatorial::new(Angle::new::<degree>(234.), Angle::new::<degree>(56.));
         let expected = Spherical::new(
-            Angle::from_degrees(194.547656),
-            Angle::from_degrees(70.149178),
+            Angle::new::<degree>(194.547656),
+            Angle::new::<degree>(70.149178),
         )
         .to_ecliptic();
         let actual = equatorial.to_ecliptic();
@@ -211,8 +213,8 @@ pub(super) mod tests {
         const STEPS: usize = 100;
         for i in 0..STEPS {
             for j in 0..STEPS {
-                let ra = Angle::from_degrees(360. * i as f64 / STEPS as f64);
-                let dec = Angle::from_degrees(180. * j as f64 / STEPS as f64 - 90.);
+                let ra = Angle::new::<degree>(360. * i as f64 / STEPS as f64);
+                let dec = Angle::new::<degree>(180. * j as f64 / STEPS as f64 - 90.);
                 let equatorial = EarthEquatorial::new(ra, dec);
                 let ecliptic_dir = equatorial.to_direction();
                 let actual = ecliptic_dir.to_earth_equatorial();

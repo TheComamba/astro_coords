@@ -1,4 +1,4 @@
-use simple_si_units::base::Distance;
+use uom::si::f64::Length;
 use utils::{constants::*, examples::*};
 
 mod utils;

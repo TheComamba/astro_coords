@@ -1,17 +1,18 @@
 //! Functions for rotating vectors.
 
-use simple_si_units::geometry::Angle;
 use std::ops::{Add, Mul, Sub};
+
+use uom::si::{angle::radian, f64::Angle};
 
 use crate::direction::Direction;
 
 /// Rotates a 3-tuple around an arbitrary axis.
-pub(crate) fn rotated_tuple<T>(tup: (T, T, T), angle: Angle<f64>, axis: &Direction) -> (T, T, T)
+pub(crate) fn rotated_tuple<T>(tup: (T, T, T), angle: Angle, axis: &Direction) -> (T, T, T)
 where
     T: Mul<f64, Output = T> + Add<Output = T> + Copy,
 {
-    let cos = angle.rad.cos();
-    let sin = angle.rad.sin();
+    let cos = angle.get::<radian>().cos();
+    let sin = angle.get::<radian>().sin();
 
     let (x, y, z) = tup;
 
@@ -38,12 +39,12 @@ where
 }
 
 /// Rotates a 3-tuple around the x-axis.
-pub(crate) fn rotated_x_tuple<T>(tup: (T, T, T), angle: Angle<f64>) -> (T, T, T)
+pub(crate) fn rotated_x_tuple<T>(tup: (T, T, T), angle: Angle) -> (T, T, T)
 where
     T: Mul<f64, Output = T> + Add<Output = T> + Sub<Output = T> + Copy,
 {
-    let cos = angle.rad.cos();
-    let sin = angle.rad.sin();
+    let cos = angle.get::<radian>().cos();
+    let sin = angle.get::<radian>().sin();
 
     let (x, y, z) = tup;
 
@@ -54,12 +55,12 @@ where
 }
 
 /// Rotates a 3-tuple around the y-axis.
-pub(crate) fn rotated_y_tuple<T>(tup: (T, T, T), angle: Angle<f64>) -> (T, T, T)
+pub(crate) fn rotated_y_tuple<T>(tup: (T, T, T), angle: Angle) -> (T, T, T)
 where
     T: Mul<f64, Output = T> + Add<Output = T> + Sub<Output = T> + Copy,
 {
-    let cos = angle.rad.cos();
-    let sin = angle.rad.sin();
+    let cos = angle.get::<radian>().cos();
+    let sin = angle.get::<radian>().sin();
 
     let (x, y, z) = tup;
 
@@ -70,12 +71,12 @@ where
 }
 
 /// Rotates a 3-tuple around the z-axis.
-pub(crate) fn rotated_z_tuple<T>(tup: (T, T, T), angle: Angle<f64>) -> (T, T, T)
+pub(crate) fn rotated_z_tuple<T>(tup: (T, T, T), angle: Angle) -> (T, T, T)
 where
     T: Mul<f64, Output = T> + Add<Output = T> + Sub<Output = T> + Copy,
 {
-    let cos = angle.rad.cos();
-    let sin = angle.rad.sin();
+    let cos = angle.get::<radian>().cos();
+    let sin = angle.get::<radian>().sin();
 
     let (x, y, z) = tup;
 
@@ -89,17 +90,17 @@ where
 ///
 /// # Example
 /// ```
-/// use simple_si_units::geometry::Angle;
+/// use uom::si::f64::Angle;
 /// use astro_coords::direction::Direction;
 /// use astro_coords::transformations::rotations::get_rotation_parameters;
 ///
 /// let start = Direction::new(1., 0., 0.).unwrap();
 /// let end = Direction::new(0., 1., 0.).unwrap();
 /// let (angle, axis) = get_rotation_parameters(&start, &end);
-/// assert!((angle.to_degrees() - 90.).abs() < 1e-5);
+/// assert!((angle.get::<degree>() - 90.).abs() < 1e-5);
 /// assert!(axis.eq_within(&Direction::Z, 1e-5));
 /// ```
-pub fn get_rotation_parameters(start: &Direction, end: &Direction) -> (Angle<f64>, Direction) {
+pub fn get_rotation_parameters(start: &Direction, end: &Direction) -> (Angle, Direction) {
     let angle = start.angle_to(end);
     let axis = start.cross_product(end);
     if let Ok(axis) = axis {

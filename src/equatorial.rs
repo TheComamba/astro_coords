@@ -1,7 +1,8 @@
 //! This module contains the Equatorial struct and its implementation.
 
-use simple_si_units::{base::Distance, geometry::Angle};
 use std::fmt::Display;
+
+use uom::si::f64::{Angle, Length};
 
 use crate::{
     cartesian::Cartesian, earth_equatorial::EarthEquatorial, ecliptic::Ecliptic, traits::*,
@@ -22,7 +23,7 @@ impl Equatorial {
         }
     }
 
-    pub fn to_cartesian(&self, length: Distance<f64>) -> Cartesian {
+    pub fn to_cartesian(&self, length: Length) -> Cartesian {
         self.to_direction().to_cartesian(length)
     }
 
@@ -44,7 +45,7 @@ impl Equatorial {
         self.to_ecliptic().to_spherical()
     }
 
-    pub fn eq_within(&self, other: &Equatorial, accuracy: Angle<f64>) -> bool {
+    pub fn eq_within(&self, other: &Equatorial, accuracy: Angle) -> bool {
         self.to_ecliptic().eq_within(&other.to_ecliptic(), accuracy)
     }
 }
@@ -61,6 +62,8 @@ impl Display for Equatorial {
 
 #[cfg(test)]
 mod tests {
+    use uom::si::angle::radian;
+
     use crate::{
         earth_equatorial::EarthEquatorial, ecliptic::EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES,
     };
@@ -162,8 +165,8 @@ mod tests {
 
         for long in ordinates.clone() {
             for lat in ordinates.clone() {
-                let long = Angle::from_radians(long);
-                let lat = Angle::from_radians(lat);
+                let long = Angle::new::<radian>(long);
+                let lat = Angle::new::<radian>(lat);
                 let spherical = Spherical::new(long, lat);
 
                 let equatorial_coordinates = Equatorial::new(spherical, earth_north.clone());
