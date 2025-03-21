@@ -27,7 +27,7 @@ pub(crate) fn earth_axis_tilt() -> Angle {
 }
 #[inline]
 pub(crate) fn galactic_longitude_of_north_celestial_pole() -> Angle {
-    Angle::new::<radian>(122.93314)
+    Angle::new::<degree>(122.93314)
 }
 #[inline]
 pub(crate) fn ra_of_galactic_north() -> Angle {
@@ -35,7 +35,7 @@ pub(crate) fn ra_of_galactic_north() -> Angle {
 }
 #[inline]
 pub(crate) fn dec_of_galactic_north() -> Angle {
-    Angle::new::<radian>(27.13)
+    Angle::new::<degree>(27.13)
 }
 
 pub(crate) fn angle_eq_within(actual: Angle, expected: Angle, accuracy: Angle) -> bool {
