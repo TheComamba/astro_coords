@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::f64::consts::PI;
 
 use rand::{rngs::StdRng, Rng, SeedableRng};
@@ -14,8 +16,6 @@ pub mod constants {
         f64::{Angle, Length},
         length::meter,
     };
-
-    use super::*;
 
     pub const ACC: f64 = 1e-5;
     pub fn distance_acc() -> Length {
@@ -236,7 +236,7 @@ pub mod benchmarks {
 
         let mut angles = Vec::new();
         for _ in 0..num {
-            let rad = rng.gen_range((-PI)..PI);
+            let rad = rng.random_range((-PI)..PI);
             angles.push(Angle::new::<radian>(rad));
         }
         angles
@@ -248,9 +248,9 @@ pub mod benchmarks {
 
         let mut directions = Vec::new();
         for _ in 0..num {
-            let x = rng.gen_range((-5.)..5.);
-            let y = rng.gen_range((-5.)..5.);
-            let z = rng.gen_range((-5.)..5.);
+            let x = rng.random_range((-5.)..5.);
+            let y = rng.random_range((-5.)..5.);
+            let z = rng.random_range((-5.)..5.);
             let direction = Direction::new(x, y, z);
             if let Ok(dir) = direction {
                 directions.push(dir);
@@ -265,7 +265,7 @@ pub mod benchmarks {
 
         let mut times = Vec::new();
         for _ in 0..num {
-            let yr = rng.gen_range(0.0..1000.0);
+            let yr = rng.random_range(0.0..1000.0);
             times.push(Time::new::<year>(yr));
         }
         times
@@ -277,9 +277,9 @@ pub mod benchmarks {
 
         let mut cartesians = Vec::new();
         for _ in 0..num {
-            let x = rng.gen_range((-5.)..5.);
-            let y = rng.gen_range((-5.)..5.);
-            let z = rng.gen_range((-5.)..5.);
+            let x = rng.random_range((-5.)..5.);
+            let y = rng.random_range((-5.)..5.);
+            let z = rng.random_range((-5.)..5.);
             cartesians.push(Cartesian::new(
                 Length::new::<meter>(x),
                 Length::new::<meter>(y),
@@ -295,8 +295,8 @@ pub mod benchmarks {
 
         let mut sphericals = Vec::new();
         for _ in 0..num {
-            let longitude = Angle::new::<radian>(rng.gen_range((-PI)..PI));
-            let latitude = Angle::new::<radian>(rng.gen_range((-PI / 2.)..(PI / 2.)));
+            let longitude = Angle::new::<radian>(rng.random_range((-PI)..PI));
+            let latitude = Angle::new::<radian>(rng.random_range((-PI / 2.)..(PI / 2.)));
             sphericals.push(Spherical::new(longitude, latitude));
         }
         sphericals
