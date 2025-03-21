@@ -2,7 +2,7 @@
 
 use std::f64::consts::PI;
 
-use rand::{rngs::StdRng, Rng, SeedableRng};
+use rand::{Rng, SeedableRng, rngs::StdRng};
 
 use astro_coords::{
     cartesian::Cartesian, direction::Direction, earth_equatorial::EarthEquatorial,

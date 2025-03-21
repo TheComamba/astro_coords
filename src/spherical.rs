@@ -11,8 +11,8 @@ use uom::{
 };
 
 use crate::{
-    angle_helper::*, cartesian::Cartesian, earth_equatorial::EarthEquatorial,
-    equatorial::Equatorial, error::AstroCoordsError, traits::*, NORMALIZATION_THRESHOLD,
+    NORMALIZATION_THRESHOLD, angle_helper::*, cartesian::Cartesian,
+    earth_equatorial::EarthEquatorial, equatorial::Equatorial, error::AstroCoordsError, traits::*,
 };
 
 use super::{

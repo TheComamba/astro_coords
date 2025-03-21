@@ -330,9 +330,11 @@ mod tests {
 
         let physical = PhysicalCoords::new(Direction::X, equatorial).in_reference_frame(ecliptic);
 
-        assert!(physical
-            .mathematical_coordinates
-            .eq_within(&Direction::X, 1e-5));
+        assert!(
+            physical
+                .mathematical_coordinates
+                .eq_within(&Direction::X, 1e-5)
+        );
     }
 
     #[test]

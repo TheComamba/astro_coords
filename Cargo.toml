@@ -2,7 +2,7 @@
 authors = ["The Comamba <thecomamba@jojoheinze.de>"]
 categories = ["mathematics", "science"]
 description = "A Rust crate containing typed coordinate systems found in the context of astronomy."
-edition = "2021"
+edition = "2024"
 keywords = ["coordinates", "astronomy"]
 license = "MIT"
 name = "astro_coords"

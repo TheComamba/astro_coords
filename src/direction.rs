@@ -1,7 +1,7 @@
 //! This module contains the Direction struct, which represents a normalized vector in 3D space.
 
-use serde::ser::SerializeTuple;
 use serde::Serializer;
+use serde::ser::SerializeTuple;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::ops::Neg;
@@ -11,7 +11,7 @@ use crate::equatorial::Equatorial;
 use crate::error::AstroCoordsError;
 use crate::traits::*;
 use crate::transformations::rotations::*;
-use crate::{angle_helper::*, NORMALIZATION_THRESHOLD};
+use crate::{NORMALIZATION_THRESHOLD, angle_helper::*};
 
 use super::{
     cartesian::Cartesian, earth_equatorial::EarthEquatorial, ecliptic::Ecliptic,

@@ -203,10 +203,15 @@ impl Display for CelestialBody {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CelestialBody::Custom(rot) => {
-                write!(f, "Custom body rotating around the {} axis, with a prime meridian offset of {}+{}*t",
-                rot.z_axis,
-                rot.prime_meridian_offset_offset.into_format_args(radian, DisplayStyle::Abbreviation),
-                rot.prime_meridian_offset_rate.into_format_args(radian_per_second, DisplayStyle::Abbreviation))
+                write!(
+                    f,
+                    "Custom body rotating around the {} axis, with a prime meridian offset of {}+{}*t",
+                    rot.z_axis,
+                    rot.prime_meridian_offset_offset
+                        .into_format_args(radian, DisplayStyle::Abbreviation),
+                    rot.prime_meridian_offset_rate
+                        .into_format_args(radian_per_second, DisplayStyle::Abbreviation)
+                )
             }
             CelestialBody::Sun => write!(f, "Sun"),
             CelestialBody::Mercury => write!(f, "Mercury"),

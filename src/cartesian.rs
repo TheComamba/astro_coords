@@ -13,13 +13,13 @@ use uom::si::{
 };
 
 use crate::{
+    NORMALIZATION_THRESHOLD,
     angle_helper::{angle_zero, half_circ, safe_acos},
     earth_equatorial::EarthEquatorial,
     equatorial::Equatorial,
     error::AstroCoordsError,
     traits::*,
     units::au,
-    NORMALIZATION_THRESHOLD,
 };
 
 use super::{

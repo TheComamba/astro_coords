@@ -13,9 +13,16 @@ fn angle_is_the_same_for_direction_and_cartesian() {
                     let cart1 = dir1.to_cartesian(dist1);
                     let cart2 = dir2.to_cartesian(dist2);
                     let new_angle = cart1.angle_to(&cart2).unwrap();
-                    assert!((angle - new_angle).get::<radian>().abs() < ACC,
-                    "dir1: {:?}\ndir2: {:?}\ndist1: {:?}\ndist2: {:?}\nangle: {:?}\nnew_angle: {:?}",
-                    dir1, dir2, dist1, dist2, angle, new_angle);
+                    assert!(
+                        (angle - new_angle).get::<radian>().abs() < ACC,
+                        "dir1: {:?}\ndir2: {:?}\ndist1: {:?}\ndist2: {:?}\nangle: {:?}\nnew_angle: {:?}",
+                        dir1,
+                        dir2,
+                        dist1,
+                        dist2,
+                        angle,
+                        new_angle
+                    );
                 }
             }
         }
