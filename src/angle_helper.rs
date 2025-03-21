@@ -93,7 +93,7 @@ pub(crate) mod test {
     }
 
     pub(crate) fn angle_to_arcsecs(angle: &Angle) -> f64 {
-        angle / &ARCSEC()
+        angle.get::<radian>() / ARCSEC().get::<radian>()
     }
 
     pub(crate) fn angle_from_second_angle(second_angle: f64) -> Angle {

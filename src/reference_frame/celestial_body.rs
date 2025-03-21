@@ -152,7 +152,7 @@ impl CelestialBody {
         let offset = match self {
             CelestialBody::Custom(rotational_elements) => {
                 rotational_elements.prime_meridian_offset_offset
-                    + rotational_elements.prime_meridian_offset_rate * time_since_epoch
+                    + (rotational_elements.prime_meridian_offset_rate * time_since_epoch).into()
             }
             CelestialBody::Sun => {
                 Angle::new::<degree>(84.176)

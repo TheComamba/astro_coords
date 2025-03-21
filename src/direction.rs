@@ -442,7 +442,10 @@ impl<'de> Deserialize<'de> for Direction {
 mod tests {
     use uom::{
         fmt::DisplayStyle,
-        si::{angle::radian, length::meter},
+        si::{
+            angle::radian,
+            length::{light_year, meter},
+        },
     };
 
     use super::*;
@@ -468,9 +471,9 @@ mod tests {
                     let expected_z = z / length;
                     let direction = cartesian.to_spherical().unwrap().to_direction();
 
-                    assert!((direction.x() - expected_x).abs() < TEST_ACCURACY);
-                    assert!((direction.y() - expected_y).abs() < TEST_ACCURACY);
-                    assert!((direction.z() - expected_z).abs() < TEST_ACCURACY);
+                    assert!((direction.x() - expected_x.value).abs() < TEST_ACCURACY);
+                    assert!((direction.y() - expected_y.value).abs() < TEST_ACCURACY);
+                    assert!((direction.z() - expected_z.value).abs() < TEST_ACCURACY);
                 }
             }
         }
@@ -807,9 +810,9 @@ mod tests {
 
     #[test]
     fn direction_from_large_vector_is_ok() {
-        let x = Distance::from_lyr(2000.);
-        let y = Distance::from_lyr(1e-10);
-        let z = Distance::from_lyr(-2000.);
+        let x = Length::new::<light_year>(2000.);
+        let y = Length::new::<light_year>(1e-10);
+        let z = Length::new::<light_year>(-2000.);
         let cartesian = Cartesian::new(x, y, z);
         let expected = Direction::new(1., 0., -1.).unwrap();
         let actual = cartesian.to_direction().unwrap();
