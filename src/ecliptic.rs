@@ -111,7 +111,10 @@ pub(super) fn EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES() -> Ecliptic {
 #[cfg(test)]
 mod tests {
 
-    use uom::si::{angle::radian, f64::Angle};
+    use uom::{
+        fmt::DisplayStyle,
+        si::{angle::radian, f64::Angle},
+    };
 
     use crate::{angle_helper::angle_eq_within, direction::Direction, traits::*};
 
@@ -135,8 +138,14 @@ mod tests {
                         let ecliptic2 = dir2.to_ecliptic();
                         let actual_angle = ecliptic1.angle_to(&ecliptic2);
 
-                        println!("Expected: {}", angle);
-                        println!("Actual: {}", actual_angle);
+                        println!(
+                            "Expected: {}",
+                            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+                        );
+                        println!(
+                            "Actual: {}",
+                            actual_angle.into_format_args(radian, DisplayStyle::Abbreviation)
+                        );
                         assert!(angle_eq_within(
                             actual_angle,
                             angle,

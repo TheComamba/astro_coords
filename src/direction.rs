@@ -238,7 +238,7 @@ impl Direction {
     }
 
     pub fn to_earth_equatorial(&self) -> EarthEquatorial {
-        let dir_in_equatorial = self.rotated(EARTH_AXIS_TILT, &Direction::X);
+        let dir_in_equatorial = self.rotated(EARTH_AXIS_TILT(), &Direction::X);
         let spherical = dir_in_equatorial.to_spherical();
         EarthEquatorial::new(spherical.longitude, spherical.latitude)
     }
@@ -440,7 +440,10 @@ impl<'de> Deserialize<'de> for Direction {
 
 #[cfg(test)]
 mod tests {
-    use uom::si::{angle::radian, length::meter};
+    use uom::{
+        fmt::DisplayStyle,
+        si::{angle::radian, length::meter},
+    };
 
     use super::*;
 
@@ -478,85 +481,139 @@ mod tests {
         let expected: Angle = HALF_CIRC();
 
         let angle = Direction::X.angle_to(&(-&Direction::X));
-        println!("angle: {}", angle);
+        println!(
+            "angle: {}",
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle = Direction::Y.angle_to(&(-&Direction::Y));
-        println!("angle: {}", angle);
+        println!(
+            "angle: {}",
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle = Direction::Z.angle_to(&(-&Direction::Z));
-        println!("angle: {}", angle);
+        println!(
+            "angle: {}",
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle1 = Direction::new(1., 1., 0.).unwrap();
         let angle2 = Direction::new(-1., -1., 0.).unwrap();
         let angle = angle1.angle_to(&angle2);
-        println!("angle: {}", angle);
+        println!(
+            "angle: {}",
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle1 = Direction::new(1., 0., 1.).unwrap();
         let angle2 = Direction::new(-1., 0., -1.).unwrap();
         let angle = angle1.angle_to(&angle2);
-        println!("angle: {}", angle);
+        println!(
+            "angle: {}",
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle1 = Direction::new(0., 1., 1.).unwrap();
         let angle2 = Direction::new(0., -1., -1.).unwrap();
         let angle = angle1.angle_to(&angle2);
-        println!("angle: {}", angle);
+        println!(
+            "angle: {}",
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
     }
 
     #[test]
     fn angle_between_is_quarter_turn() {
-        let expected = QUARTER_CIRC;
+        let expected = QUARTER_CIRC();
 
         let angle = Direction::X.angle_to(&Direction::Y);
-        println!("expected: {}, actual: {}", expected, angle);
+        println!(
+            "expected: {}, actual: {}",
+            expected.into_format_args(radian, DisplayStyle::Abbreviation),
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle = Direction::X.angle_to(&Direction::Z);
-        println!("expected: {}, actual: {}", expected, angle);
+        println!(
+            "expected: {}, actual: {}",
+            expected.into_format_args(radian, DisplayStyle::Abbreviation),
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle = Direction::Y.angle_to(&Direction::Z);
-        println!("expected: {}, actual: {}", expected, angle);
+        println!(
+            "expected: {}, actual: {}",
+            expected.into_format_args(radian, DisplayStyle::Abbreviation),
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle1 = Direction::new(1., 1., 0.).unwrap();
         let angle2 = Direction::new(1., -1., 0.).unwrap();
         let angle = angle1.angle_to(&angle2);
-        println!("expected: {}, actual: {}", expected, angle);
+        println!(
+            "expected: {}, actual: {}",
+            expected.into_format_args(radian, DisplayStyle::Abbreviation),
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle1 = Direction::new(1., 0., 1.).unwrap();
         let angle2 = Direction::new(1., 0., -1.).unwrap();
         let angle = angle1.angle_to(&angle2);
-        println!("expected: {}, actual: {}", expected, angle);
+        println!(
+            "expected: {}, actual: {}",
+            expected.into_format_args(radian, DisplayStyle::Abbreviation),
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
     }
 
     #[test]
     fn angle_between_is_zero() {
-        let expected: Angle = Angle::from_rad(0.);
+        let expected = Angle::new::<radian>(0.);
 
         let angle = Direction::X.angle_to(&Direction::X);
-        println!("expected: {}, actual: {}", expected, angle);
+        println!(
+            "expected: {}, actual: {}",
+            expected.into_format_args(radian, DisplayStyle::Abbreviation),
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle = Direction::Y.angle_to(&Direction::Y);
-        println!("expected: {}, actual: {}", expected, angle);
+        println!(
+            "expected: {}, actual: {}",
+            expected.into_format_args(radian, DisplayStyle::Abbreviation),
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle = Direction::Z.angle_to(&Direction::Z);
-        println!("expected: {}, actual: {}", expected, angle);
+        println!(
+            "expected: {}, actual: {}",
+            expected.into_format_args(radian, DisplayStyle::Abbreviation),
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
 
         let angle1 = Direction::new(1., 1., 0.).unwrap();
         let angle2 = Direction::new(1., 1., 0.).unwrap();
         let angle = angle1.angle_to(&angle2);
-        println!("expected: {}, actual: {}", expected, angle);
+        println!(
+            "expected: {}, actual: {}",
+            expected.into_format_args(radian, DisplayStyle::Abbreviation),
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, expected, ROTATION_ACCURACY()));
     }
 
@@ -763,7 +820,7 @@ mod tests {
     #[test]
     fn angle_between_two_close_directions() {
         // The maths is correct, but this is really unstable due to accos.
-        let test_accuracy = Angle { rad: 0.03 };
+        let test_accuracy = Angle::new::<radian>(0.03);
         let a = Direction {
             x: -0.085366555,
             y: -0.8412673,
@@ -775,7 +832,10 @@ mod tests {
             z: -0.5338369,
         };
         let angle = a.angle_to(&b);
-        println!("angle: {}", angle);
+        println!(
+            "angle: {}",
+            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+        );
         assert!(angle_eq_within(angle, ANGLE_ZERO(), test_accuracy));
     }
 

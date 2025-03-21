@@ -139,7 +139,7 @@ pub(super) mod tests {
     #[test]
     fn ra_zero_dec_zer_is_x_axis() {
         let equatorial = EarthEquatorial::new(ANGLE_ZERO(), ANGLE_ZERO());
-        let expected = Ecliptic::X_DIRECTION;
+        let expected = Ecliptic::X_DIRECTION();
         let actual = equatorial.to_ecliptic();
         println!("expected: {},\n  actual: {}", expected, actual);
         assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY()));

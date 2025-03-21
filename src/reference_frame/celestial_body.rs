@@ -167,7 +167,8 @@ impl CelestialBody {
                     - Angle::new::<degree>(1.4813688) * time_since_epoch.get::<day>()
             }
             CelestialBody::Earth => {
-                FULL_CIRC * (0.7790572732640 + 1.00273781191135448 * time_since_epoch.get::<day>())
+                FULL_CIRC()
+                    * (0.7790572732640 + 1.00273781191135448 * time_since_epoch.get::<day>())
             }
             CelestialBody::Mars => {
                 Angle::new::<degree>(176.049863)
