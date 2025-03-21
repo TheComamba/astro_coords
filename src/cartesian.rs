@@ -6,7 +6,7 @@ use std::{
 };
 
 use serde::{Deserialize, Serialize};
-use uom::si::f64::Length;
+use uom::si::f64::{Angle, Length};
 
 use crate::{
     angle_helper::{safe_acos, ANGLE_ZERO, HALF_CIRC},
@@ -116,9 +116,9 @@ impl Cartesian {
     /// assert!(c1.eq_within(&c2, Length::new::<meter>(0.1)));
     /// ```
     pub fn eq_within(&self, other: &Cartesian, accuracy: Length) -> bool {
-        (self.x.m - other.x.m).abs() < accuracy.m
-            && (self.y.m - other.y.m).abs() < accuracy.m
-            && (self.z.m - other.z.m).abs() < accuracy.m
+        (self.x - other.x).abs() < accuracy
+            && (self.y - other.y).abs() < accuracy
+            && (self.z - other.z).abs() < accuracy
     }
 
     /// Returns the length of the vector defined by the coordinates.
@@ -579,6 +579,8 @@ impl Display for Cartesian {
 
 #[cfg(test)]
 mod tests {
+    use uom::si::length::meter;
+
     use super::*;
 
     const TEST_ACCURACY: f64 = 1e-5;

@@ -437,7 +437,14 @@ mod tests {
                                 let end = end.unwrap();
                                 println!("start: {}, end: {}", start, end);
                                 let (angle, axis) = get_rotation_parameters(&start, &end);
-                                println!("angle: {}, axis: {}", angle, axis);
+                                println!(
+                                    "angle: {}, axis: {}",
+                                    angle.into_format_args(
+                                        radian,
+                                        uom::fmt::DisplayStyle::Abbreviation
+                                    ),
+                                    axis
+                                );
                                 let rotated = start.rotated(angle, &axis);
                                 println!("expected: {}, actual: {}", end, rotated);
                                 assert!(rotated.eq_within(&end, ROTATION_DIRECTION_ACCURACY));

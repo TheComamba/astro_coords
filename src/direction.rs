@@ -440,6 +440,8 @@ impl<'de> Deserialize<'de> for Direction {
 
 #[cfg(test)]
 mod tests {
+    use uom::si::length::meter;
+
     use super::*;
 
     const TEST_ACCURACY: f64 = 1e-5;

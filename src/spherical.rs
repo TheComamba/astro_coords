@@ -2,9 +2,12 @@
 
 use serde::{Deserialize, Serialize};
 use std::{fmt::Display, ops::Neg};
-use uom::si::{
-    angle::{degree, radian},
-    f64::Angle,
+use uom::{
+    fmt::DisplayStyle,
+    si::{
+        angle::{degree, radian},
+        f64::{Angle, Length},
+    },
 };
 
 use crate::{
@@ -401,7 +404,14 @@ impl Neg for Spherical {
 
 impl Display for Spherical {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({} long, {} lat)", self.longitude, self.latitude)
+        write!(
+            f,
+            "({} long, {} lat)",
+            self.longitude
+                .into_format_args(radian, DisplayStyle::Abbreviation),
+            self.latitude
+                .into_format_args(radian, DisplayStyle::Abbreviation)
+        )
     }
 }
 

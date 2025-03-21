@@ -1,9 +1,13 @@
 use std::fmt::Display;
 
-use uom::si::{
-    angle::degree,
-    f64::{Angle, AngularVelocity, Time},
-    time::day,
+use uom::{
+    fmt::DisplayStyle,
+    si::{
+        angle::{degree, radian},
+        angular_velocity::radian_per_second,
+        f64::{Angle, AngularVelocity, Time},
+        time::day,
+    },
 };
 
 use crate::{
@@ -196,8 +200,8 @@ impl Display for CelestialBody {
             CelestialBody::Custom(rot) => {
                 write!(f, "Custom body rotating around the {} axis, with a prime meridian offset of {}+{}*t",
                 rot.z_axis,
-                rot.prime_meridian_offset_offset,
-                rot.prime_meridian_offset_rate)
+                rot.prime_meridian_offset_offset.into_format_args(radian, DisplayStyle::Abbreviation),
+                rot.prime_meridian_offset_rate.into_format_args(radian_per_second, DisplayStyle::Abbreviation))
             }
             CelestialBody::Sun => write!(f, "Sun"),
             CelestialBody::Mercury => write!(f, "Mercury"),

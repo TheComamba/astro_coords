@@ -2,7 +2,13 @@
 
 use std::fmt::Display;
 
-use uom::si::f64::{Angle, Length};
+use uom::{
+    fmt::DisplayStyle,
+    si::{
+        angle::degree,
+        f64::{Angle, Length},
+    },
+};
 
 use crate::{
     angle_helper::EARTH_AXIS_TILT, cartesian::Cartesian, equatorial::Equatorial, traits::*,
@@ -71,13 +77,20 @@ impl EarthEquatorial {
 
 impl Display for EarthEquatorial {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "RA: {}, Dec: {}", self.right_ascension, self.declination)
+        write!(
+            f,
+            "RA: {}, Dec: {}",
+            self.right_ascension
+                .into_format_args(degree, DisplayStyle::Abbreviation),
+            self.declination
+                .into_format_args(degree, DisplayStyle::Abbreviation)
+        )
     }
 }
 
 #[cfg(test)]
 pub(super) mod tests {
-    use uom::si::f64::Angle;
+    use uom::si::{angle::degree, f64::Angle};
 
     use crate::{angle_helper::*, direction::Direction, ecliptic::Ecliptic, spherical::Spherical};
 
