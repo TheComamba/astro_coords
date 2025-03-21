@@ -1,4 +1,5 @@
 use astro_coords::traits::*;
+use uom::{fmt::DisplayStyle, si::length::meter};
 use utils::{constants::*, examples::*};
 
 mod utils;
@@ -16,7 +17,7 @@ fn cartesian_roundtrips() {
 
             let mathematical_after_roundtrip = new_physical.mathematical_coordinates();
             assert!(
-                original_mathematical.eq_within(mathematical_after_roundtrip, DISTANCE_ACC),
+                original_mathematical.eq_within(mathematical_after_roundtrip, DISTANCE_ACC()),
                 "{:?} != {:?}",
                 original_mathematical,
                 mathematical_after_roundtrip
@@ -60,7 +61,7 @@ fn spherical_roundtrips() {
 
             let mathematical_after_roundtrip = new_physical.mathematical_coordinates();
             assert!(
-                original_mathematical.eq_within(mathematical_after_roundtrip, ANGLE_ACC),
+                original_mathematical.eq_within(mathematical_after_roundtrip, ANGLE_ACC()),
                 "{:?} != {:?}",
                 original_mathematical,
                 mathematical_after_roundtrip
@@ -79,10 +80,10 @@ fn changing_reference_frame_of_cartesian_preserves_length() {
             new_physical.change_reference_frame(target_frame);
             let new_length = new_physical.mathematical_coordinates().length();
             assert!(
-                (original_length - new_length).m.abs() < ACC,
+                (original_length - new_length).abs().value < ACC,
                 "{} != {}",
-                original_length,
-                new_length
+                original_length.into_format_args(meter, DisplayStyle::Abbreviation),
+                new_length.into_format_args(meter, DisplayStyle::Abbreviation)
             );
         }
     }

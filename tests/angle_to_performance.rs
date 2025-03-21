@@ -1,5 +1,6 @@
 use serial_test::serial;
 use std::time::{Duration, Instant};
+use uom::si::angle::radian;
 
 use utils::benchmarks::{many_cartesians, many_directions, many_sphericals};
 

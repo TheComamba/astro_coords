@@ -1,3 +1,4 @@
+use uom::si::angle::radian;
 use utils::{constants::*, examples::*};
 
 mod utils;
