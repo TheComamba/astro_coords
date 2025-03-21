@@ -18,10 +18,10 @@ pub mod constants {
     use super::*;
 
     pub const ACC: f64 = 1e-5;
-    pub fn DISTANCE_ACC() -> Length {
+    pub fn distance_acc() -> Length {
         Length::new::<meter>(ACC)
     }
-    pub fn ANGLE_ACC() -> Angle {
+    pub fn angle_acc() -> Angle {
         Angle::new::<radian>(ACC)
     }
 }

@@ -49,7 +49,7 @@ fn rotated_is_the_same_for_direction_and_spherical() {
 
                 let expected = rotated_dir.to_spherical();
                 assert!(
-                    rotated_spherical.eq_within(&expected, ANGLE_ACC()),
+                    rotated_spherical.eq_within(&expected, angle_acc()),
                     "{} != {}",
                     rotated_spherical,
                     expected
@@ -70,7 +70,7 @@ fn rotated_x_is_the_same_for_direction_and_spherical() {
 
             let expected = rotated_dir.to_spherical();
             assert!(
-                rotated_spherical.eq_within(&expected, ANGLE_ACC()),
+                rotated_spherical.eq_within(&expected, angle_acc()),
                 "{} != {}",
                 rotated_spherical,
                 expected
@@ -90,7 +90,7 @@ fn rotated_y_is_the_same_for_direction_and_spherical() {
 
             let expected = rotated_dir.to_spherical();
             assert!(
-                rotated_spherical.eq_within(&expected, ANGLE_ACC()),
+                rotated_spherical.eq_within(&expected, angle_acc()),
                 "{} != {}",
                 rotated_spherical,
                 expected
@@ -110,7 +110,7 @@ fn rotated_z_is_the_same_for_direction_and_spherical() {
 
             let expected = rotated_dir.to_spherical();
             assert!(
-                rotated_spherical.eq_within(&expected, ANGLE_ACC()),
+                rotated_spherical.eq_within(&expected, angle_acc()),
                 "vec: {}\nangle: {}\n{} != {}",
                 vec,
                 angle.into_format_args(radian, DisplayStyle::Abbreviation),
@@ -133,7 +133,7 @@ fn active_rotation_is_the_same_for_direction_and_spherical() {
 
             let expected = rotated_dir.to_spherical();
             assert!(
-                rotated_spherical.eq_within(&expected, ANGLE_ACC()),
+                rotated_spherical.eq_within(&expected, angle_acc()),
                 "new_z: {}\nvec: {}\nrotated_dir: {}\nrotated_spherical: {}\nexpected: {}",
                 new_z,
                 vec,
@@ -156,7 +156,7 @@ fn passive_rotation_is_the_same_for_direction_and_spherical() {
             let rotated_spherical = spherical_dir.passive_rotation_to_new_z_axis(&spherical_new_z);
 
             let expected = rotated_dir.to_spherical();
-            assert!(rotated_spherical.eq_within(&expected, ANGLE_ACC()));
+            assert!(rotated_spherical.eq_within(&expected, angle_acc()));
         }
     }
 }

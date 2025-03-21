@@ -13,7 +13,7 @@ use uom::si::{
 };
 
 use crate::{
-    angle_helper::{safe_acos, ANGLE_ZERO, HALF_CIRC},
+    angle_helper::{angle_zero, half_circ, safe_acos},
     earth_equatorial::EarthEquatorial,
     equatorial::Equatorial,
     error::AstroCoordsError,
@@ -80,31 +80,32 @@ impl AsRef<Cartesian> for Cartesian {
 
 impl Cartesian {
     /// The origin of the coordinate system, given by (x,y,z)=(0,0,0).
-    pub fn ORIGIN() -> Cartesian {
+    #[inline]
+    pub fn origin() -> Cartesian {
         Cartesian {
             x: Length::new::<meter>(0.),
             y: Length::new::<meter>(0.),
             z: Length::new::<meter>(0.),
         }
     }
-
-    pub fn X_DIRECTION() -> Cartesian {
+    #[inline]
+    pub fn x_direction() -> Cartesian {
         Cartesian {
             x: Length::new::<meter>(1.),
             y: Length::new::<meter>(0.),
             z: Length::new::<meter>(0.),
         }
     }
-
-    pub fn Y_DIRECTION() -> Cartesian {
+    #[inline]
+    pub fn y_direction() -> Cartesian {
         Cartesian {
             x: Length::new::<meter>(0.),
             y: Length::new::<meter>(1.),
             z: Length::new::<meter>(0.),
         }
     }
-
-    pub fn Z_DIRECTION() -> Cartesian {
+    #[inline]
+    pub fn z_direction() -> Cartesian {
         Cartesian {
             x: Length::new::<meter>(0.),
             y: Length::new::<meter>(0.),
@@ -218,7 +219,7 @@ impl Cartesian {
         if dot_prod >= Area::new::<square_meter>(0.) {
             Ok(angle)
         } else {
-            Ok(HALF_CIRC() - angle)
+            Ok(half_circ() - angle)
         }
     }
 
@@ -427,16 +428,16 @@ impl PassiveRotation<Cartesian> for Cartesian {
 }
 
 fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Cartesian) -> (Angle, Angle) {
-    let angle_to_old_z = match new_z.angle_to(&Cartesian::Z_DIRECTION()) {
+    let angle_to_old_z = match new_z.angle_to(&Cartesian::z_direction()) {
         Ok(angle) => angle,
-        Err(_) => return (ANGLE_ZERO(), ANGLE_ZERO()),
+        Err(_) => return (angle_zero(), angle_zero()),
     };
 
     let axis_projected_onto_xy_plane = Cartesian::new(new_z.x, new_z.y, Length::new::<meter>(0.));
     let mut polar_rotation_angle =
-        match axis_projected_onto_xy_plane.angle_to(&Cartesian::Y_DIRECTION()) {
+        match axis_projected_onto_xy_plane.angle_to(&Cartesian::y_direction()) {
             Ok(angle) => angle,
-            Err(_) => return (ANGLE_ZERO(), ANGLE_ZERO()),
+            Err(_) => return (angle_zero(), angle_zero()),
         };
     if axis_projected_onto_xy_plane.x.value < 0. {
         polar_rotation_angle = -polar_rotation_angle;

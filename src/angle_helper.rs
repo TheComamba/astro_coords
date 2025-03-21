@@ -5,28 +5,36 @@ use uom::si::{
     f64::Angle,
 };
 
-pub(crate) fn ANGLE_ZERO() -> Angle {
+#[inline]
+pub(crate) fn angle_zero() -> Angle {
     Angle::new::<radian>(0.)
 }
-pub(crate) fn FULL_CIRC() -> Angle {
+#[inline]
+pub(crate) fn full_circ() -> Angle {
     Angle::new::<radian>(2. * PI)
 }
-pub(crate) fn QUARTER_CIRC() -> Angle {
+#[inline]
+pub(crate) fn quarter_circ() -> Angle {
     Angle::new::<radian>(2. * PI / 4.)
 }
-pub(crate) fn HALF_CIRC() -> Angle {
+#[inline]
+pub(crate) fn half_circ() -> Angle {
     Angle::new::<radian>(2. * PI / 2.)
 }
-pub(crate) fn EARTH_AXIS_TILT() -> Angle {
+#[inline]
+pub(crate) fn earth_axis_tilt() -> Angle {
     Angle::new::<degree>(23.439_281)
 }
-pub(crate) fn GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE() -> Angle {
+#[inline]
+pub(crate) fn galactic_longitude_of_north_celestial_pole() -> Angle {
     Angle::new::<radian>(122.93314)
 }
-pub(crate) fn RA_OF_GALACTIC_NORTH() -> Angle {
+#[inline]
+pub(crate) fn ra_of_galactic_north() -> Angle {
     Angle::new::<radian>(3.3658674624710652)
 }
-pub(crate) fn DEC_OF_GALACTIC_NORTH() -> Angle {
+#[inline]
+pub(crate) fn dec_of_galactic_north() -> Angle {
     Angle::new::<radian>(27.13)
 }
 
@@ -37,11 +45,11 @@ pub(crate) fn angle_eq_within(actual: Angle, expected: Angle, accuracy: Angle) -
 
 /// Normalize the angle to a range of −π to +π radians, -180° to 180°.
 pub fn normalized_angle(mut angle: Angle) -> Angle {
-    angle %= FULL_CIRC();
-    if angle > HALF_CIRC() {
-        angle -= FULL_CIRC();
-    } else if angle < -HALF_CIRC() {
-        angle += FULL_CIRC();
+    angle %= full_circ();
+    if angle > half_circ() {
+        angle -= full_circ();
+    } else if angle < -half_circ() {
+        angle += full_circ();
     }
     angle
 }
@@ -61,9 +69,9 @@ pub(crate) fn arcushaversine(h: f64) -> Angle {
 /// Saves acos from being called with an argument outside of its definition range due to numerical instability
 pub(crate) fn safe_acos(cosine_argument: f64) -> Angle {
     if cosine_argument > 1. {
-        return ANGLE_ZERO();
+        return angle_zero();
     } else if cosine_argument < -1. {
-        return HALF_CIRC();
+        return half_circ();
     }
     Angle::new::<radian>(cosine_argument.acos())
 }
@@ -72,31 +80,36 @@ pub(crate) fn safe_acos(cosine_argument: f64) -> Angle {
 pub(crate) mod test {
     use super::*;
 
-    pub(crate) fn THREE_QUARTER_CIRC() -> Angle {
+    #[inline]
+    pub(crate) fn three_quarter_circ() -> Angle {
         Angle::new::<radian>(2. * PI * 3. / 4.)
     }
-    pub(crate) fn ONE_THIRD_CIRC() -> Angle {
+    #[inline]
+    pub(crate) fn one_third_circ() -> Angle {
         Angle::new::<radian>(2. * PI / 3.)
     }
-    pub(crate) fn TWO_THIRDS_CIRC() -> Angle {
+    #[inline]
+    pub(crate) fn two_thirds_circ() -> Angle {
         Angle::new::<radian>(2. * PI * 2. / 3.)
     }
-    pub(crate) fn ARCSEC() -> Angle {
+    #[inline]
+    pub(crate) fn arcsec() -> Angle {
         Angle::new::<radian>(2. * PI / (360. * 60. * 60.))
     }
-    pub(crate) fn SECOND_ANGLE() -> Angle {
+    #[inline]
+    pub(crate) fn second_angle() -> Angle {
         Angle::new::<radian>(2. * PI / (24. * 60. * 60.))
     }
-
-    pub(crate) fn angle_from_arcsecs(arcsec: f64) -> Angle {
-        arcsec * ARCSEC()
+    #[inline]
+    pub(crate) fn angle_from_arcsecs(arcsecs: f64) -> Angle {
+        arcsecs * arcsec()
     }
-
+    #[inline]
     pub(crate) fn angle_to_arcsecs(angle: &Angle) -> f64 {
-        angle.get::<radian>() / ARCSEC().get::<radian>()
+        angle.get::<radian>() / arcsec().get::<radian>()
     }
-
-    pub(crate) fn angle_from_second_angle(second_angle: f64) -> Angle {
-        second_angle * SECOND_ANGLE()
+    #[inline]
+    pub(crate) fn angle_from_second_angle(second_angles: f64) -> Angle {
+        second_angles * second_angle()
     }
 }

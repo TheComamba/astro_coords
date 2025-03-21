@@ -17,7 +17,7 @@ fn cartesian_roundtrips() {
 
             let mathematical_after_roundtrip = new_physical.mathematical_coordinates();
             assert!(
-                original_mathematical.eq_within(mathematical_after_roundtrip, DISTANCE_ACC()),
+                original_mathematical.eq_within(mathematical_after_roundtrip, distance_acc()),
                 "{:?} != {:?}",
                 original_mathematical,
                 mathematical_after_roundtrip
@@ -61,7 +61,7 @@ fn spherical_roundtrips() {
 
             let mathematical_after_roundtrip = new_physical.mathematical_coordinates();
             assert!(
-                original_mathematical.eq_within(mathematical_after_roundtrip, ANGLE_ACC()),
+                original_mathematical.eq_within(mathematical_after_roundtrip, angle_acc()),
                 "{:?} != {:?}",
                 original_mathematical,
                 mathematical_after_roundtrip

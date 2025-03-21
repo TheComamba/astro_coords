@@ -11,7 +11,7 @@ use uom::{
 };
 
 use crate::{
-    angle_helper::{normalized_angle, FULL_CIRC},
+    angle_helper::{full_circ, normalized_angle},
     spherical::Spherical,
 };
 
@@ -167,7 +167,7 @@ impl CelestialBody {
                     - Angle::new::<degree>(1.4813688) * time_since_epoch.get::<day>()
             }
             CelestialBody::Earth => {
-                FULL_CIRC()
+                full_circ()
                     * (0.7790572732640 + 1.00273781191135448 * time_since_epoch.get::<day>())
             }
             CelestialBody::Mars => {

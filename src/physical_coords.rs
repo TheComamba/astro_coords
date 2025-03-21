@@ -43,15 +43,15 @@ where
     }
 
     fn change_from_ecliptic_to_equatorial(&mut self) {
-        self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(EARTH_AXIS_TILT());
+        self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(earth_axis_tilt());
     }
 
     fn change_from_galactic_to_equatorial(&mut self) {
         self.mathematical_coordinates = self
             .mathematical_coordinates
-            .rotated_z(HALF_CIRC() - GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE())
-            .rotated_y(QUARTER_CIRC() - DEC_OF_GALACTIC_NORTH())
-            .rotated_z(RA_OF_GALACTIC_NORTH());
+            .rotated_z(half_circ() - galactic_longitude_of_north_celestial_pole())
+            .rotated_y(quarter_circ() - dec_of_galactic_north())
+            .rotated_z(ra_of_galactic_north());
     }
 
     fn change_from_cartographic_to_equatorial(
@@ -60,8 +60,8 @@ where
         time_since_epoch: Time,
     ) {
         let old_z = celestial_body.z_axis();
-        let equinox_to_q = QUARTER_CIRC() - old_z.longitude;
-        let plane_tilt = QUARTER_CIRC() - old_z.latitude;
+        let equinox_to_q = quarter_circ() - old_z.longitude;
+        let plane_tilt = quarter_circ() - old_z.latitude;
         let w = celestial_body.prime_meridian_offset(time_since_epoch);
         self.mathematical_coordinates = self
             .mathematical_coordinates
@@ -82,15 +82,15 @@ where
     }
 
     fn change_from_equatorial_to_ecliptic(&mut self) {
-        self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(-EARTH_AXIS_TILT());
+        self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(-earth_axis_tilt());
     }
 
     fn change_from_equatorial_to_galactic(&mut self) {
         self.mathematical_coordinates = self
             .mathematical_coordinates
-            .rotated_z(-RA_OF_GALACTIC_NORTH())
-            .rotated_y(DEC_OF_GALACTIC_NORTH() - QUARTER_CIRC())
-            .rotated_z(GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE() - HALF_CIRC());
+            .rotated_z(-ra_of_galactic_north())
+            .rotated_y(dec_of_galactic_north() - quarter_circ())
+            .rotated_z(galactic_longitude_of_north_celestial_pole() - half_circ());
     }
 
     fn change_from_equatorial_to_cartographic(
@@ -99,8 +99,8 @@ where
         time_since_epoch: Time,
     ) {
         let new_z = celestial_body.z_axis();
-        let equinox_to_q = QUARTER_CIRC() - new_z.longitude;
-        let plane_tilt = QUARTER_CIRC() - new_z.latitude;
+        let equinox_to_q = quarter_circ() - new_z.longitude;
+        let plane_tilt = quarter_circ() - new_z.latitude;
         let w = celestial_body.prime_meridian_offset(time_since_epoch);
         self.mathematical_coordinates = self
             .mathematical_coordinates
@@ -314,7 +314,7 @@ mod tests {
     use uom::si::angle::{degree, radian};
 
     use crate::{
-        angle_helper::{normalized_angle, EARTH_AXIS_TILT},
+        angle_helper::{earth_axis_tilt, normalized_angle},
         direction::Direction,
         ra_and_dec::{Declination, RightAscension, Sgn},
         spherical::Spherical,
@@ -338,7 +338,7 @@ mod tests {
     fn the_equations_for_changing_from_equatorial_to_ecliptic_reference_hold() {
         // https://aas.aanda.org/articles/aas/full/1998/01/ds1449/node3.html
 
-        let e = EARTH_AXIS_TILT().get::<radian>();
+        let e = earth_axis_tilt().get::<radian>();
 
         let angles = vec![0., PI, 0.3, 1.4, -1.4, 3.5, 7.];
         for ra in angles.clone() {

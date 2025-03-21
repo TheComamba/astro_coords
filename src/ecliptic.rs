@@ -21,21 +21,22 @@ pub struct Ecliptic {
 }
 
 impl Ecliptic {
-    pub fn X_DIRECTION() -> Ecliptic {
+    #[inline]
+    pub fn x_direction() -> Ecliptic {
         Ecliptic {
-            spherical: Spherical::X_DIRECTION(),
+            spherical: Spherical::x_direction(),
         }
     }
-
-    pub fn Y_DIRECTION() -> Ecliptic {
+    #[inline]
+    pub fn y_direction() -> Ecliptic {
         Ecliptic {
-            spherical: Spherical::Y_DIRECTION(),
+            spherical: Spherical::y_direction(),
         }
     }
-
-    pub fn Z_DIRECTION() -> Ecliptic {
+    #[inline]
+    pub fn z_direction() -> Ecliptic {
         Ecliptic {
-            spherical: Spherical::Z_DIRECTION(),
+            spherical: Spherical::z_direction(),
         }
     }
 
@@ -101,10 +102,11 @@ impl Display for Ecliptic {
 }
 
 #[cfg(test)]
-pub(super) fn EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES() -> Ecliptic {
+#[inline]
+pub(super) fn earth_north_pole_in_ecliptic_coordinates() -> Ecliptic {
     Ecliptic::new(Spherical::new(
-        crate::angle_helper::QUARTER_CIRC(),
-        crate::angle_helper::QUARTER_CIRC() - crate::angle_helper::EARTH_AXIS_TILT(),
+        crate::angle_helper::quarter_circ(),
+        crate::angle_helper::quarter_circ() - crate::angle_helper::earth_axis_tilt(),
     ))
 }
 
