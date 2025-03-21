@@ -1,3 +1,4 @@
+use uom::si::angle::radian;
 use utils::{constants::*, examples::*};
 
 mod utils;
@@ -12,9 +13,16 @@ fn angle_is_the_same_for_direction_and_cartesian() {
                     let cart1 = dir1.to_cartesian(dist1);
                     let cart2 = dir2.to_cartesian(dist2);
                     let new_angle = cart1.angle_to(&cart2).unwrap();
-                    assert!((angle - new_angle).rad.abs() < ACC,
-                    "dir1: {:?}\ndir2: {:?}\ndist1: {:?}\ndist2: {:?}\nangle: {:?}\nnew_angle: {:?}",
-                    dir1, dir2, dist1, dist2, angle, new_angle);
+                    assert!(
+                        (angle - new_angle).get::<radian>().abs() < ACC,
+                        "dir1: {:?}\ndir2: {:?}\ndist1: {:?}\ndist2: {:?}\nangle: {:?}\nnew_angle: {:?}",
+                        dir1,
+                        dir2,
+                        dist1,
+                        dist2,
+                        angle,
+                        new_angle
+                    );
                 }
             }
         }
@@ -30,7 +38,7 @@ fn angle_is_the_same_for_direction_and_spherical() {
             let sph2 = dir2.to_spherical();
             let new_angle = sph1.angle_to(&sph2);
             assert!(
-                (angle - new_angle).rad.abs() < ACC,
+                (angle - new_angle).get::<radian>().abs() < ACC,
                 "dir1: {:?}\ndir2: {:?}\nsph1: {:?}\nsph2: {:?}\nangle: {:?}\nnew_angle: {:?}",
                 dir1,
                 dir2,
@@ -52,7 +60,7 @@ fn angle_is_the_same_for_direction_and_spherical2() {
             let dir2 = sph2.to_direction();
             let new_angle = dir1.angle_to(&dir2);
             assert!(
-                (angle - new_angle).rad.abs() < ACC,
+                (angle - new_angle).get::<radian>().abs() < ACC,
                 "dir1: {:?}\ndir2: {:?}\nsph1: {:?}\nsph2: {:?}\nangle: {:?}\nnew_angle: {:?}",
                 dir1,
                 dir2,

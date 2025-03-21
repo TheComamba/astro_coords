@@ -28,7 +28,7 @@ pub fn direction_relative_to_normal(
 
 #[cfg(test)]
 mod tests {
-    use simple_si_units::geometry::Angle;
+    use uom::si::{angle::radian, f64::Angle};
 
     use crate::angle_helper::*;
 
@@ -60,10 +60,10 @@ mod tests {
     fn objects_along_the_new_x_axis_have_no_y_component() {
         let ordinates = vec![0., 1., -1., 12.];
         let angles = vec![
-            ANGLE_ZERO,
-            Angle::from_radians(1.),
-            Angle::from_radians(-1.),
-            Angle::from_radians(12.),
+            angle_zero(),
+            Angle::new::<radian>(1.),
+            Angle::new::<radian>(-1.),
+            Angle::new::<radian>(12.),
         ];
         for x1 in ordinates.clone().iter() {
             for y1 in ordinates.clone().iter() {
@@ -142,7 +142,7 @@ mod tests {
 
                     let new = direction_relative_to_normal(&orig, &Direction::Z, &-&Direction::X);
 
-                    let expected = orig.rotated(HALF_CIRC, &Direction::Z);
+                    let expected = orig.rotated(half_circ(), &Direction::Z);
 
                     assert!(new.eq_within(&expected, TEST_ACCURACY));
                 }
@@ -164,7 +164,7 @@ mod tests {
 
                     let new = direction_relative_to_normal(&orig, &-&Direction::Z, &Direction::X);
 
-                    let expected = orig.rotated(HALF_CIRC, &Direction::X);
+                    let expected = orig.rotated(half_circ(), &Direction::X);
 
                     assert!(new.eq_within(&expected, TEST_ACCURACY));
                 }

@@ -1,8 +1,9 @@
 //! This module contains the Ecliptic struct and its implementation.
 
-use serde::{Deserialize, Serialize};
-use simple_si_units::{base::Distance, geometry::Angle};
 use std::{fmt::Display, ops::Neg};
+
+use serde::{Deserialize, Serialize};
+use uom::si::f64::{Angle, Length};
 
 use crate::{cartesian::Cartesian, equatorial::Equatorial};
 
@@ -20,17 +21,24 @@ pub struct Ecliptic {
 }
 
 impl Ecliptic {
-    pub const X_DIRECTION: Ecliptic = Ecliptic {
-        spherical: Spherical::X_DIRECTION,
-    };
-
-    pub const Y_DIRECTION: Ecliptic = Ecliptic {
-        spherical: Spherical::Y_DIRECTION,
-    };
-
-    pub const Z_DIRECTION: Ecliptic = Ecliptic {
-        spherical: Spherical::Z_DIRECTION,
-    };
+    #[inline]
+    pub fn x_direction() -> Ecliptic {
+        Ecliptic {
+            spherical: Spherical::x_direction(),
+        }
+    }
+    #[inline]
+    pub fn y_direction() -> Ecliptic {
+        Ecliptic {
+            spherical: Spherical::y_direction(),
+        }
+    }
+    #[inline]
+    pub fn z_direction() -> Ecliptic {
+        Ecliptic {
+            spherical: Spherical::z_direction(),
+        }
+    }
 
     pub const fn new(spherical: Spherical) -> Ecliptic {
         Ecliptic { spherical }
@@ -40,11 +48,11 @@ impl Ecliptic {
         self.spherical.normalize();
     }
 
-    pub fn eq_within(&self, other: &Ecliptic, accuracy: Angle<f64>) -> bool {
+    pub fn eq_within(&self, other: &Ecliptic, accuracy: Angle) -> bool {
         self.spherical.eq_within(&other.spherical, accuracy)
     }
 
-    pub fn to_cartesian(&self, length: Distance<f64>) -> Cartesian {
+    pub fn to_cartesian(&self, length: Length) -> Cartesian {
         self.to_direction().to_cartesian(length)
     }
 
@@ -64,7 +72,7 @@ impl Ecliptic {
         self.spherical
     }
 
-    pub fn angle_to(&self, other: &Self) -> Angle<f64> {
+    pub fn angle_to(&self, other: &Self) -> Angle {
         self.to_direction().angle_to(&other.to_direction())
     }
 }
@@ -94,17 +102,21 @@ impl Display for Ecliptic {
 }
 
 #[cfg(test)]
-pub(super) const EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES: Ecliptic =
+#[inline]
+pub(super) fn earth_north_pole_in_ecliptic_coordinates() -> Ecliptic {
     Ecliptic::new(Spherical::new(
-        crate::angle_helper::QUARTER_CIRC,
-        Angle {
-            rad: crate::angle_helper::QUARTER_CIRC.rad - crate::angle_helper::EARTH_AXIS_TILT.rad,
-        },
-    ));
+        crate::angle_helper::quarter_circ(),
+        crate::angle_helper::quarter_circ() - crate::angle_helper::earth_axis_tilt(),
+    ))
+}
 
 #[cfg(test)]
 mod tests {
-    use simple_si_units::geometry::Angle;
+
+    use uom::{
+        fmt::DisplayStyle,
+        si::{angle::radian, f64::Angle},
+    };
 
     use crate::{angle_helper::angle_eq_within, direction::Direction, traits::*};
 
@@ -119,7 +131,7 @@ mod tests {
                         if dir1.is_err() {
                             continue;
                         }
-                        let angle = Angle::from_radians((*angle).abs());
+                        let angle = Angle::new::<radian>((*angle).abs());
                         let dir1 = dir1.unwrap();
                         let axis = dir1.some_orthogonal_vector();
                         let dir2 = dir1.rotated(angle, &axis);
@@ -128,9 +140,19 @@ mod tests {
                         let ecliptic2 = dir2.to_ecliptic();
                         let actual_angle = ecliptic1.angle_to(&ecliptic2);
 
-                        println!("Expected: {}", angle);
-                        println!("Actual: {}", actual_angle);
-                        assert!(angle_eq_within(actual_angle, angle, Angle { rad: 1e-5 }));
+                        println!(
+                            "Expected: {}",
+                            angle.into_format_args(radian, DisplayStyle::Abbreviation)
+                        );
+                        println!(
+                            "Actual: {}",
+                            actual_angle.into_format_args(radian, DisplayStyle::Abbreviation)
+                        );
+                        assert!(angle_eq_within(
+                            actual_angle,
+                            angle,
+                            Angle::new::<radian>(1e-5)
+                        ));
                     }
                 }
             }

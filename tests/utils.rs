@@ -1,7 +1,8 @@
+#![allow(dead_code)]
+
 use std::f64::consts::PI;
 
-use rand::{rngs::StdRng, Rng, SeedableRng};
-use simple_si_units::{base::Distance, geometry::Angle};
+use rand::{Rng, SeedableRng, rngs::StdRng};
 
 use astro_coords::{
     cartesian::Cartesian, direction::Direction, earth_equatorial::EarthEquatorial,
@@ -10,11 +11,19 @@ use astro_coords::{
 
 #[cfg(test)]
 pub mod constants {
-    use super::*;
+    use uom::si::{
+        angle::radian,
+        f64::{Angle, Length},
+        length::meter,
+    };
 
     pub const ACC: f64 = 1e-5;
-    pub const DISTANCE_ACC: Distance<f64> = Distance { m: ACC };
-    pub const ANGLE_ACC: Angle<f64> = Angle { rad: ACC };
+    pub fn distance_acc() -> Length {
+        Length::new::<meter>(ACC)
+    }
+    pub fn angle_acc() -> Angle {
+        Angle::new::<radian>(ACC)
+    }
 }
 
 #[cfg(test)]
@@ -23,45 +32,50 @@ pub mod examples {
         physical_coords::PhysicalCoords,
         reference_frame::{CelestialBody, ReferenceFrame, RotationalElements},
     };
-    use simple_si_units::base::Time;
+    use uom::si::{
+        angle::degree,
+        f64::{Angle, Length, Time},
+        length::meter,
+        time::{day, year},
+    };
 
     use super::*;
 
-    pub fn distance_examples() -> Vec<Distance<f64>> {
+    pub fn distance_examples() -> Vec<Length> {
         vec![
-            Distance::from_m(0.1),
-            Distance::from_m(2.0),
-            Distance::from_m(-3.0),
+            Length::new::<meter>(0.1),
+            Length::new::<meter>(2.0),
+            Length::new::<meter>(-3.0),
         ]
     }
 
-    pub fn positive_distance_examples() -> Vec<Distance<f64>> {
+    pub fn positive_distance_examples() -> Vec<Length> {
         vec![
-            Distance::from_m(0.1),
-            Distance::from_m(2.0),
-            Distance::from_m(30.),
+            Length::new::<meter>(0.1),
+            Length::new::<meter>(2.0),
+            Length::new::<meter>(30.),
         ]
     }
 
-    pub fn angle_examples() -> Vec<Angle<f64>> {
+    pub fn angle_examples() -> Vec<Angle> {
         vec![
-            Angle::from_degrees(0.0),
-            Angle::from_degrees(0.1),
-            Angle::from_degrees(45.0),
-            Angle::from_degrees(90.0),
-            Angle::from_degrees(180.0),
-            Angle::from_degrees(270.0),
-            Angle::from_degrees(360.0),
+            Angle::new::<degree>(0.0),
+            Angle::new::<degree>(0.1),
+            Angle::new::<degree>(45.0),
+            Angle::new::<degree>(90.0),
+            Angle::new::<degree>(180.0),
+            Angle::new::<degree>(270.0),
+            Angle::new::<degree>(360.0),
         ]
     }
 
-    pub fn long_time_examples() -> Vec<Time<f64>> {
+    pub fn long_time_examples() -> Vec<Time> {
         vec![
-            Time::from_yr(0.0),
-            Time::from_yr(1.0),
-            Time::from_yr(100.0),
-            Time::from_yr(1000.0),
-            Time::from_yr(10000.0),
+            Time::new::<year>(0.0),
+            Time::new::<year>(1.0),
+            Time::new::<year>(100.0),
+            Time::new::<year>(1000.0),
+            Time::new::<year>(10000.0),
         ]
     }
 
@@ -92,7 +106,7 @@ pub mod examples {
         for x in distance_examples() {
             for y in distance_examples() {
                 for z in distance_examples() {
-                    let dir = Direction::new(x.m, y.m, z.m).unwrap();
+                    let dir = Direction::new(x.value, y.value, z.value).unwrap();
                     examples.push(dir);
                 }
             }
@@ -144,7 +158,7 @@ pub mod examples {
         let angles = angle_examples();
         let angular_velocities: Vec<_> = angle_examples()
             .into_iter()
-            .map(|a| a / Time::from_days(1.0))
+            .map(|a| a / Time::new::<day>(1.0))
             .collect();
         for i in 0..sphericals.len() {
             let j = i * 12345 % angles.len();
@@ -152,7 +166,7 @@ pub mod examples {
             let rot = RotationalElements {
                 z_axis: sphericals[i],
                 prime_meridian_offset_offset: angles[j],
-                prime_meridian_offset_rate: angular_velocities[k],
+                prime_meridian_offset_rate: angular_velocities[k].into(),
             };
             vec.push(CelestialBody::Custom(rot));
         }
@@ -206,18 +220,24 @@ pub mod examples {
 
 #[cfg(test)]
 pub mod benchmarks {
-    use simple_si_units::base::Time;
+
+    use uom::si::{
+        angle::radian,
+        f64::{Angle, Length, Time},
+        length::meter,
+        time::year,
+    };
 
     use super::*;
 
-    pub fn many_angles(num: usize) -> Vec<Angle<f64>> {
+    pub fn many_angles(num: usize) -> Vec<Angle> {
         let seed = [42; 32];
         let mut rng = StdRng::from_seed(seed);
 
         let mut angles = Vec::new();
         for _ in 0..num {
-            let rad = rng.gen_range((-PI)..PI);
-            angles.push(Angle { rad });
+            let rad = rng.random_range((-PI)..PI);
+            angles.push(Angle::new::<radian>(rad));
         }
         angles
     }
@@ -228,9 +248,9 @@ pub mod benchmarks {
 
         let mut directions = Vec::new();
         for _ in 0..num {
-            let x = rng.gen_range((-5.)..5.);
-            let y = rng.gen_range((-5.)..5.);
-            let z = rng.gen_range((-5.)..5.);
+            let x = rng.random_range((-5.)..5.);
+            let y = rng.random_range((-5.)..5.);
+            let z = rng.random_range((-5.)..5.);
             let direction = Direction::new(x, y, z);
             if let Ok(dir) = direction {
                 directions.push(dir);
@@ -239,14 +259,14 @@ pub mod benchmarks {
         directions
     }
 
-    pub fn many_times(num: usize) -> Vec<Time<f64>> {
+    pub fn many_times(num: usize) -> Vec<Time> {
         let seed = [42; 32];
         let mut rng = StdRng::from_seed(seed);
 
         let mut times = Vec::new();
         for _ in 0..num {
-            let yr = rng.gen_range(0.0..1000.0);
-            times.push(Time::from_yr(yr));
+            let yr = rng.random_range(0.0..1000.0);
+            times.push(Time::new::<year>(yr));
         }
         times
     }
@@ -257,13 +277,13 @@ pub mod benchmarks {
 
         let mut cartesians = Vec::new();
         for _ in 0..num {
-            let x = rng.gen_range((-5.)..5.);
-            let y = rng.gen_range((-5.)..5.);
-            let z = rng.gen_range((-5.)..5.);
+            let x = rng.random_range((-5.)..5.);
+            let y = rng.random_range((-5.)..5.);
+            let z = rng.random_range((-5.)..5.);
             cartesians.push(Cartesian::new(
-                Distance::from_m(x),
-                Distance::from_m(y),
-                Distance::from_m(z),
+                Length::new::<meter>(x),
+                Length::new::<meter>(y),
+                Length::new::<meter>(z),
             ));
         }
         cartesians
@@ -275,12 +295,8 @@ pub mod benchmarks {
 
         let mut sphericals = Vec::new();
         for _ in 0..num {
-            let longitude = Angle {
-                rad: rng.gen_range((-PI)..PI),
-            };
-            let latitude = Angle {
-                rad: rng.gen_range((-PI / 2.)..(PI / 2.)),
-            };
+            let longitude = Angle::new::<radian>(rng.random_range((-PI)..PI));
+            let latitude = Angle::new::<radian>(rng.random_range((-PI / 2.)..(PI / 2.)));
             sphericals.push(Spherical::new(longitude, latitude));
         }
         sphericals

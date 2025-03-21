@@ -1,5 +1,6 @@
 use serial_test::serial;
 use std::time::{Duration, Instant};
+use uom::si::angle::radian;
 
 use utils::benchmarks::{many_cartesians, many_directions, many_sphericals};
 
@@ -20,7 +21,7 @@ fn angle_to_for_direction_is_fast() {
     let mut dummy: f64 = 0.0;
     for dir1 in &dirs1 {
         for dir2 in &dirs2 {
-            dummy += dir1.angle_to(&dir2).rad;
+            dummy += dir1.angle_to(&dir2).get::<radian>();
         }
     }
     let duration = start.elapsed();
@@ -47,7 +48,7 @@ fn angle_to_for_cartesian_is_fast() {
     let mut dummy: f64 = 0.0;
     for cart1 in &carts1 {
         for cart2 in &carts2 {
-            dummy += cart1.angle_to(&cart2).unwrap().rad;
+            dummy += cart1.angle_to(&cart2).unwrap().get::<radian>();
         }
     }
     let duration = start.elapsed();
@@ -74,7 +75,7 @@ fn angle_to_for_spherical_is_fast() {
     let mut dummy: f64 = 0.0;
     for sph1 in &sphericals1 {
         for sph2 in &sphericals2 {
-            dummy += sph1.angle_to(&sph2).rad;
+            dummy += sph1.angle_to(&sph2).get::<radian>();
         }
     }
     let duration = start.elapsed();

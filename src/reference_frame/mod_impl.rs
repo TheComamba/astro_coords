@@ -2,7 +2,7 @@
 
 use std::fmt::Display;
 
-use simple_si_units::base::Time;
+use uom::si::f64::Time;
 
 use super::CelestialBody;
 
@@ -33,7 +33,7 @@ pub enum ReferenceFrame {
     ///
     /// The z-axis points along the north pole of the celestial body, which is not necessarily to axis of positive rotation, but rather the axis of rotation that points towards the positive half-dome of the ecliptic.
     /// The x-axis points along a direction usually specified by tome distinguishable feature of the body, which is recommended by the IAU working group.
-    Cartographic(CelestialBody, Time<f64>),
+    Cartographic(CelestialBody, Time),
 }
 
 impl Display for ReferenceFrame {
@@ -62,12 +62,14 @@ impl Eq for ReferenceFrame {}
 
 #[cfg(test)]
 mod tests {
+    use uom::si::time::second;
+
     use super::*;
 
     #[test]
     fn cartographic_reference_frames_are_never_equal() {
         let body = CelestialBody::Sun;
-        let time = Time::from_s(0.0);
+        let time = Time::new::<second>(0.0);
         let cartographic_ref = ReferenceFrame::Cartographic(body, time);
 
         assert_ne!(cartographic_ref, ReferenceFrame::Equatorial);

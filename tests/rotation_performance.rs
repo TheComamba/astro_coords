@@ -1,6 +1,7 @@
 use astro_coords::traits::*;
 use serial_test::serial;
 use std::time::{Duration, Instant};
+use uom::si::angle::radian;
 
 use utils::benchmarks::*;
 
@@ -197,7 +198,7 @@ fn rotation_for_sphericals_is_fast() {
         for vec in vecs.iter() {
             for axis in axes.iter() {
                 let rotated_dir = vec.rotated(angle, &axis);
-                dummy += rotated_dir.longitude.rad;
+                dummy += rotated_dir.longitude.get::<radian>();
             }
         }
     }
@@ -226,7 +227,7 @@ fn x_rotation_for_sphericals_is_fast() {
     for angle in angles {
         for vec in vecs.iter() {
             let rotated_dir = vec.rotated_x(angle);
-            dummy += rotated_dir.longitude.rad;
+            dummy += rotated_dir.longitude.get::<radian>();
         }
     }
     let duration = start.elapsed();
@@ -254,7 +255,7 @@ fn y_rotation_for_sphericals_is_fast() {
     for angle in angles {
         for vec in vecs.iter() {
             let rotated_dir = vec.rotated_y(angle);
-            dummy += rotated_dir.longitude.rad;
+            dummy += rotated_dir.longitude.get::<radian>();
         }
     }
     let duration = start.elapsed();
@@ -282,7 +283,7 @@ fn z_rotation_for_sphericals_is_fast() {
     for angle in angles {
         for vec in vecs.iter() {
             let rotated_dir = vec.rotated_z(angle);
-            dummy += rotated_dir.longitude.rad;
+            dummy += rotated_dir.longitude.get::<radian>();
         }
     }
     let duration = start.elapsed();
@@ -310,7 +311,7 @@ fn active_rotation_for_spherical_is_fast() {
     for vec in vecs {
         for new_z in new_zs.iter() {
             let rotated_dir = vec.active_rotation_to_new_z_axis(&new_z);
-            dummy += rotated_dir.longitude.rad;
+            dummy += rotated_dir.longitude.get::<radian>();
         }
     }
     let duration = start.elapsed();
@@ -338,7 +339,7 @@ fn passive_rotation_for_spherical_is_fast() {
     for vec in vecs {
         for new_z in new_zs.iter() {
             let rotated_dir = vec.passive_rotation_to_new_z_axis(&new_z);
-            dummy += rotated_dir.longitude.rad;
+            dummy += rotated_dir.longitude.get::<radian>();
         }
     }
     let duration = start.elapsed();
