@@ -43,15 +43,15 @@ where
     }
 
     fn change_from_ecliptic_to_equatorial(&mut self) {
-        self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(EARTH_AXIS_TILT);
+        self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(EARTH_AXIS_TILT());
     }
 
     fn change_from_galactic_to_equatorial(&mut self) {
         self.mathematical_coordinates = self
             .mathematical_coordinates
-            .rotated_z(HALF_CIRC - GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE)
-            .rotated_y(QUARTER_CIRC - DEC_OF_GALACTIC_NORTH)
-            .rotated_z(RA_OF_GALACTIC_NORTH);
+            .rotated_z(HALF_CIRC() - GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE())
+            .rotated_y(QUARTER_CIRC() - DEC_OF_GALACTIC_NORTH())
+            .rotated_z(RA_OF_GALACTIC_NORTH());
     }
 
     fn change_from_cartographic_to_equatorial(
@@ -60,8 +60,8 @@ where
         time_since_epoch: Time,
     ) {
         let old_z = celestial_body.z_axis();
-        let equinox_to_q = QUARTER_CIRC - old_z.longitude;
-        let plane_tilt = QUARTER_CIRC - old_z.latitude;
+        let equinox_to_q = QUARTER_CIRC() - old_z.longitude;
+        let plane_tilt = QUARTER_CIRC() - old_z.latitude;
         let w = celestial_body.prime_meridian_offset(time_since_epoch);
         self.mathematical_coordinates = self
             .mathematical_coordinates
@@ -82,15 +82,15 @@ where
     }
 
     fn change_from_equatorial_to_ecliptic(&mut self) {
-        self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(-EARTH_AXIS_TILT);
+        self.mathematical_coordinates = self.mathematical_coordinates.rotated_x(-EARTH_AXIS_TILT());
     }
 
     fn change_from_equatorial_to_galactic(&mut self) {
         self.mathematical_coordinates = self
             .mathematical_coordinates
-            .rotated_z(-RA_OF_GALACTIC_NORTH)
-            .rotated_y(DEC_OF_GALACTIC_NORTH - QUARTER_CIRC)
-            .rotated_z(GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE - HALF_CIRC);
+            .rotated_z(-RA_OF_GALACTIC_NORTH())
+            .rotated_y(DEC_OF_GALACTIC_NORTH() - QUARTER_CIRC())
+            .rotated_z(GALACTIC_LONGITUDE_OF_NORTH_CELESTIAL_POLE() - HALF_CIRC());
     }
 
     fn change_from_equatorial_to_cartographic(
@@ -99,8 +99,8 @@ where
         time_since_epoch: Time,
     ) {
         let new_z = celestial_body.z_axis();
-        let equinox_to_q = QUARTER_CIRC - new_z.longitude;
-        let plane_tilt = QUARTER_CIRC - new_z.latitude;
+        let equinox_to_q = QUARTER_CIRC() - new_z.longitude;
+        let plane_tilt = QUARTER_CIRC() - new_z.latitude;
         let w = celestial_body.prime_meridian_offset(time_since_epoch);
         self.mathematical_coordinates = self
             .mathematical_coordinates
@@ -338,13 +338,13 @@ mod tests {
     fn the_equations_for_changing_from_equatorial_to_ecliptic_reference_hold() {
         // https://aas.aanda.org/articles/aas/full/1998/01/ds1449/node3.html
 
-        let e = EARTH_AXIS_TILT.get::<radian>();
+        let e = EARTH_AXIS_TILT().get::<radian>();
 
         let angles = vec![0., PI, 0.3, 1.4, -1.4, 3.5, 7.];
         for ra in angles.clone() {
             for dec in angles.clone() {
                 let equatorial = PhysicalCoords::new(
-                    Spherical::new(Angle { rad: ra }, Angle { rad: dec }),
+                    Spherical::new(Angle::new::<radian>(ra), Angle::new::<radian>(dec)),
                     ReferenceFrame::Equatorial,
                 );
                 let ecliptic = equatorial.in_reference_frame(ReferenceFrame::Ecliptic);
@@ -393,7 +393,7 @@ mod tests {
         for ra in angles.clone() {
             for dec in angles.clone() {
                 let equatorial = PhysicalCoords::new(
-                    Spherical::new(Angle { rad: ra }, Angle { rad: dec }),
+                    Spherical::new(Angle::new::<radian>(ra), Angle::new::<radian>(dec)),
                     ReferenceFrame::Equatorial,
                 );
                 let galactic = equatorial.in_reference_frame(ReferenceFrame::Galactic);

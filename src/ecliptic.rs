@@ -21,17 +21,23 @@ pub struct Ecliptic {
 }
 
 impl Ecliptic {
-    pub const X_DIRECTION: Ecliptic = Ecliptic {
-        spherical: Spherical::X_DIRECTION,
-    };
+    pub fn X_DIRECTION() -> Ecliptic {
+        Ecliptic {
+            spherical: Spherical::X_DIRECTION(),
+        }
+    }
 
-    pub const Y_DIRECTION: Ecliptic = Ecliptic {
-        spherical: Spherical::Y_DIRECTION,
-    };
+    pub fn Y_DIRECTION() -> Ecliptic {
+        Ecliptic {
+            spherical: Spherical::Y_DIRECTION(),
+        }
+    }
 
-    pub const Z_DIRECTION: Ecliptic = Ecliptic {
-        spherical: Spherical::Z_DIRECTION,
-    };
+    pub fn Z_DIRECTION() -> Ecliptic {
+        Ecliptic {
+            spherical: Spherical::Z_DIRECTION(),
+        }
+    }
 
     pub const fn new(spherical: Spherical) -> Ecliptic {
         Ecliptic { spherical }
@@ -95,14 +101,12 @@ impl Display for Ecliptic {
 }
 
 #[cfg(test)]
-pub(super) const EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES: Ecliptic =
+pub(super) fn EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES() -> Ecliptic {
     Ecliptic::new(Spherical::new(
-        crate::angle_helper::QUARTER_CIRC,
-        Angle {
-            rad: crate::angle_helper::QUARTER_CIRC.get::<radian>()
-                - crate::angle_helper::EARTH_AXIS_TILT.get::<radian>(),
-        },
-    ));
+        crate::angle_helper::QUARTER_CIRC(),
+        crate::angle_helper::QUARTER_CIRC() - crate::angle_helper::EARTH_AXIS_TILT(),
+    ))
+}
 
 #[cfg(test)]
 mod tests {
@@ -133,7 +137,11 @@ mod tests {
 
                         println!("Expected: {}", angle);
                         println!("Actual: {}", actual_angle);
-                        assert!(angle_eq_within(actual_angle, angle, Angle { rad: 1e-5 }));
+                        assert!(angle_eq_within(
+                            actual_angle,
+                            angle,
+                            Angle::new::<radian>(1e-5)
+                        ));
                     }
                 }
             }

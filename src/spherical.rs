@@ -42,22 +42,28 @@ impl AsRef<Spherical> for Spherical {
 
 impl Spherical {
     /// The x-axis direction represented in spherical coordinates.
-    pub const X_DIRECTION: Spherical = Spherical {
-        longitude: ANGLE_ZERO,
-        latitude: ANGLE_ZERO,
-    };
+    pub fn X_DIRECTION() -> Spherical {
+        Spherical {
+            longitude: ANGLE_ZERO(),
+            latitude: ANGLE_ZERO(),
+        }
+    }
 
     /// The y-axis direction represented in spherical coordinates.
-    pub const Y_DIRECTION: Spherical = Spherical {
-        longitude: QUARTER_CIRC,
-        latitude: ANGLE_ZERO,
-    };
+    pub fn Y_DIRECTION() -> Spherical {
+        Spherical {
+            longitude: QUARTER_CIRC(),
+            latitude: ANGLE_ZERO(),
+        }
+    }
 
     /// The z-axis direction represented in spherical coordinates.
-    pub const Z_DIRECTION: Spherical = Spherical {
-        longitude: ANGLE_ZERO,
-        latitude: QUARTER_CIRC,
-    };
+    pub fn Z_DIRECTION() -> Spherical {
+        Spherical {
+            longitude: ANGLE_ZERO(),
+            latitude: QUARTER_CIRC(),
+        }
+    }
 
     /// Creates a new Spherical struct from longitude and latitude input.
     ///
@@ -90,14 +96,14 @@ impl Spherical {
     pub fn normalize(&mut self) {
         self.longitude = normalized_angle(self.longitude);
         self.latitude = normalized_angle(self.latitude);
-        if self.latitude > QUARTER_CIRC {
-            self.longitude += HALF_CIRC;
+        if self.latitude > QUARTER_CIRC() {
+            self.longitude += HALF_CIRC();
             self.longitude = normalized_angle(self.longitude);
-            self.latitude = HALF_CIRC - self.latitude;
-        } else if self.latitude < -QUARTER_CIRC {
-            self.longitude += HALF_CIRC;
+            self.latitude = HALF_CIRC() - self.latitude;
+        } else if self.latitude < -QUARTER_CIRC() {
+            self.longitude += HALF_CIRC();
             self.longitude = normalized_angle(self.longitude);
-            self.latitude = -HALF_CIRC - self.latitude;
+            self.latitude = -HALF_CIRC() - self.latitude;
         }
     }
 
@@ -113,8 +119,8 @@ impl Spherical {
     /// assert!(c1.eq_within(&c2, Angle::new::<degree>(1.)));
     /// ```
     pub fn eq_within(&self, other: &Self, accuracy: Angle) -> bool {
-        let northpole_latitude = QUARTER_CIRC;
-        let southpole_latitude = -QUARTER_CIRC;
+        let northpole_latitude = QUARTER_CIRC();
+        let southpole_latitude = -QUARTER_CIRC();
         let mut copy = *self;
         let mut other_copy = *other;
         copy.normalize();
@@ -369,13 +375,13 @@ impl PassiveRotation<Spherical> for Spherical {
 }
 
 fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Spherical) -> (Angle, Angle) {
-    let angle_to_old_z = QUARTER_CIRC - new_z.latitude;
+    let angle_to_old_z = QUARTER_CIRC() - new_z.latitude;
     let is_polar = angle_to_old_z.get::<radian>().abs() < 1e-20
-        || (angle_to_old_z - HALF_CIRC).get::<radian>().abs() < 1e-20;
+        || (angle_to_old_z - HALF_CIRC()).get::<radian>().abs() < 1e-20;
     let polar_rotation_angle = if is_polar {
-        Angle { rad: 0. }
+        Angle::new::<radian>(0.)
     } else {
-        QUARTER_CIRC - new_z.longitude
+        QUARTER_CIRC() - new_z.longitude
     };
     (angle_to_old_z, polar_rotation_angle)
 }
@@ -384,7 +390,7 @@ impl Neg for &Spherical {
     type Output = Spherical;
 
     fn neg(self) -> Spherical {
-        let mut longitude = self.longitude + HALF_CIRC;
+        let mut longitude = self.longitude + HALF_CIRC();
         longitude = normalized_angle(longitude);
         let latitude = -self.latitude;
         Spherical {
@@ -425,7 +431,9 @@ mod tests {
     use super::*;
 
     const TEST_ACCURACY: f64 = 1e-5;
-    const ANGLE_TEST_ACCURACY: Angle = Angle { rad: TEST_ACCURACY };
+    fn ANGLE_TEST_ACCURACY() -> Angle {
+        Angle::new::<radian>(TEST_ACCURACY)
+    }
 
     #[test]
     fn test_from_cartesian() {
@@ -440,7 +448,7 @@ mod tests {
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
-        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let cartesian = Cartesian::new(
             Length::new::<meter>(1.),
@@ -453,7 +461,7 @@ mod tests {
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
-        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let cartesian = Cartesian::new(
             Length::new::<meter>(1.),
@@ -466,7 +474,7 @@ mod tests {
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
-        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let cartesian = Cartesian::new(
             Length::new::<meter>(1.),
@@ -479,7 +487,7 @@ mod tests {
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
-        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let cartesian = Cartesian::new(
             Length::new::<meter>(-1.),
@@ -492,7 +500,7 @@ mod tests {
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
-        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let cartesian = Cartesian::new(
             Length::new::<meter>(-1.),
@@ -505,7 +513,7 @@ mod tests {
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
-        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let cartesian = Cartesian::new(
             Length::new::<meter>(-1.),
@@ -518,7 +526,7 @@ mod tests {
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
-        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let cartesian = Cartesian::new(
             Length::new::<meter>(-1.),
@@ -531,29 +539,29 @@ mod tests {
         };
         let actual = cartesian.to_spherical().unwrap();
         println!("{}, expected: {}, actual: {}", cartesian, expected, actual);
-        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(actual.eq_within(&expected, ANGLE_TEST_ACCURACY()));
     }
 
     #[test]
     fn test_unary_minus() {
-        let x = Spherical::X_DIRECTION;
-        let y = Spherical::Y_DIRECTION;
-        let z = Spherical::Z_DIRECTION;
+        let x = Spherical::X_DIRECTION();
+        let y = Spherical::Y_DIRECTION();
+        let z = Spherical::Z_DIRECTION();
         let xyz = Spherical {
             longitude: Angle::new::<radian>(PI / 4.),
             latitude: Angle::new::<radian>(PI / 4.),
         };
         let expected_minus_x = Spherical {
-            longitude: HALF_CIRC,
-            latitude: ANGLE_ZERO,
+            longitude: HALF_CIRC(),
+            latitude: ANGLE_ZERO(),
         };
         let expected_minus_y = Spherical {
-            longitude: -QUARTER_CIRC,
-            latitude: ANGLE_ZERO,
+            longitude: -QUARTER_CIRC(),
+            latitude: ANGLE_ZERO(),
         };
         let expected_minus_z = Spherical {
-            longitude: ANGLE_ZERO,
-            latitude: -QUARTER_CIRC,
+            longitude: ANGLE_ZERO(),
+            latitude: -QUARTER_CIRC(),
         };
         let expected_minus_xyz = Spherical {
             longitude: Angle::new::<radian>(-PI * 3. / 4.),
@@ -562,43 +570,43 @@ mod tests {
 
         let minus_x = -x;
         println!("-x, expected: {}, actual: {}", expected_minus_x, minus_x);
-        assert!(minus_x.eq_within(&expected_minus_x, ANGLE_TEST_ACCURACY));
+        assert!(minus_x.eq_within(&expected_minus_x, ANGLE_TEST_ACCURACY()));
 
         let minus_y = -y;
         println!("-y, expected: {}, actual: {}", expected_minus_y, minus_y);
-        assert!(minus_y.eq_within(&expected_minus_y, ANGLE_TEST_ACCURACY));
+        assert!(minus_y.eq_within(&expected_minus_y, ANGLE_TEST_ACCURACY()));
 
         let minus_z = -z;
         println!("-z, expected: {}, actual: {}", expected_minus_z, minus_z);
-        assert!(minus_z.eq_within(&expected_minus_z, ANGLE_TEST_ACCURACY));
+        assert!(minus_z.eq_within(&expected_minus_z, ANGLE_TEST_ACCURACY()));
 
         let minus_xyz = -xyz;
         println!(
             "-xyz, expected: {}, actual: {}",
             expected_minus_xyz, minus_xyz
         );
-        assert!(minus_xyz.eq_within(&expected_minus_xyz, ANGLE_TEST_ACCURACY));
+        assert!(minus_xyz.eq_within(&expected_minus_xyz, ANGLE_TEST_ACCURACY()));
     }
 
     #[test]
     fn test_eq_within() {
-        const LOCAL_TEST_ANGLE_ACCURACY: Angle = Angle {
-            rad: 10. * TEST_ACCURACY,
-        };
+        fn LOCAL_TEST_ANGLE_ACCURACY() -> Angle {
+            Angle::new::<radian>(10. * TEST_ACCURACY)
+        }
 
         let small_offsets = vec![
-            -LOCAL_TEST_ANGLE_ACCURACY / 100.,
-            ANGLE_ZERO,
-            LOCAL_TEST_ANGLE_ACCURACY / 100.,
+            -LOCAL_TEST_ANGLE_ACCURACY() / 100.,
+            ANGLE_ZERO(),
+            LOCAL_TEST_ANGLE_ACCURACY() / 100.,
         ];
-        let large_offsets = vec![-FULL_CIRC, ANGLE_ZERO, FULL_CIRC, 100. * FULL_CIRC];
+        let large_offsets = vec![-FULL_CIRC(), ANGLE_ZERO(), FULL_CIRC(), 100. * FULL_CIRC()];
         let directions = vec![
-            Spherical::X_DIRECTION,
-            Spherical::Y_DIRECTION,
-            Spherical::Z_DIRECTION,
-            -Spherical::X_DIRECTION,
-            -Spherical::Y_DIRECTION,
-            -Spherical::Z_DIRECTION,
+            Spherical::X_DIRECTION(),
+            Spherical::Y_DIRECTION(),
+            Spherical::Z_DIRECTION(),
+            -Spherical::X_DIRECTION(),
+            -Spherical::Y_DIRECTION(),
+            -Spherical::Z_DIRECTION(),
         ];
         for direction in directions.clone() {
             for small_offset in small_offsets.clone() {
@@ -620,11 +628,11 @@ mod tests {
                         latitude: latitude2,
                     };
                     println!("Expecting {} == {}", direction, coords1);
-                    assert![direction.eq_within(&coords1, LOCAL_TEST_ANGLE_ACCURACY)];
+                    assert![direction.eq_within(&coords1, LOCAL_TEST_ANGLE_ACCURACY())];
                     println!("Expecting {} == {}", direction, coords2);
-                    assert![direction.eq_within(&coords2, LOCAL_TEST_ANGLE_ACCURACY)];
+                    assert![direction.eq_within(&coords2, LOCAL_TEST_ANGLE_ACCURACY())];
                     println!("Expecting {} == {}", direction, coords3);
-                    assert![direction.eq_within(&coords3, LOCAL_TEST_ANGLE_ACCURACY)];
+                    assert![direction.eq_within(&coords3, LOCAL_TEST_ANGLE_ACCURACY())];
                 }
             }
         }
@@ -632,9 +640,9 @@ mod tests {
 
     #[test]
     fn test_normalization_two_pi_offsets() {
-        const LOCAL_TEST_ANGLE_ACCURACY: Angle = Angle {
-            rad: 10. * TEST_ACCURACY,
-        };
+        fn LOCAL_TEST_ANGLE_ACCURACY() -> Angle {
+            Angle::new::<radian>(10. * TEST_ACCURACY)
+        }
 
         let longitudes = vec![
             -0.75 * PI,
@@ -651,7 +659,7 @@ mod tests {
             2. * PI,
         ];
         let latitudes = vec![-0.25 * PI, 0., 0.25 * PI];
-        let offsets = vec![-FULL_CIRC, ANGLE_ZERO, FULL_CIRC, 100. * FULL_CIRC];
+        let offsets = vec![-FULL_CIRC(), ANGLE_ZERO(), FULL_CIRC(), 100. * FULL_CIRC()];
         for longitude in longitudes.clone() {
             for latitude in latitudes.clone() {
                 for offset in offsets.clone() {
@@ -679,9 +687,9 @@ mod tests {
                     coords2.normalize();
                     coords3.normalize();
                     coords4.normalize();
-                    assert!(coords1.eq_within(&coords2, LOCAL_TEST_ANGLE_ACCURACY));
-                    assert!(coords1.eq_within(&coords3, LOCAL_TEST_ANGLE_ACCURACY));
-                    assert!(coords1.eq_within(&coords4, LOCAL_TEST_ANGLE_ACCURACY));
+                    assert!(coords1.eq_within(&coords2, LOCAL_TEST_ANGLE_ACCURACY()));
+                    assert!(coords1.eq_within(&coords3, LOCAL_TEST_ANGLE_ACCURACY()));
+                    assert!(coords1.eq_within(&coords4, LOCAL_TEST_ANGLE_ACCURACY()));
                 }
             }
         }
@@ -690,55 +698,55 @@ mod tests {
     #[test]
     fn test_normalization_crossing_poles() {
         let mut coord = Spherical {
-            longitude: ANGLE_ZERO,
+            longitude: ANGLE_ZERO(),
             latitude: Angle::new::<radian>(3. / 4. * PI),
         };
         let expected = Spherical {
-            longitude: HALF_CIRC,
+            longitude: HALF_CIRC(),
             latitude: Angle::new::<radian>(PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
-        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let mut coord = Spherical {
-            longitude: ANGLE_ZERO,
+            longitude: ANGLE_ZERO(),
             latitude: Angle::new::<radian>(-3. / 4. * PI),
         };
         let expected = Spherical {
-            longitude: HALF_CIRC,
+            longitude: HALF_CIRC(),
             latitude: Angle::new::<radian>(-PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
-        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let mut coord = Spherical {
-            longitude: HALF_CIRC,
+            longitude: HALF_CIRC(),
             latitude: Angle::new::<radian>(3. / 4. * PI),
         };
         let expected = Spherical {
-            longitude: ANGLE_ZERO,
+            longitude: ANGLE_ZERO(),
             latitude: Angle::new::<radian>(PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
-        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let mut coord = Spherical {
-            longitude: HALF_CIRC,
+            longitude: HALF_CIRC(),
             latitude: Angle::new::<radian>(-3. / 4. * PI),
         };
         let expected = Spherical {
-            longitude: ANGLE_ZERO,
+            longitude: ANGLE_ZERO(),
             latitude: Angle::new::<radian>(-PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
-        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let mut coord = Spherical {
-            longitude: QUARTER_CIRC,
+            longitude: QUARTER_CIRC(),
             latitude: Angle::new::<radian>(3. / 4. * PI),
         };
         let expected = Spherical {
@@ -747,10 +755,10 @@ mod tests {
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
-        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let mut coord = Spherical {
-            longitude: QUARTER_CIRC,
+            longitude: QUARTER_CIRC(),
             latitude: Angle::new::<radian>(-3. / 4. * PI),
         };
         let expected = Spherical {
@@ -759,24 +767,24 @@ mod tests {
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
-        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY()));
 
         let mut coord = Spherical {
             longitude: Angle::new::<radian>(3. / 2. * PI),
             latitude: Angle::new::<radian>(3. / 4. * PI),
         };
         let expected = Spherical {
-            longitude: QUARTER_CIRC,
+            longitude: QUARTER_CIRC(),
             latitude: Angle::new::<radian>(PI / 4.),
         };
         coord.normalize();
         println!("expected: {}, actual: {}", expected, coord);
-        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY));
+        assert!(coord.eq_within(&expected, ANGLE_TEST_ACCURACY()));
     }
 
     #[test]
     fn roundtrips_to_ra_and_dec() {
-        let local_test_accuracy = 10. * ANGLE_TEST_ACCURACY;
+        let local_test_accuracy = 10. * ANGLE_TEST_ACCURACY();
         const STEP: usize = 100;
         for i in 0..STEP {
             for j in 0..STEP {

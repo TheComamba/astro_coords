@@ -411,14 +411,14 @@ impl PassiveRotation<Cartesian> for Cartesian {
 fn get_angle_to_old_z_and_polar_rotation_angle(new_z: &Cartesian) -> (Angle, Angle) {
     let angle_to_old_z = match new_z.angle_to(&Cartesian::Z_DIRECTION) {
         Ok(angle) => angle,
-        Err(_) => return (ANGLE_ZERO, ANGLE_ZERO),
+        Err(_) => return (ANGLE_ZERO(), ANGLE_ZERO()),
     };
 
     let axis_projected_onto_xy_plane = Cartesian::new(new_z.x, new_z.y, Distance { m: 0. });
     let mut polar_rotation_angle =
         match axis_projected_onto_xy_plane.angle_to(&Cartesian::Y_DIRECTION) {
             Ok(angle) => angle,
-            Err(_) => return (ANGLE_ZERO, ANGLE_ZERO),
+            Err(_) => return (ANGLE_ZERO(), ANGLE_ZERO()),
         };
     if axis_projected_onto_xy_plane.x.m < 0. {
         polar_rotation_angle = -polar_rotation_angle;

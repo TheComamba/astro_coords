@@ -84,7 +84,7 @@ mod tests {
                     }
                     let axis = axis.unwrap();
 
-                    let coordinates = Equatorial::new(Spherical::Z_DIRECTION, axis.clone());
+                    let coordinates = Equatorial::new(Spherical::Z_DIRECTION(), axis.clone());
                     let expected = axis;
                     let actual = coordinates.to_direction();
                     println!("expected: {},\n actual: {}", expected, actual);
@@ -106,7 +106,7 @@ mod tests {
                     }
                     let axis = axis.unwrap();
 
-                    let coordinates = Equatorial::new(-Spherical::Z_DIRECTION, axis.clone());
+                    let coordinates = Equatorial::new(-Spherical::Z_DIRECTION(), axis.clone());
                     let expected = -&axis;
                     let actual = coordinates.to_direction();
                     println!("expected: {},\n actual: {}", expected, actual);
@@ -128,7 +128,7 @@ mod tests {
                     }
                     let axis = axis.unwrap();
 
-                    let coordinates = Equatorial::new(Spherical::X_DIRECTION, axis);
+                    let coordinates = Equatorial::new(Spherical::X_DIRECTION(), axis);
                     let direction = coordinates.to_direction();
                     assert!(direction.z().abs() < TEST_ACCURACY);
                 }
@@ -148,7 +148,7 @@ mod tests {
                     }
                     let axis = axis.unwrap();
 
-                    let coordinates = Equatorial::new(-Spherical::X_DIRECTION, axis);
+                    let coordinates = Equatorial::new(-Spherical::X_DIRECTION(), axis);
                     let direction = coordinates.to_direction();
                     assert!(direction.z().abs() < TEST_ACCURACY);
                 }
@@ -159,7 +159,7 @@ mod tests {
     #[test]
     fn behaves_like_earth_equatorial() {
         let ordinates: Vec<f64> = vec![-1., 0., 1., 10.];
-        let earth_north = EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES
+        let earth_north = EARTH_NORTH_POLE_IN_ECLIPTIC_COORDINATES()
             .spherical
             .to_direction();
 
@@ -184,13 +184,13 @@ mod tests {
     fn axis_tilted_to_y() {
         let axis = Direction::Y;
 
-        let equatorial_x = Equatorial::new(Spherical::X_DIRECTION, axis.clone());
+        let equatorial_x = Equatorial::new(Spherical::X_DIRECTION(), axis.clone());
         let expected = Direction::X;
         let actual = equatorial_x.to_direction();
         println!("expected: {},\n actual: {}", expected, actual);
         assert!(actual.eq_within(&expected, TEST_ACCURACY));
 
-        let equatorial_y = Equatorial::new(Spherical::Y_DIRECTION, axis.clone());
+        let equatorial_y = Equatorial::new(Spherical::Y_DIRECTION(), axis.clone());
         let expected = -&Direction::Z;
         let actual = equatorial_y.to_direction();
         println!("expected: {},\n actual: {}", expected, actual);
@@ -201,13 +201,13 @@ mod tests {
     fn axis_tilted_to_x() {
         let axis = Direction::X;
 
-        let equatorial_x = Equatorial::new(Spherical::X_DIRECTION, axis.clone());
+        let equatorial_x = Equatorial::new(Spherical::X_DIRECTION(), axis.clone());
         let expected = -&Direction::Y;
         let actual = equatorial_x.to_direction();
         println!("expected: {},\n actual: {}", expected, actual);
         assert!(actual.eq_within(&expected, TEST_ACCURACY));
 
-        let equatorial_y = Equatorial::new(Spherical::Y_DIRECTION, axis.clone());
+        let equatorial_y = Equatorial::new(Spherical::Y_DIRECTION(), axis.clone());
         let expected = -&Direction::Z;
         let actual = equatorial_y.to_direction();
         println!("expected: {},\n actual: {}", expected, actual);

@@ -60,7 +60,7 @@ mod tests {
     fn objects_along_the_new_x_axis_have_no_y_component() {
         let ordinates = vec![0., 1., -1., 12.];
         let angles = vec![
-            ANGLE_ZERO,
+            ANGLE_ZERO(),
             Angle::new::<radian>(1.),
             Angle::new::<radian>(-1.),
             Angle::new::<radian>(12.),
@@ -142,7 +142,7 @@ mod tests {
 
                     let new = direction_relative_to_normal(&orig, &Direction::Z, &-&Direction::X);
 
-                    let expected = orig.rotated(HALF_CIRC, &Direction::Z);
+                    let expected = orig.rotated(HALF_CIRC(), &Direction::Z);
 
                     assert!(new.eq_within(&expected, TEST_ACCURACY));
                 }
@@ -164,7 +164,7 @@ mod tests {
 
                     let new = direction_relative_to_normal(&orig, &-&Direction::Z, &Direction::X);
 
-                    let expected = orig.rotated(HALF_CIRC, &Direction::X);
+                    let expected = orig.rotated(HALF_CIRC(), &Direction::X);
 
                     assert!(new.eq_within(&expected, TEST_ACCURACY));
                 }

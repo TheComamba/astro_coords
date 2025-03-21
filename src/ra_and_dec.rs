@@ -155,6 +155,8 @@ impl Display for Declination {
 
 #[cfg(test)]
 mod tests {
+    use uom::si::angle::radian;
+
     use crate::angle_helper::{angle_eq_within, test::*};
 
     use super::*;
@@ -168,7 +170,7 @@ mod tests {
         assert!(angle_eq_within(
             dec.to_angle(),
             expected,
-            Angle { rad: 1e-5 }
+            Angle::new::<radian>(1e-5)
         ));
     }
 
