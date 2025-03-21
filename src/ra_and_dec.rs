@@ -11,6 +11,7 @@ use uom::si::{angle::degree, f64::Angle};
 ///
 /// # Examples
 /// ```
+/// use uom::si::angle::degree;
 /// use astro_coords::ra_and_dec::RightAscension;
 ///
 /// let ra = RightAscension::new(1, 2, 3.456);
@@ -46,6 +47,7 @@ pub struct RightAscension {
 ///
 /// # Examples
 /// ```
+/// use uom::si::angle::degree;
 /// use astro_coords::ra_and_dec::{Declination, Sgn};
 ///
 /// let dec = Declination::new(Sgn::Pos, 1, 2, 3.456);

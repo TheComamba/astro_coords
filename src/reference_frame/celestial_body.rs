@@ -24,7 +24,9 @@ use crate::{
 /// # Examples
 /// ```
 /// use uom::si::f64::Angle;
-/// use simple_si_units::base::Time;
+/// use uom::si::f64::Time;
+/// use uom::si::angle::degree;
+/// use uom::si::time::day;
 /// use astro_coords::reference_frame::{CelestialBody, RotationalElements};
 /// use astro_coords::spherical::Spherical;
 ///
@@ -38,18 +40,18 @@ use crate::{
 /// let custom_dec = Angle::new::<degree>(119.24);
 /// let custom_z = Spherical::new(custom_ra, custom_dec);
 /// let custom_prime_meridian_offset = Angle::new::<degree>(23.0);
-/// let custom_prime_meridian_rate = Angle::new::<degree>(40.0) / Time::from_days(1.0);
+/// let custom_prime_meridian_rate = Angle::new::<degree>(40.0) / Time::new::<day>(1.0);
 /// let custom_rotational_elements = RotationalElements {
 ///     z_axis: custom_z,
 ///     prime_meridian_offset_offset: custom_prime_meridian_offset,
-///     prime_meridian_offset_rate: custom_prime_meridian_rate,
+///     prime_meridian_offset_rate: custom_prime_meridian_rate.into(),
 /// };
 /// let custom_body = CelestialBody::Custom(custom_rotational_elements);
 /// let z = custom_body.z_axis();
 /// let (ra, dec) = (z.longitude, z.latitude);
 /// assert!((ra-custom_ra).get::<degree>() < 1e-5);
 /// assert!((dec-custom_dec).get::<degree>() < 1e-5);
-/// let time = Time::from_days(1.0);
+/// let time = Time::new::<day>(1.0);
 /// let offset = custom_body.prime_meridian_offset(time);
 /// let expected_offset = Angle::new::<degree>(23.0) + Angle::new::<degree>(40.0);
 /// assert!((offset-expected_offset).get::<degree>().abs() < 1e-5);
@@ -137,11 +139,13 @@ impl CelestialBody {
     ///
     /// # Example
     /// ```
-    /// use simple_si_units::base::Time;
+    /// use uom::si::f64::Time;
+    /// use uom::si::angle::degree;
+    /// use uom::si::time::day;
     /// use astro_coords::reference_frame::CelestialBody;
     ///
     /// // Vernal equinox was on the 20th of March 2000, which is 79 days after the J2000 epoch.
-    /// let time_between_j2000_and_vernal_equinox = Time::from_days(79.);
+    /// let time_between_j2000_and_vernal_equinox = Time::new::<day>(79.);
     /// // At the vernal equinox, the prime meridian offset of the earth is roughly 0.
     /// let prime_meridian_offset = CelestialBody::Earth.prime_meridian_offset(time_between_j2000_and_vernal_equinox);
     /// // It is not exactly 0, because it is not guaranteed that the moment of vernal equinox is exactly at 12:00:00 TT.

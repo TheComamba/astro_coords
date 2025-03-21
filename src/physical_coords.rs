@@ -187,6 +187,7 @@ where
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::traits::*;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     ///
     /// // As an example, the position of the star Sirius is expressed in various reference frames.
     /// // The values are taken from [NASA's HEASARC Object Position Finder Tool](https://heasarc.gsfc.nasa.gov/cgi-bin/Tools/convcoord/convcoord.pl?CoordVal=Sirius&CoordType=J2000&Resolver=GRB%2FSIMBAD%2BSesame%2FNED&NoCache=on&Epoch=)

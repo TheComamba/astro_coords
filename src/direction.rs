@@ -89,6 +89,7 @@ impl Direction {
     /// # Example
     /// ```
     /// use uom::si::f64::Length;
+    /// use uom::si::length::meter;
     /// use astro_coords::{direction::Direction, cartesian::Cartesian};
     ///
     /// let direction = Direction::new(1., 1., 1.).unwrap();
@@ -107,6 +108,7 @@ impl Direction {
     /// # Example
     /// ```
     /// use astro_coords::direction::Direction;
+    /// use uom::si::angle::degree;
     ///
     /// let direction = Direction::X;
     /// let spherical = direction.to_spherical();
@@ -164,6 +166,7 @@ impl Direction {
     ///
     /// # Example
     /// ```
+    /// use uom::si::angle::degree;
     /// use astro_coords::direction::Direction;
     ///
     /// let direction = Direction::X;
@@ -183,6 +186,7 @@ impl Direction {
     ///
     /// # Example
     /// ```
+    /// use uom::si::angle::degree;
     /// use astro_coords::direction::Direction;
     ///
     /// let direction = Direction::new(1., 2., 3.).unwrap();
@@ -260,6 +264,7 @@ impl ActiveRotation<Direction> for Direction {
     /// # Example
     /// ```
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::X;
@@ -280,6 +285,7 @@ impl ActiveRotation<Direction> for Direction {
     /// # Example
     /// ```
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::Y;
@@ -299,6 +305,7 @@ impl ActiveRotation<Direction> for Direction {
     /// # Example
     /// ```
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::Z;
@@ -318,6 +325,7 @@ impl ActiveRotation<Direction> for Direction {
     /// # Example
     /// ```
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// let direction = Direction::X;
@@ -359,6 +367,7 @@ impl PassiveRotation<Direction> for Direction {
     /// # Example
     /// ```
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     /// use astro_coords::{direction::Direction, traits::*};
     ///
     /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.

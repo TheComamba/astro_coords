@@ -35,6 +35,7 @@ use super::{
 /// # Examples
 /// ```
 /// use uom::si::f64::Length;
+/// use uom::si::length::meter;
 /// use astro_coords::cartesian::Cartesian;
 ///
 /// let c1 = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(2.), Length::new::<meter>(3.));
@@ -123,6 +124,7 @@ impl Cartesian {
     /// # Examples
     /// ```
     /// use uom::si::f64::Length;
+    /// use uom::si::length::meter;
     /// use astro_coords::cartesian::Cartesian;
     ///
     /// let c1 = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(2.), Length::new::<meter>(3.));
@@ -143,6 +145,7 @@ impl Cartesian {
     /// # Examples
     /// ```
     /// use uom::si::f64::Length;
+    /// use uom::si::length::meter;
     /// use astro_coords::cartesian::Cartesian;
     ///
     /// let coordinates = Cartesian::new(Length::new::<meter>(3.), Length::new::<meter>(4.), Length::new::<meter>(5.));
@@ -160,10 +163,12 @@ impl Cartesian {
     /// # Examples
     /// ```
     /// use uom::si::f64::Length;
+    /// use uom::si::length::meter;
+    /// use uom::si::area::square_meter;
     /// use astro_coords::cartesian::Cartesian;
     ///
     /// let coordinates = Cartesian::new(Length::new::<meter>(3.), Length::new::<meter>(4.), Length::new::<meter>(5.));
-    /// assert!((coordinates.length_squared().to_m2() - 50.).abs() < 1e-5);
+    /// assert!((coordinates.length_squared().get::<square_meter>() - 50.).abs() < 1e-5);
     /// ```
     pub fn length_squared(&self) -> Area {
         let x = self.x;
@@ -177,6 +182,7 @@ impl Cartesian {
     /// # Examples
     /// ```
     /// use uom::si::f64::Length;
+    /// use uom::si::length::meter;
     /// use astro_coords::cartesian::Cartesian;
     ///
     /// let c1 = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(2.), Length::new::<meter>(3.));
@@ -194,6 +200,8 @@ impl Cartesian {
     /// ```
     /// use uom::si::f64::Length;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
+    /// use uom::si::length::meter;
     /// use astro_coords::cartesian::Cartesian;
     ///
     /// let c1 = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(0.), Length::new::<meter>(0.));
@@ -230,6 +238,7 @@ impl Cartesian {
     /// # Examples
     /// ```
     /// use uom::si::f64::Length;
+    /// use uom::si::length::meter;
     /// use astro_coords::cartesian::Cartesian;
     ///
     /// let coordinates = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(1.), Length::new::<meter>(0.));
@@ -271,6 +280,8 @@ impl Cartesian {
     /// # Examples
     /// ```
     /// use uom::si::f64::Length;
+    /// use uom::si::angle::degree;
+    /// use uom::si::length::meter;
     /// use astro_coords::cartesian::Cartesian;
     ///
     /// let coordinates = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(1.), Length::new::<meter>(0.));
@@ -294,6 +305,8 @@ impl ActiveRotation<Cartesian> for Cartesian {
     /// ```
     /// use uom::si::f64::Length;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
+    /// use uom::si::length::meter;
     /// use astro_coords::{cartesian::Cartesian, direction::Direction, traits::*};
     ///
     /// let coordinates = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(0.), Length::new::<meter>(0.));
@@ -316,6 +329,8 @@ impl ActiveRotation<Cartesian> for Cartesian {
     /// ```
     /// use uom::si::f64::Length;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
+    /// use uom::si::length::meter;
     /// use astro_coords::{cartesian::Cartesian, traits::*};
     ///
     /// let coordinates = Cartesian::new(Length::new::<meter>(0.), Length::new::<meter>(1.), Length::new::<meter>(0.));
@@ -337,6 +352,8 @@ impl ActiveRotation<Cartesian> for Cartesian {
     /// ```
     /// use uom::si::f64::Length;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
+    /// use uom::si::length::meter;
     /// use astro_coords::{cartesian::Cartesian, traits::*};
     ///
     /// let coordinates = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(0.), Length::new::<meter>(0.));
@@ -358,6 +375,8 @@ impl ActiveRotation<Cartesian> for Cartesian {
     /// ```
     /// use uom::si::f64::Length;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
+    /// use uom::si::length::meter;
     /// use astro_coords::{cartesian::Cartesian, traits::*};
     ///
     /// let coordinates = Cartesian::new(Length::new::<meter>(1.), Length::new::<meter>(0.), Length::new::<meter>(0.));
@@ -401,23 +420,24 @@ impl PassiveRotation<Cartesian> for Cartesian {
     /// ```
     /// use astro_coords::{cartesian::Cartesian, traits::*};
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     ///
     /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
-    /// let dir_of_sun_in_ecliptic = Cartesian::Y_DIRECTION;
+    /// let dir_of_sun_in_ecliptic = Cartesian::y_direction();
     ///
     /// // Now we want to express the sun's direction in earth equatorial coordinates.
     /// // The rotation axis of the earth expressed in ecliptic coordinates is given by:
     /// let earth_axis_tilt = Angle::new::<degree>(23.44);
-    /// let earth_rotation_axis_in_ecliptic = Cartesian::Z_DIRECTION.rotated_x(-earth_axis_tilt);
+    /// let earth_rotation_axis_in_ecliptic = Cartesian::z_direction().rotated_x(-earth_axis_tilt);
     ///
     /// // The sun's direction in earth equatorial coordinates is then:
     /// let dir_of_sun_in_equatorial = dir_of_sun_in_ecliptic.passive_rotation_to_new_z_axis(&earth_rotation_axis_in_ecliptic);
     ///
     /// // At summer solstice, the sun is highest in the sky in the northern hemisphere, so its x-projection is zero, and its y- and z-projection are both positive.
     /// println!("{}", dir_of_sun_in_equatorial);
-    /// assert!(dir_of_sun_in_equatorial.x.m.abs() < 1e-5);
-    /// assert!(dir_of_sun_in_equatorial.y.m > 0.);
-    /// assert!(dir_of_sun_in_equatorial.z.m > 0.);
+    /// assert!(dir_of_sun_in_equatorial.x.value.abs() < 1e-5);
+    /// assert!(dir_of_sun_in_equatorial.y.value > 0.);
+    /// assert!(dir_of_sun_in_equatorial.z.value > 0.);
     /// ```
     fn passive_rotation_to_new_z_axis(&self, new_z: &Cartesian) -> Cartesian {
         let (angle_to_old_z, polar_rotation_angle) =

@@ -86,6 +86,7 @@ impl Spherical {
     /// ```
     /// use astro_coords::spherical::Spherical;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     ///
     /// let mut coords = Spherical::new(Angle::new::<degree>(190.), Angle::new::<degree>(0.));
     /// coords.normalize();
@@ -116,6 +117,7 @@ impl Spherical {
     /// ```
     /// use astro_coords::spherical::Spherical;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     ///
     /// let mut c1 = Spherical::new(Angle::new::<degree>(10.), Angle::new::<degree>(100.));
     /// let mut c2 = Spherical::new(Angle::new::<degree>(-170.), Angle::new::<degree>(80.));
@@ -148,11 +150,12 @@ impl Spherical {
     /// ```
     /// use astro_coords::spherical::Spherical;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     ///
     /// let a = Spherical::new(Angle::new::<degree>(0.), Angle::new::<degree>(0.));
     /// let b = Spherical::new(Angle::new::<degree>(90.), Angle::new::<degree>(0.));
     /// let angle = a.angle_to(&b);
-    /// assert!((angle - Angle::new::<degree>(90.)).get::<radian>().abs() < 1e-5);
+    /// assert!((angle - Angle::new::<degree>(90.)).abs().value < 1e-5);
     /// ```
     pub fn angle_to(&self, other: &Self) -> Angle {
         let lat_diff = other.latitude - self.latitude;
@@ -191,9 +194,9 @@ impl Spherical {
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::direction::Direction;
     ///
-    /// let x = Spherical::X_DIRECTION.to_direction();
-    /// let y = Spherical::Y_DIRECTION.to_direction();
-    /// let z = Spherical::Z_DIRECTION.to_direction();
+    /// let x = Spherical::x_direction().to_direction();
+    /// let y = Spherical::y_direction().to_direction();
+    /// let z = Spherical::z_direction().to_direction();
     /// assert!(x.eq_within(&Direction::X, 1e-5));
     /// assert!(y.eq_within(&Direction::Y, 1e-5));
     /// assert!(z.eq_within(&Direction::Z, 1e-5));
@@ -256,10 +259,11 @@ impl ActiveRotation<Spherical> for Spherical {
     /// use astro_coords::direction::Direction;
     /// use astro_coords::traits::*;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     ///
-    /// let mut coords = Spherical::X_DIRECTION;
+    /// let mut coords = Spherical::x_direction();
     /// let rotated = coords.rotated(Angle::new::<degree>(90.), &Direction::Z);
-    /// assert!(rotated.eq_within(&Spherical::Y_DIRECTION, Angle::new::<degree>(1e-5)));
+    /// assert!(rotated.eq_within(&Spherical::y_direction(), Angle::new::<degree>(1e-5)));
     /// ```
     fn rotated(&self, angle: Angle, axis: &Direction) -> Spherical {
         self.to_direction().rotated(angle, axis).to_spherical()
@@ -274,10 +278,11 @@ impl ActiveRotation<Spherical> for Spherical {
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::traits::*;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     ///
-    /// let mut coords = Spherical::Y_DIRECTION;
+    /// let mut coords = Spherical::y_direction();
     /// let rotated = coords.rotated_x(Angle::new::<degree>(90.));
-    /// assert!((rotated.eq_within(&Spherical::Z_DIRECTION, Angle::new::<degree>(1e-5))));
+    /// assert!((rotated.eq_within(&Spherical::z_direction(), Angle::new::<degree>(1e-5))));
     /// ```
     fn rotated_x(&self, angle: Angle) -> Spherical {
         self.to_direction().rotated_x(angle).to_spherical()
@@ -292,10 +297,11 @@ impl ActiveRotation<Spherical> for Spherical {
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::traits::*;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     ///
-    /// let mut coords = Spherical::Z_DIRECTION;
+    /// let mut coords = Spherical::z_direction();
     /// let rotated = coords.rotated_y(Angle::new::<degree>(90.));
-    /// assert!((rotated.eq_within(&Spherical::X_DIRECTION, Angle::new::<degree>(1e-5))));
+    /// assert!((rotated.eq_within(&Spherical::x_direction(), Angle::new::<degree>(1e-5))));
     /// ```
     fn rotated_y(&self, angle: Angle) -> Spherical {
         self.to_direction().rotated_y(angle).to_spherical()
@@ -310,10 +316,11 @@ impl ActiveRotation<Spherical> for Spherical {
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::traits::*;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     ///
-    /// let mut coords = Spherical::X_DIRECTION;
+    /// let mut coords = Spherical::x_direction();
     /// let rotated = coords.rotated_z(Angle::new::<degree>(90.));
-    /// assert!((rotated.eq_within(&Spherical::Y_DIRECTION, Angle::new::<degree>(1e-5))));
+    /// assert!((rotated.eq_within(&Spherical::y_direction(), Angle::new::<degree>(1e-5))));
     /// ```
     fn rotated_z(&self, angle: Angle) -> Spherical {
         let mut rotated = self.clone();
@@ -352,14 +359,15 @@ impl PassiveRotation<Spherical> for Spherical {
     /// use astro_coords::spherical::Spherical;
     /// use astro_coords::traits::*;
     /// use uom::si::f64::Angle;
+    /// use uom::si::angle::degree;
     ///
     /// // Suppose it is summer solstice and the sun is in y-direction in the ecliptic coordinate system.
-    /// let dir_of_sun_in_ecliptic = Spherical::Y_DIRECTION;
+    /// let dir_of_sun_in_ecliptic = Spherical::y_direction();
     ///
     /// // Now we want to express the sun's direction in earth equatorial coordinates.
     /// // The rotation axis of the earth expressed in ecliptic coordinates is given by:
     /// let earth_axis_tilt = Angle::new::<degree>(23.44);
-    /// let earth_rotation_axis_in_ecliptic = Spherical::Z_DIRECTION.rotated_x(-earth_axis_tilt);
+    /// let earth_rotation_axis_in_ecliptic = Spherical::z_direction().rotated_x(-earth_axis_tilt);
     ///
     /// // The sun's direction in earth equatorial coordinates is then:
     /// let dir_of_sun_in_equatorial = dir_of_sun_in_ecliptic.passive_rotation_to_new_z_axis(&earth_rotation_axis_in_ecliptic);

@@ -91,6 +91,8 @@ where
 /// # Example
 /// ```
 /// use uom::si::f64::Angle;
+/// use uom::si::angle::degree;
+/// use uom::si::length::meter;
 /// use astro_coords::direction::Direction;
 /// use astro_coords::transformations::rotations::get_rotation_parameters;
 ///
