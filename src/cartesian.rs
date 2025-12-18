@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use uom::si::{
     area::square_meter,
     f64::{Angle, Area, Length},
-    length::{kilometer, meter, parsec},
+    length::{astronomical_unit, kilometer, meter, parsec},
 };
 
 use crate::{
@@ -19,7 +19,6 @@ use crate::{
     equatorial::Equatorial,
     error::AstroCoordsError,
     traits::*,
-    units::au,
 };
 
 use super::{
@@ -596,13 +595,13 @@ impl Display for Cartesian {
                 self.y.get::<parsec>(),
                 self.z.get::<parsec>()
             )
-        } else if length.get::<au>() > 0.1 {
+        } else if length.get::<astronomical_unit>() > 0.1 {
             write!(
                 f,
                 "({:.2} AU, {:.2} AU, {:.2} AU)",
-                self.x.get::<au>(),
-                self.y.get::<au>(),
-                self.z.get::<au>()
+                self.x.get::<astronomical_unit>(),
+                self.y.get::<astronomical_unit>(),
+                self.z.get::<astronomical_unit>()
             )
         } else {
             write!(
