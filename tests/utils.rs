@@ -2,7 +2,7 @@
 
 use std::f64::consts::PI;
 
-use rand::{Rng, SeedableRng, rngs::StdRng};
+use rand::{SeedableRng, rngs::StdRng};
 
 use astro_coords::{
     cartesian::Cartesian, direction::Direction, earth_equatorial::EarthEquatorial,
@@ -221,6 +221,7 @@ pub mod examples {
 #[cfg(test)]
 pub mod benchmarks {
 
+    use rand::RngExt;
     use uom::si::{
         angle::radian,
         f64::{Angle, Length, Time},
